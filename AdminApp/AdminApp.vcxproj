@@ -185,10 +185,11 @@
   <ItemGroup>
     <ClInclude Include="AdminApp.h" />
     <ClInclude Include="AdminAppDlg.h" />
+    <ClInclude Include="CAbout.h" />
     <ClInclude Include="CDelete.h" />
     <ClInclude Include="CInsert.h" />
     <ClInclude Include="CSearch.h" />
-    <ClInclude Include="CUpdate.h" />
+    <ClInclude Include="CUpdateDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -197,10 +198,11 @@
   <ItemGroup>
     <ClCompile Include="AdminApp.cpp" />
     <ClCompile Include="AdminAppDlg.cpp" />
+    <ClCompile Include="CAbout.cpp" />
     <ClCompile Include="CDelete.cpp" />
     <ClCompile Include="CInsert.cpp" />
     <ClCompile Include="CSearch.cpp" />
-    <ClCompile Include="CUpdate.cpp" />
+    <ClCompile Include="CUpdateDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

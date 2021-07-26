@@ -36,13 +36,16 @@
     <ClInclude Include="CInsert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CUpdate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CDelete.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CUpdateDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAbout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,13 +62,16 @@
     <ClCompile Include="CInsert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CUpdate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CSearch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CDelete.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CUpdateDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAbout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

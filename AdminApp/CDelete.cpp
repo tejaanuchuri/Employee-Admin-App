@@ -44,7 +44,7 @@ END_MESSAGE_MAP()
 void CDelete::OnBnClickedButtonDelete()
 {
 	UpdateData(TRUE); // flow direction database <- ui
-	//if (dlg.DoModal() == IDD_DIALOG_INSERT) {
+
 	CString id = DEmployeeNumber;
 
 	CDatabase database;

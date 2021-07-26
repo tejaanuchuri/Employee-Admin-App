@@ -34,18 +34,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrl emp_list;
-	CButton c_insert;
-	int v_insert;
-	CButton c_update;
-	int v_update;
-	CButton c_search;
-	int v_search;
-	CButton c_delete;
-	int v_delete;
-	afx_msg void OnBnClickedRadioInsert();
-	afx_msg void OnBnClickedRadioUpdate();
-	afx_msg void OnBnClickedRadioSearch();
-	afx_msg void OnBnClickedRadioDelete();
-	afx_msg void OnBnClickedButtonSubmit();
+	int row;
 	afx_msg void OnBnClickedButtonInsert();
+	afx_msg void OnBnClickedButtonUpdate();
+	afx_msg void OnBnClickedButtonSearch();
+	afx_msg void OnBnClickedButtonDelete();
+	afx_msg void OnFileClose();
+	afx_msg void OnAboutAdminapp();
 };

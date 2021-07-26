@@ -15,6 +15,7 @@
 // CAdminAppApp
 
 BEGIN_MESSAGE_MAP(CAdminAppApp, CWinApp)
+	ON_COMMAND(ID_FILE_CLOSE32771, &CAdminAppApp::OnFileClose32771)
 END_MESSAGE_MAP()
 
 
@@ -61,3 +62,9 @@ BOOL CAdminAppApp::InitInstance()
 
 
 
+
+
+void CAdminAppApp::OnFileClose32771()
+{
+	// TODO: Add your command handler code here
+}

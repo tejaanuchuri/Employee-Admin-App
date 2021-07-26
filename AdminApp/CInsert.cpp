@@ -10,7 +10,6 @@
 #include "odbcinst.h"
 #include "afxdb.h"
 #include "AdminAppDlg.h"
-// CInsert dialog
 
 IMPLEMENT_DYNAMIC(CInsert, CDialogEx)
 
@@ -75,7 +74,7 @@ END_MESSAGE_MAP()
 void CInsert::OnBnClickedButtonInsert()
 {
 	UpdateData(TRUE); // flow direction database <- ui
-	//if (dlg.DoModal() == IDD_DIALOG_INSERT) {
+
 
 	CDatabase database;
 	CString sDsn;

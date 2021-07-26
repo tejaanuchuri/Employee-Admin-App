@@ -88,7 +88,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -190,6 +190,8 @@
     <ClInclude Include="CInsert.h" />
     <ClInclude Include="CSearch.h" />
     <ClInclude Include="CUpdateDlg.h" />
+    <ClInclude Include="external\GraphCtrl.h" />
+    <ClInclude Include="external\MyStatic.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -203,6 +205,8 @@
     <ClCompile Include="CInsert.cpp" />
     <ClCompile Include="CSearch.cpp" />
     <ClCompile Include="CUpdateDlg.cpp" />
+    <ClCompile Include="external\GraphCtrl.cpp" />
+    <ClCompile Include="external\MyStatic.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

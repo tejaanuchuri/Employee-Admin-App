@@ -48,6 +48,12 @@
     <ClInclude Include="CAbout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="external\GraphCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\MyStatic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdminApp.cpp">
@@ -72,6 +78,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CAbout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="external\GraphCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="external\MyStatic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,6 +17,8 @@
 #define new DEBUG_NEW
 #endif
 #include "CAbout.h"
+#include <vector>
+#include <stdlib.h>
 
 
 // CAdminAppDlg dialog
@@ -26,7 +28,9 @@
 CAdminAppDlg::CAdminAppDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_ADMINAPP_DIALOG, pParent)
 	, row(-1)
+	, m_iYScale(0)
 {
+	m_iYScale = 1;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -34,6 +38,7 @@ void CAdminAppDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_EMP, emp_list);
+	DDX_Control(pDX, IDC_STATIC_GRAPH_CHART, m_Graph);
 }
 
 BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
@@ -60,6 +65,70 @@ BOOL CAdminAppDlg::OnInitDialog()
 	m_Menu.LoadMenu(IDR_MENU1);
 	SetMenu(&m_Menu);
 	emp_data_load();
+
+	UpdateData(FALSE); // flow direction database -> ui
+
+	CString e_id;
+	CString e_age;
+
+	CDatabase database;
+	CString sDsn;
+	CString SqlString;
+	int n = 0;
+	CString s_id[100];
+	CString s_Age[100];
+	// Build ODBC connection string
+
+	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
+	TRY{
+		// Open the database
+		CRecordset recset(&database);
+		database.Open(NULL,false,false,sDsn);
+	SqlString = L"SELECT EmpID,Age FROM EmployeeTable";
+
+	//AfxMessageBox(SqlString);
+
+	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+	while (!recset.IsEOF()) {
+
+		// Copy each column into a variable
+		recset.GetFieldValue(L"EmpID", e_id);
+		recset.GetFieldValue(L"Age", e_age);
+		s_id[n].Insert(n, e_id);
+		s_Age[n].Insert(n, e_age);
+			n++;
+			recset.MoveNext();
+	}
+	database.Close();
+	}CATCH(CDBException, e) {
+		// If a database exception occured, show error msg
+		AfxMessageBox(L"Database error: " + e->m_strError);
+	}
+	END_CATCH;
+
+
+	m_Graph.SetUnit(L"Age");
+	m_Graph.SetScale(3);
+	int x = 1, y = 50;
+	m_Graph.GetDisplayRange(x, y);
+	m_iYScale = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		char tmp[20];
+		int k = _wtoi(s_id[i]);
+		sprintf_s(tmp, "EmpID - %d", k);
+		k = _wtoi(s_Age[i]);
+		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
+
+		//sprintf(tmp, "%d", i);
+		//m_BarCombo.AddString(tmp);
+	}
+	m_Graph.SetBGColor(RGB(255, 229, 204));
+	m_Graph.SetAxisColor(RGB(102, 0, 0));
+	m_Graph.SetTextColor(RGB(102, 102, 255));
+
+	UpdateData(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -301,3 +370,5 @@ void CAdminAppDlg::OnAboutAdminapp()
 
 	}
 }
+
+

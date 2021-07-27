@@ -28,6 +28,7 @@ CUpdateDlg::CUpdateDlg(CWnd* pParent /*=nullptr*/)
 	, u_dateofbirthdate(COleDateTime::GetCurrentTime())
 	, u_hiredate(COleDateTime::GetCurrentTime())
 	, u_empid(_T(""))
+	, u_yrsofexp(_T(""))
 {
 
 }
@@ -52,6 +53,7 @@ void CUpdateDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_MonthCalCtrl(pDX, IDC_MONTHCALENDAR_UDATEOFBIRTH, u_dateofbirthdate);
 	DDX_MonthCalCtrl(pDX, IDC_MONTHCALENDAR_UHIREDATE, u_hiredate);
 	DDX_Text(pDX, IDC_EDIT_EMP_ID_VALUE, u_empid);
+	DDX_Text(pDX, IDC_EDIT_UYEARSOFEXPERIENCE, u_yrsofexp);
 }
 
 
@@ -190,8 +192,12 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 	SqlString.Append(quo);
 	SqlString.Append(DT.Format(_T("%Y-%m-%d")));
 	SqlString.Append(quo);
-	//SqlString.Append(out);
+	SqlString.Append(out);
 
+	SqlString.Append(L"YearsOfExp = ");
+	SqlString.Append(quo);
+	SqlString.Append(u_yrsofexp);
+	SqlString.Append(quo);
 
 	SqlString.Append(_T(" WHERE EmpID = " + u_id));
 

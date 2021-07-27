@@ -44,4 +44,6 @@ public:
 	CComboBox CJobTitle;
 	CEdit CSalary;
 	virtual BOOL OnInitDialog();
+	CString e_yrsofexp;
+	CEdit CYrsOfExp;
 };

@@ -27,6 +27,7 @@ CInsert::CInsert(CWnd* pParent /*=nullptr*/)
 	, emp_salary(_T(""))
 	, emp_datebirth(COleDateTime::GetCurrentTime())
 	, employee_hiredate(COleDateTime::GetCurrentTime())
+	, e_yrsofexp(_T(""))
 {
 
 }
@@ -60,6 +61,8 @@ void CInsert::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_ADDRESS, CAddress);
 	DDX_Control(pDX, IDC_COMBO_JOBTITLE, CJobTitle);
 	DDX_Control(pDX, IDC_EDIT_SALARY, CSalary);
+	DDX_Text(pDX, IDC_EDIT_YEARSOFEXP, e_yrsofexp);
+	DDX_Control(pDX, IDC_EDIT_YEARSOFEXP, CYrsOfExp);
 }
 
 
@@ -110,6 +113,9 @@ void CInsert::OnBnClickedButtonInsert()
 	else if (emp_salary.IsEmpty()) {
 		AfxMessageBox(L"Salary Must Be Required ...!");
 	}
+	else if (e_yrsofexp.IsEmpty()) {
+		AfxMessageBox(L"Years Of Experience Must Be Required ...!");
+	}
 	else {
 		// Build ODBC connection string
 		sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
@@ -120,7 +126,7 @@ void CInsert::OnBnClickedButtonInsert()
 
 		CString out = L" ,";
 		CString quo = L"'";
-		SqlString.Append(_T("INSERT INTO EmployeeTable(Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary,Hiredate) VALUES ("));
+		SqlString.Append(_T("INSERT INTO EmployeeTable(Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary,Hiredate,YearsOfExp) VALUES ("));
 		SqlString.Append(quo);
 		SqlString.Append(emp_title);
 		SqlString.Append(quo);
@@ -181,8 +187,11 @@ void CInsert::OnBnClickedButtonInsert()
 		SqlString.Append(quo);
 		SqlString.Append(DT.Format(_T("%Y-%m-%d")));
 		SqlString.Append(quo);
-		//SqlString.Append(out);
+		SqlString.Append(out);
 
+		SqlString.Append(quo);
+		SqlString.Append(e_yrsofexp);
+		SqlString.Append(quo);
 
 		SqlString.Append(_T(" )"));
 
@@ -228,7 +237,7 @@ BOOL CInsert::OnInitDialog()
 	CJobTitle.SetWindowText(_T(""));
 	CSalary.SetWindowText(_T(""));
 	CGender.SetWindowText(_T(""));
-
+	CYrsOfExp.SetWindowText(_T(""));
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
 }

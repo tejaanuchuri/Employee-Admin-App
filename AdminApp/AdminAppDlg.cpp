@@ -65,76 +65,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 	m_Menu.LoadMenu(IDR_MENU1);
 	SetMenu(&m_Menu);
 	emp_data_load();
-
-	UpdateData(FALSE); // flow direction database -> ui
-
-	CString e_id;
-	CString e_age;
-	CString e_yrsofexp;
-
-	CDatabase database;
-	CString sDsn;
-	CString SqlString;
-	int n = 0;
-	CString s_id[100];
-	CString s_Age[100];
-	CString s_YrsOfExp[100];
-	// Build ODBC connection string
-
-	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
-	TRY{
-		// Open the database
-		CRecordset recset(&database);
-		database.Open(NULL,false,false,sDsn);
-	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
-
-	//AfxMessageBox(SqlString);
-
-	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
-	while (!recset.IsEOF()) {
-
-		// Copy each column into a variable
-		recset.GetFieldValue(L"EmpID", e_id);
-		recset.GetFieldValue(L"Age", e_age);
-		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
-
-		s_id[n].Insert(n, e_id);
-		s_Age[n].Insert(n, e_age);
-		s_YrsOfExp[n].Insert(n, e_yrsofexp);
-			n++;
-			recset.MoveNext();
-	}
-	database.Close();
-	}CATCH(CDBException, e) {
-		// If a database exception occured, show error msg
-		AfxMessageBox(L"Database error: " + e->m_strError);
-	}
-	END_CATCH;
-
-
-	m_Graph.SetUnit(L"Age");
-	m_Graph.SetScale(10);
-	int x = 1, y = 100;
-	m_Graph.GetDisplayRange(x, y);
-	m_iYScale = 3;
-
-	for (int i = 0; i < n; i++)
-	{
-		char tmp[20];
-		int k = _wtoi(s_id[i]);
-		sprintf_s(tmp, "EmpID - %d", k);
-		k = _wtoi(s_YrsOfExp[i]);
-		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
-
-		//sprintf(tmp, "%d", i);
-		//m_BarCombo.AddString(tmp);
-	}
-	m_Graph.SetBGColor(RGB(255, 229, 204));
-	m_Graph.SetAxisColor(RGB(102, 0, 0));
-	m_Graph.SetTextColor(RGB(102, 102, 255));
-
-	UpdateData(FALSE);
-
+	bargraph_loaded();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 void CAdminAppDlg::emp_data_load() {
@@ -237,6 +168,152 @@ void CAdminAppDlg::emp_data_load() {
 	END_CATCH;
 }
 
+void CAdminAppDlg::bargraph_loaded()
+{
+
+	UpdateData(FALSE); // flow direction database -> ui
+
+	CString e_id;
+	CString e_age;
+	CString e_yrsofexp;
+
+	CDatabase database;
+	CString sDsn;
+	CString SqlString;
+	int n = 0;
+	CString s_id[100];
+	CString s_Age[100];
+	CString s_YrsOfExp[100];
+	// Build ODBC connection string
+
+	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
+	TRY{
+		// Open the database
+		CRecordset recset(&database);
+		database.Open(NULL,false,false,sDsn);
+	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
+
+	//AfxMessageBox(SqlString);
+
+	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+	while (!recset.IsEOF()) {
+
+		// Copy each column into a variable
+		recset.GetFieldValue(L"EmpID", e_id);
+		recset.GetFieldValue(L"Age", e_age);
+		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
+
+		s_id[n].Insert(n, e_id);
+		s_Age[n].Insert(n, e_age);
+		s_YrsOfExp[n].Insert(n, e_yrsofexp);
+			n++;
+			recset.MoveNext();
+	}
+	database.Close();
+	}CATCH(CDBException, e) {
+		// If a database exception occured, show error msg
+		AfxMessageBox(L"Database error: " + e->m_strError);
+	}
+	END_CATCH;
+
+
+	m_Graph.SetUnit(L"Age");
+	m_Graph.SetScale(10);
+	int x = 1, y = 100;
+	m_Graph.GetDisplayRange(x, y);
+	m_iYScale = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		char tmp[20];
+		int k = _wtoi(s_id[i]);
+		sprintf_s(tmp, "EmpID - %d", k);
+		k = _wtoi(s_YrsOfExp[i]);
+		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
+
+		//sprintf(tmp, "%d", i);
+		//m_BarCombo.AddString(tmp);
+	}
+	m_Graph.SetBGColor(RGB(255, 229, 204));
+	m_Graph.SetAxisColor(RGB(102, 0, 0));
+	m_Graph.SetTextColor(RGB(102, 102, 255));
+
+	UpdateData(FALSE);
+}
+
+void CAdminAppDlg::bargraph_update()
+{
+	UpdateData(FALSE); // flow direction database -> ui
+
+	CString e_id;
+	CString e_age;
+	CString e_yrsofexp;
+
+	CDatabase database;
+	CString sDsn;
+	CString SqlString;
+	int n = 0;
+	CString s_id[100];
+	CString s_Age[100];
+	CString s_YrsOfExp[100];
+	// Build ODBC connection string
+
+	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
+	TRY{
+		// Open the database
+		CRecordset recset(&database);
+		database.Open(NULL,false,false,sDsn);
+	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
+
+	//AfxMessageBox(SqlString);
+
+	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+	while (!recset.IsEOF()) {
+
+		// Copy each column into a variable
+		recset.GetFieldValue(L"EmpID", e_id);
+		recset.GetFieldValue(L"Age", e_age);
+		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
+
+		s_id[n].Insert(n, e_id);
+		s_Age[n].Insert(n, e_age);
+		s_YrsOfExp[n].Insert(n, e_yrsofexp);
+			n++;
+			recset.MoveNext();
+	}
+	database.Close();
+	}CATCH(CDBException, e) {
+		// If a database exception occured, show error msg
+		AfxMessageBox(L"Database error: " + e->m_strError);
+	}
+	END_CATCH;
+
+
+	m_Graph.SetUnit(L"Age");
+	m_Graph.SetScale(10);
+	int x = 1, y = 100;
+	m_Graph.GetDisplayRange(x, y);
+	m_iYScale = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		//char tmp[20];
+		//int k = _wtoi(s_id[i]);
+		//sprintf_s(tmp, "EmpID - %d", k);
+		int k = _wtoi(s_YrsOfExp[i]);
+		m_Graph.SetBarValue(i, k, TRUE);
+		//m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
+
+		//sprintf(tmp, "%d", i);
+		//m_BarCombo.AddString(tmp);
+	}
+	m_Graph.SetBGColor(RGB(255, 229, 204));
+	m_Graph.SetAxisColor(RGB(102, 0, 0));
+	m_Graph.SetTextColor(RGB(102, 102, 255));
+
+	UpdateData(FALSE);
+}
+
 void CAdminAppDlg::m_ResetListControl() {
 	emp_list.DeleteAllItems();
 	int iNbrOfColumns = 0, i;
@@ -254,6 +331,7 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 	CInsert dlg;
 	if (dlg.DoModal() == IDOK) {
 		emp_data_load();
+		bargraph_loaded();
 		UpdateWindow();
 	}
 }
@@ -284,6 +362,8 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 		emp_datebirth.ParseDateTime(emp_list.GetItemText(row, 8));
 		COleDateTime employee_hiredate;
 		employee_hiredate.ParseDateTime(emp_list.GetItemText(row, 12));
+		CString emp_yrsofexp = emp_list.GetItemText(row, 13);
+
 
 		CUpdateDlg u;
 		u.u_id = id;
@@ -300,10 +380,13 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 		u.u_salary = emp_salary;
 		u.u_dateofbirthdate = emp_datebirth;
 		u.u_hiredate = employee_hiredate;
+		u.u_yrsofexp = emp_yrsofexp;
 		if (u.DoModal() == IDOK) {
+
 			MessageBox(L"Update Record Sucessfully...!");
+			emp_data_load();
+			bargraph_update();
 		}
-		emp_data_load();
 		UpdateWindow();
 	}
 
@@ -352,8 +435,8 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 			AfxMessageBox(L"Database error: " + e->m_strError);
 		}
 		END_CATCH;
-
 		emp_data_load();
+		bargraph_loaded();
 		UpdateWindow();
 	}
 

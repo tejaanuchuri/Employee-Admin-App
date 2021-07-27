@@ -36,4 +36,5 @@ public:
 	COleDateTime u_hiredate;
 	afx_msg void OnBnClickedButtonUpdateButton();
 	CString u_empid;
+	CString u_yrsofexp;
 };

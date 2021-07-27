@@ -3,6 +3,10 @@
 // Used by AdminApp.rc
 //
 #define IDD_ADMINAPP_DIALOG             102
+#define IDC_STATIC_YEARSOFEXP           109
+#define IDC_EDIT1                       110
+#define IDC_EDIT_UYEARSOFEXPERIENCE     110
+#define IDC_STATIC_UYEARSOFEXPERIENCE   111
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_INSERTDLG            130
 #define IDD_DIALOG_SEARCH               134
@@ -47,7 +51,7 @@
 #define IDC_MONTHCALENDAR_UHIREDATE     1064
 #define IDC_BUTTON_UPDATE_BUTTON        1065
 #define IDC_STATIC_EMP_ID               1066
-#define IDC_EDIT1                       1067
+#define IDC_EDIT_YEARSOFEXP             1067
 #define IDC_STATIC_ABOUT_TEXT           1068
 #define IDC_STATIC_GRAPH_CHART          1069
 #define IDC_STATIC_SCALE                1070
@@ -85,7 +89,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         109
+#define _APS_NEXT_CONTROL_VALUE         112
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

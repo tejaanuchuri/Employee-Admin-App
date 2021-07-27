@@ -24,7 +24,8 @@ protected:
 public:
 	void m_ResetListControl();
 	void emp_data_load();
-
+	void bargraph_loaded();
+	void bargraph_update();
 
 
 	// Implementation

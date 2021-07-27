@@ -48,6 +48,8 @@ BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE, &CAdminAppDlg::OnBnClickedButtonDelete)
 	ON_COMMAND(ID_FILE_CLOSE32771, &CAdminAppDlg::OnFileClose)
 	ON_COMMAND(ID_ABOUT_ADMINAPP, &CAdminAppDlg::OnAboutAdminapp)
+	ON_BN_CLICKED(IDC_BUTTON_DELETE_ALL_BARS, &CAdminAppDlg::OnBnClickedButtonDeleteAllBars)
+	ON_BN_CLICKED(IDC_BUTTON_SELECTGRAPH, &CAdminAppDlg::OnBnClickedButtonSelectgraph)
 END_MESSAGE_MAP()
 
 
@@ -98,7 +100,7 @@ void CAdminAppDlg::emp_data_load() {
 		CRecordset recset(&database);
 		database.Open(NULL,false,false,sDsn);
 	SqlString = L"SELECT * FROM EmployeeTable";
-
+	//SqlString = L"SELECT TOP 1 EmpID FROM Customers ORDER BY EmpID DESC";
 	//AfxMessageBox(SqlString);
 
 	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
@@ -221,7 +223,7 @@ void CAdminAppDlg::bargraph_loaded()
 	m_Graph.SetScale(10);
 	int x = 1, y = 100;
 	m_Graph.GetDisplayRange(x, y);
-	m_iYScale = 3;
+	m_iYScale = 1;
 
 	for (int i = 0; i < n; i++)
 	{
@@ -234,6 +236,7 @@ void CAdminAppDlg::bargraph_loaded()
 		//sprintf(tmp, "%d", i);
 		//m_BarCombo.AddString(tmp);
 	}
+	//m_Graph.DeleteBar(1);
 	m_Graph.SetBGColor(RGB(255, 229, 204));
 	m_Graph.SetAxisColor(RGB(102, 0, 0));
 	m_Graph.SetTextColor(RGB(102, 102, 255));
@@ -314,6 +317,24 @@ void CAdminAppDlg::bargraph_update()
 	UpdateData(FALSE);
 }
 
+void CAdminAppDlg::bargraph_empty()
+{
+	UpdateData(FALSE);
+	while (1) {
+		int m = m_Graph.GetNumberOfBars();
+		if (m == 0) {
+			break;
+		}
+		//	MessageBox((LPCTSTR)itoa(m));
+		for (int i = 0; i < m; i++) {
+			m_Graph.DeleteBar(i);
+			//m_Graph.DrawGraph();
+		}
+		UpdateWindow();
+	}
+	return;
+}
+
 void CAdminAppDlg::m_ResetListControl() {
 	emp_list.DeleteAllItems();
 	int iNbrOfColumns = 0, i;
@@ -331,7 +352,44 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 	CInsert dlg;
 	if (dlg.DoModal() == IDOK) {
 		emp_data_load();
-		bargraph_loaded();
+
+		UpdateData(FALSE); // flow direction database -> ui
+
+		CString e_id;
+		CDatabase database;
+		CString sDsn;
+		CString SqlString;
+		int iRec = 0;
+		// Build ODBC connection string
+
+		sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
+		TRY{
+			// Open the database
+			CRecordset recset(&database);
+			database.Open(NULL,false,false,sDsn);
+			SqlString = L"SELECT TOP 1 EmpID FROM EmployeeTable ORDER BY EmpID DESC";
+			//AfxMessageBox(SqlString);
+
+			recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+
+			while (!recset.IsEOF()) {
+				// Copy each column into a variable
+				recset.GetFieldValue(L"EmpID", e_id);
+				recset.MoveNext();
+			}
+			database.Close();
+		}CATCH(CDBException, e) {
+			// If a database exception occured, show error msg
+			AfxMessageBox(L"Database error: " + e->m_strError);
+		}
+		END_CATCH;
+
+		char tmp[20];
+		int k = _wtoi(e_id);
+		sprintf_s(tmp, "EmpID - %d", k);
+		k = _wtoi(dlg.e_yrsofexp);
+		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
+		m_Graph.DrawGraph();
 		UpdateWindow();
 	}
 }
@@ -342,6 +400,8 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 	UpdateData(TRUE); // flow direction database <- ui
 
 	row = emp_list.GetSelectionMark();
+	//MessageBox((LPCTSTR)row);
+	//AfxMessageBox(row);
 	if (row < 0) {
 		AfxMessageBox(L"No row Selected");
 	}
@@ -410,7 +470,7 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 	}
 	else {
 
-		CString id = emp_list.GetItemText(row, 0);
+		/*CString id = emp_list.GetItemText(row, 0);
 
 		CDatabase database;
 		CString sDsn;
@@ -435,8 +495,12 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 			AfxMessageBox(L"Database error: " + e->m_strError);
 		}
 		END_CATCH;
-		emp_data_load();
-		bargraph_loaded();
+		emp_data_load();*/
+		//bargraph_empty();
+		//bargraph_loaded();
+		m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row);
+		m_Graph.DrawGraph();
+
 		UpdateWindow();
 	}
 
@@ -464,3 +528,58 @@ void CAdminAppDlg::OnAboutAdminapp()
 }
 
 
+
+
+void CAdminAppDlg::OnBnClickedButtonDeleteAllBars()
+{
+	bargraph_empty();
+	m_Graph.DrawGraph();
+	UpdateData(FALSE);
+	//AfxMessageBox(m_Graph.GetNumberOfBars());
+	UpdateWindow();
+}
+
+
+void CAdminAppDlg::OnBnClickedButtonSelectgraph()
+{
+	bargraph_empty();
+	m_Graph.DrawGraph();
+	row = emp_list.GetSelectionMark();
+
+	if (row < 0) {
+		AfxMessageBox(L"No row Selected");
+	}
+	else {
+		CString id;
+		CString emp_age;
+		//id = emp_list.GetItemText(row, 0);
+		//emp_age = emp_list.GetItemText(row, 2);
+		m_Graph.SetScale(10);
+		int x = 1, y = 100;
+		m_Graph.GetDisplayRange(x, y);
+		m_iYScale = 1;
+
+		POSITION pos = emp_list.GetFirstSelectedItemPosition();
+
+		if (pos != NULL) {
+			while (pos)
+			{
+				int Row = emp_list.GetNextSelectedItem(pos);
+				CString id = emp_list.GetItemText(Row, 0);
+				CString yrsofexp = emp_list.GetItemText(Row, 13);
+				char tmp[20];
+				int k = _wtoi(id);
+				sprintf_s(tmp, "EmpID - %d", k);
+				k = _wtoi(yrsofexp);
+				m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
+
+			}
+		}
+		m_Graph.SetBGColor(RGB(255, 229, 204));
+		m_Graph.SetAxisColor(RGB(102, 0, 0));
+		m_Graph.SetTextColor(RGB(102, 102, 255));
+
+		UpdateData(FALSE);
+
+	}
+}

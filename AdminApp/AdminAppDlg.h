@@ -26,6 +26,7 @@ public:
 	void emp_data_load();
 	void bargraph_loaded();
 	void bargraph_update();
+	void bargraph_empty();
 
 
 	// Implementation
@@ -46,4 +47,6 @@ public:
 	afx_msg void OnFileClose();
 	afx_msg void OnAboutAdminapp();
 
+	afx_msg void OnBnClickedButtonDeleteAllBars();
+	afx_msg void OnBnClickedButtonSelectgraph();
 };

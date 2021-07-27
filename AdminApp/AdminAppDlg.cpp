@@ -70,6 +70,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 
 	CString e_id;
 	CString e_age;
+	CString e_yrsofexp;
 
 	CDatabase database;
 	CString sDsn;
@@ -77,6 +78,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 	int n = 0;
 	CString s_id[100];
 	CString s_Age[100];
+	CString s_YrsOfExp[100];
 	// Build ODBC connection string
 
 	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
@@ -84,7 +86,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 		// Open the database
 		CRecordset recset(&database);
 		database.Open(NULL,false,false,sDsn);
-	SqlString = L"SELECT EmpID,Age FROM EmployeeTable";
+	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
 
 	//AfxMessageBox(SqlString);
 
@@ -94,8 +96,11 @@ BOOL CAdminAppDlg::OnInitDialog()
 		// Copy each column into a variable
 		recset.GetFieldValue(L"EmpID", e_id);
 		recset.GetFieldValue(L"Age", e_age);
+		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
+
 		s_id[n].Insert(n, e_id);
 		s_Age[n].Insert(n, e_age);
+		s_YrsOfExp[n].Insert(n, e_yrsofexp);
 			n++;
 			recset.MoveNext();
 	}
@@ -108,8 +113,8 @@ BOOL CAdminAppDlg::OnInitDialog()
 
 
 	m_Graph.SetUnit(L"Age");
-	m_Graph.SetScale(3);
-	int x = 1, y = 50;
+	m_Graph.SetScale(10);
+	int x = 1, y = 100;
 	m_Graph.GetDisplayRange(x, y);
 	m_iYScale = 3;
 
@@ -118,7 +123,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 		char tmp[20];
 		int k = _wtoi(s_id[i]);
 		sprintf_s(tmp, "EmpID - %d", k);
-		k = _wtoi(s_Age[i]);
+		k = _wtoi(s_YrsOfExp[i]);
 		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
 
 		//sprintf(tmp, "%d", i);
@@ -148,6 +153,7 @@ void CAdminAppDlg::emp_data_load() {
 	CString e_jobtitle;
 	CString e_salary;
 	CString e_hiredate;
+	CString e_yrsofexp;
 
 	CDatabase database;
 	CString sDsn;
@@ -185,6 +191,7 @@ void CAdminAppDlg::emp_data_load() {
 	emp_list.InsertColumn(10, L"JobTitle", LVCFMT_LEFT, 100);
 	emp_list.InsertColumn(11, L"Salary", LVCFMT_CENTER, 100);
 	emp_list.InsertColumn(12, L"HireDate", LVCFMT_LEFT, 100);
+	emp_list.InsertColumn(13, L"YearsOfExp", LVCFMT_LEFT, 100);
 
 	while (!recset.IsEOF()) {
 		// Copy each column into a variable
@@ -201,6 +208,7 @@ void CAdminAppDlg::emp_data_load() {
 		recset.GetFieldValue(L"JobTitle", e_jobtitle);
 		recset.GetFieldValue(L"Salary", e_salary);
 		recset.GetFieldValue(L"Hiredate", e_hiredate);
+		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
 
 		// Insert values into the list control
 		iRec = emp_list.InsertItem(0, e_id, 0);
@@ -216,6 +224,7 @@ void CAdminAppDlg::emp_data_load() {
 		emp_list.SetItemText(0, 10, e_jobtitle);
 		emp_list.SetItemText(0, 11, e_salary);
 		emp_list.SetItemText(0, 12, e_hiredate);
+		emp_list.SetItemText(0, 13, e_yrsofexp);
 
 		// goto next record
 		recset.MoveNext();

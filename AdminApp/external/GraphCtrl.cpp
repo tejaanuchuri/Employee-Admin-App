@@ -316,7 +316,7 @@ int CGraphCtrl::DrawGraph(void)
 	int iActHt = (Height - offsety);
 	int iDiv = (iActHt - 5) / ((iEnd - iStart) / scale);
 
-	str = _T("Employee Age =>");
+	str = _T("Years Of Experience =>");
 	MemDC.ExtTextOut(0, iActHt - 20, 0, NULL, str, NULL);
 
 	MemDC.SelectObject(&newFont);

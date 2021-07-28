@@ -19,6 +19,21 @@
 #include "CAbout.h"
 #include <vector>
 #include <stdlib.h>
+#include "ChartCtrl/ChartAxis.h"
+#include "afxdialogex.h"
+#include "ChartCtrl\ChartLineSerie.h"
+#include "ChartCtrl\ChartPointsSerie.h"
+#include "ChartCtrl\ChartSurfaceSerie.h"
+#include "ChartCtrl\ChartGrid.h"
+#include "ChartCtrl\ChartBarSerie.h"
+#include "ChartCtrl\ChartLabel.h"
+
+#include "ChartCtrl\ChartAxisLabel.h"
+#include "ChartCtrl\ChartStandardAxis.h"
+#include "ChartCtrl\ChartDateTimeAxis.h"
+
+#include "ChartCtrl\ChartCrossHairCursor.h"
+#include "ChartCtrl\ChartDragLineCursor.h"
 
 
 // CAdminAppDlg dialog
@@ -39,6 +54,7 @@ void CAdminAppDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_EMP, emp_list);
 	DDX_Control(pDX, IDC_STATIC_GRAPH_CHART, m_Graph);
+	DDX_Control(pDX, IDC_CUSTOM_LINE_GRAPH, m_ChartCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
@@ -69,6 +85,8 @@ BOOL CAdminAppDlg::OnInitDialog()
 	SetMenu(&m_Menu);
 	emp_data_load();
 	bargraph_loaded();
+	linegraph_loaded();
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 void CAdminAppDlg::emp_data_load() {
@@ -230,7 +248,7 @@ void CAdminAppDlg::bargraph_loaded()
 	{
 		char tmp[20];
 		int k = _wtoi(s_id[i]);
-		sprintf_s(tmp, "EmpID - %d", k);
+		sprintf_s(tmp, "ID-%d", k);
 		k = _wtoi(s_YrsOfExp[i]);
 		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
 
@@ -336,6 +354,90 @@ void CAdminAppDlg::bargraph_empty()
 	return;
 }
 
+void CAdminAppDlg::linegraph_loaded()
+{
+	CChartCtrl ref;
+	ref.RemoveAllSeries();
+	m_ChartCtrl.EnableRefresh(true);
+	pBottomAxis = m_ChartCtrl.CreateStandardAxis(CChartCtrl::BottomAxis);
+	pLeftAxis = m_ChartCtrl.CreateStandardAxis(CChartCtrl::LeftAxis);
+	pBottomAxis->SetMinMax(1, 50);
+	pLeftAxis->SetMinMax(0, 80);
+	//pLeftAxis->GetLabel()->SetText("Intensity");
+	pBottomAxis->SetTickIncrement(false, 1);
+	pBottomAxis->SetDiscrete(false);
+	pBottomAxis->EnableScrollBar(true);
+
+	pSeries = m_ChartCtrl.CreateLineSerie();
+	pSeries->ClearSerie();
+	pSeries->SetWidth(1); //line width
+	pSeries->SetColor(RGB(0, 0, 255)); //color of line
+
+
+	UpdateData(FALSE); // flow direction database -> ui
+
+	CString e_id;
+	CString e_age;
+	CString e_yrsofexp;
+
+	CDatabase database;
+	CString sDsn;
+	CString SqlString;
+	int n = 0;
+	CString s_id[100];
+	CString s_Age[100];
+	CString s_YrsOfExp[100];
+	// Build ODBC connection string
+
+	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
+	TRY{
+		// Open the database
+		CRecordset recset(&database);
+		database.Open(NULL,false,false,sDsn);
+	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
+
+	//AfxMessageBox(SqlString);
+
+	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+	while (!recset.IsEOF()) {
+
+		// Copy each column into a variable
+		recset.GetFieldValue(L"EmpID", e_id);
+		recset.GetFieldValue(L"Age", e_age);
+		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
+
+		s_id[n].Insert(n, e_id);
+		s_Age[n].Insert(n, e_age);
+		s_YrsOfExp[n].Insert(n, e_yrsofexp);
+			n++;
+			recset.MoveNext();
+	}
+	database.Close();
+	}CATCH(CDBException, e) {
+		// If a database exception occured, show error msg
+		AfxMessageBox(L"Database error: " + e->m_strError);
+	}
+	END_CATCH;
+
+	double XVal[100];
+	double YVal[100];
+
+
+	for (int i = 0; i < n; i++)
+	{
+		int k = _wtoi(s_id[i]);
+		XVal[i] = k;
+		k = _wtoi(s_YrsOfExp[i]);
+		YVal[i] = k;
+	}
+	unsigned int l = n;
+	pSeries->SetPoints(XVal, YVal, l);
+
+	m_ChartCtrl.EnableRefresh(true);
+
+	return;
+}
+
 void CAdminAppDlg::m_ResetListControl() {
 	emp_list.DeleteAllItems();
 	int iNbrOfColumns = 0, i;
@@ -387,7 +489,7 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 
 		char tmp[20];
 		int k = _wtoi(e_id);
-		sprintf_s(tmp, "EmpID - %d", k);
+		sprintf_s(tmp, "EID-%d", k);
 		k = _wtoi(dlg.e_yrsofexp);
 		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
 		m_Graph.DrawGraph();

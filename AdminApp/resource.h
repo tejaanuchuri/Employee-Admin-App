@@ -8,8 +8,8 @@
 #define IDC_STATIC_UYEARSOFEXPERIENCE   111
 #define IDC_BUTTON_DELETE_ALL_BARS      112
 #define IDC_BUTTON_SELECTGRAPH          113
-#define IDC_BUTTON1                     114
 #define IDC_BUTTON_LOADBRAGRAPH         114
+#define IDC_CUSTOM_LINE_GRAPH           115
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_INSERTDLG            130
 #define IDD_DIALOG_SEARCH               134
@@ -92,7 +92,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32773
-#define _APS_NEXT_CONTROL_VALUE         115
+#define _APS_NEXT_CONTROL_VALUE         116
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

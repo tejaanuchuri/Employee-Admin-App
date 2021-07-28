@@ -5,6 +5,9 @@
 #pragma once
 #include "external/GraphCtrl.h"
 
+#include "ChartCtrl\ChartCtrl.h"
+#include "ChartCtrl\ChartLineSerie.h"
+#include "ChartCtrl\ChartLabel.h"
 
 // CAdminAppDlg dialog
 class CAdminAppDlg : public CDialogEx
@@ -27,6 +30,7 @@ public:
 	void bargraph_loaded();
 	void bargraph_update();
 	void bargraph_empty();
+	void linegraph_loaded();
 
 
 	// Implementation
@@ -50,4 +54,9 @@ public:
 	afx_msg void OnBnClickedButtonDeleteAllBars();
 	afx_msg void OnBnClickedButtonSelectgraph();
 	afx_msg void OnBnClickedButtonLoadbragraph();
+	CChartCtrl m_ChartCtrl;
+	CChartStandardAxis* pBottomAxis;
+	CChartStandardAxis* pLeftAxis;
+	CChartLineSerie* pSeries;
+
 };

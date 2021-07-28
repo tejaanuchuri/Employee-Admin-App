@@ -21,23 +21,23 @@ struct BAR_DATA
 
 class CGraphCtrl : public CStatic
 {
-// Construction
+	// Construction
 public:
 	CGraphCtrl();
 
-// Attributes
+	// Attributes
 public:
 	CList<BAR_DATA, BAR_DATA> listBars;
 
-// Operations
+	// Operations
 public:
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CGraphCtrl)
-	public:
+	// Overrides
+		// ClassWizard generated virtual function overrides
+		//{{AFX_VIRTUAL(CGraphCtrl)
+public:
 	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
-	protected:
+protected:
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -56,11 +56,11 @@ public:
 	int iStart, iEnd;
 
 	int AddBar(int iVal, COLORREF bClr, const char* sLabel);
-	int InsertBar(int index,int iVal, COLORREF bClr, const char* sLabel);
+	int InsertBar(int index, int iVal, COLORREF bClr, const char* sLabel);
 	int DeleteBar(int index);
 
-	void SetBarValue(int, int, BOOL bDraw=TRUE);
-	void SetBarColor(int, COLORREF, BOOL bDraw=TRUE);
+	void SetBarValue(int, int, BOOL bDraw = TRUE);
+	void SetBarColor(int, COLORREF, BOOL bDraw = TRUE);
 
 	int GetBarValue(int);
 	COLORREF GetBarColor(int);

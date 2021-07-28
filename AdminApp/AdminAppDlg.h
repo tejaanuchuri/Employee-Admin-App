@@ -49,4 +49,5 @@ public:
 
 	afx_msg void OnBnClickedButtonDeleteAllBars();
 	afx_msg void OnBnClickedButtonSelectgraph();
+	afx_msg void OnBnClickedButtonLoadbragraph();
 };

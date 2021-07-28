@@ -50,6 +50,7 @@ BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
 	ON_COMMAND(ID_ABOUT_ADMINAPP, &CAdminAppDlg::OnAboutAdminapp)
 	ON_BN_CLICKED(IDC_BUTTON_DELETE_ALL_BARS, &CAdminAppDlg::OnBnClickedButtonDeleteAllBars)
 	ON_BN_CLICKED(IDC_BUTTON_SELECTGRAPH, &CAdminAppDlg::OnBnClickedButtonSelectgraph)
+	ON_BN_CLICKED(IDC_BUTTON_LOADBRAGRAPH, &CAdminAppDlg::OnBnClickedButtonLoadbragraph)
 END_MESSAGE_MAP()
 
 
@@ -470,7 +471,7 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 	}
 	else {
 
-		/*CString id = emp_list.GetItemText(row, 0);
+		CString id = emp_list.GetItemText(row, 0);
 
 		CDatabase database;
 		CString sDsn;
@@ -495,10 +496,10 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 			AfxMessageBox(L"Database error: " + e->m_strError);
 		}
 		END_CATCH;
-		emp_data_load();*/
-		//bargraph_empty();
-		//bargraph_loaded();
-		m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row);
+		emp_data_load();
+		bargraph_empty();
+		bargraph_loaded();
+		//m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row);
 		m_Graph.DrawGraph();
 
 		UpdateWindow();
@@ -542,14 +543,14 @@ void CAdminAppDlg::OnBnClickedButtonDeleteAllBars()
 
 void CAdminAppDlg::OnBnClickedButtonSelectgraph()
 {
-	bargraph_empty();
-	m_Graph.DrawGraph();
-	row = emp_list.GetSelectionMark();
-
-	if (row < 0) {
+	POSITION pos = emp_list.GetFirstSelectedItemPosition();
+	if (pos == NULL) {
 		AfxMessageBox(L"No row Selected");
 	}
 	else {
+		bargraph_empty();
+		m_Graph.DrawGraph();
+
 		CString id;
 		CString emp_age;
 		//id = emp_list.GetItemText(row, 0);
@@ -582,4 +583,14 @@ void CAdminAppDlg::OnBnClickedButtonSelectgraph()
 		UpdateData(FALSE);
 
 	}
+}
+
+
+void CAdminAppDlg::OnBnClickedButtonLoadbragraph()
+{
+	bargraph_empty();
+	bargraph_loaded();
+	m_Graph.DrawGraph();
+	UpdateWindow();
+	return;
 }

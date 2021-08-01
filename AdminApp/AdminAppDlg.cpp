@@ -478,72 +478,6 @@ void CAdminAppDlg::linegraph_loaded()
 	return;
 }
 
-void CAdminAppDlg::linegraph_update()
-{
-	UpdateData(FALSE); // flow direction database -> ui
-
-	CString e_id;
-	CString e_age;
-	CString e_yrsofexp;
-
-	CDatabase database;
-	CString sDsn;
-	CString SqlString;
-	int n = 0;
-	CString s_id[100];
-	CString s_Age[100];
-	CString s_YrsOfExp[100];
-	// Build ODBC connection string
-
-	sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
-	TRY{
-		// Open the database
-		CRecordset recset(&database);
-		database.Open(NULL,false,false,sDsn);
-	SqlString = L"SELECT EmpID,Age,YearsOfExp FROM EmployeeTable";
-
-	//AfxMessageBox(SqlString);
-
-	recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
-	while (!recset.IsEOF()) {
-
-		// Copy each column into a variable
-		recset.GetFieldValue(L"EmpID", e_id);
-		recset.GetFieldValue(L"Age", e_age);
-		recset.GetFieldValue(L"YearsOfExp", e_yrsofexp);
-
-		s_id[n].Insert(n, e_id);
-		s_Age[n].Insert(n, e_age);
-		s_YrsOfExp[n].Insert(n, e_yrsofexp);
-			n++;
-			recset.MoveNext();
-	}
-	database.Close();
-	}CATCH(CDBException, e) {
-		// If a database exception occured, show error msg
-		AfxMessageBox(L"Database error: " + e->m_strError);
-	}
-	END_CATCH;
-
-	double XVal[100] = { 0 };
-	double YVal[100] = { 0 };
-
-
-	for (int i = 0; i < n; i++)
-	{
-		int k = _wtoi(s_id[i]);
-		XVal[i] = k;
-		k = _wtoi(s_YrsOfExp[i]);
-		YVal[i] = k;
-	}
-	unsigned int l = n;
-	pSeries->SetPoints(XVal, YVal, l);
-
-	m_ChartCtrl.EnableRefresh(true);
-
-	UpdateData(FALSE);
-}
-
 void CAdminAppDlg::linegraph_empty()
 {
 	m_ChartCtrl.RemoveAllSeries();
@@ -605,8 +539,8 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 		k = _wtoi(dlg.e_yrsofexp);
 		m_Graph.AddBar(k, RGB(rand() % 256, rand() % 256, rand() % 256), tmp);
 		m_Graph.DrawGraph();
-		//linegraph_empty();
-		//linegraph_loaded();
+		linegraph_empty();
+		linegraph_loaded();
 		UpdateWindow();
 	}
 }
@@ -666,7 +600,7 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 			emp_data_load();
 			bargraph_update();
 
-			m_ChartCtrl.RemoveAllSeries();
+			linegraph_empty();
 			linegraph_loaded();
 
 		}
@@ -851,8 +785,9 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 		bargraph_loaded();
 		//m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row);
 		m_Graph.DrawGraph();
-		linegraph_empty();
-		//linegraph_loaded();
+		//linegraph_empty();
+		m_ChartCtrl.RemoveSerie(_wtoi(id) + 1);
+		m_ChartCtrl.EnableRefresh(true);
 
 		UpdateWindow();
 	}

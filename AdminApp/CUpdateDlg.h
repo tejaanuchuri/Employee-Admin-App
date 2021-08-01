@@ -2,6 +2,13 @@
 
 
 // CUpdateDlg dialog
+struct Date {
+	int d, m, y;
+};
+
+const int monthDays[12]
+= { 31, 28, 31, 30, 31, 30,
+   31, 31, 30, 31, 30, 31 };
 
 class CUpdateDlg : public CDialogEx
 {
@@ -18,6 +25,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -37,4 +45,10 @@ public:
 	afx_msg void OnBnClickedButtonUpdateButton();
 	CString u_empid;
 	CString u_yrsofexp;
+	int countLeapYears(Date d);
+
+	int getDifference(Date dt1, Date dt2);
+
 };
+
+

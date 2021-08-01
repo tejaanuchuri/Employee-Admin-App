@@ -82,7 +82,13 @@ void CInsert::OnBnClickedButtonInsert()
 	CDatabase database;
 	CString sDsn;
 	CString SqlString;
-
+	COleDateTime date;
+	date = COleDateTime::GetCurrentTime();
+	CString cur_date = date.Format(_T("%d/%m/%Y"));
+	CString hiredate = employee_hiredate.Format(_T("%d/%m/%Y"));
+	COleDateTimeSpan diff = (cur_date - hiredate);
+	int yrs = diff.GetTotalDays() / 365.0;
+	CString yrsofexps = _T("%d", yrs);
 	if (emp_title.IsEmpty()) {
 		AfxMessageBox(L"Title Must Be Required ...!");
 	}
@@ -190,7 +196,7 @@ void CInsert::OnBnClickedButtonInsert()
 		SqlString.Append(out);
 
 		SqlString.Append(quo);
-		SqlString.Append(e_yrsofexp);
+		SqlString.Append(yrsofexps);
 		SqlString.Append(quo);
 
 		SqlString.Append(_T(" )"));

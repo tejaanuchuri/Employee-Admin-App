@@ -74,6 +74,60 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 	CString sDsn;
 	CString SqlString;
 
+
+	COleDateTime date;
+	date = COleDateTime::GetCurrentTime();
+	int cur_year = _wtoi(date.Format(_T("%Y")));
+	int hireyear = _wtoi(u_hiredate.Format(_T("%Y")));
+	int cur_month = _wtoi(date.Format(_T("%m")));
+	int hire_month = _wtoi(u_hiredate.Format(_T("%m")));
+	int cur_date = _wtoi(u_hiredate.Format(_T("%d")));
+	int hire_date = _wtoi(u_hiredate.Format(_T("%d")));
+	int b_date = _wtoi(u_dateofbirthdate.Format(_T("%d")));
+	int b_month = _wtoi(u_dateofbirthdate.Format(_T("%m")));
+	int b_year = _wtoi(u_dateofbirthdate.Format(_T("%Y")));
+	Date dt1 = { hire_date, hire_month, hireyear };
+	Date dt2 = { cur_date, cur_month, cur_year };
+	Date dt3 = { b_date, b_month, b_year };
+
+	//AfxMessageBox(cur_year);
+	//AfxMessageBox(hireyear);
+	//COleDateTimeSpan diff = (date.Format(_T("%Y-%m-%d")) - u_hiredate.Format(_T("%Y-%m-%d")));
+	//double d = diff.GetDays();
+	//int y = d / 365;
+	//int yrs = cur_year - hireyear;
+	CString age_;
+
+	int remove_leap_year = 0;
+	for (int i = b_year; i <= cur_year; i++) {
+		if (i % 400 == 0) {
+			remove_leap_year++;
+		}
+		else if (i % 100 != 0) {
+
+		}
+		else if (i % 4 == 0) {
+			remove_leap_year++;
+		}
+	}
+	age_.Format(_T("%d"), ((getDifference(dt3, dt2) - remove_leap_year) / 365));
+	//AfxMessageBox(age_);
+	CString yrsofexps;
+	remove_leap_year = 0;
+	for (int i = hireyear; i <= cur_year; i++) {
+		if (i % 400 == 0) {
+			remove_leap_year++;
+		}
+		else if (i % 100 != 0) {
+
+		}
+		else if (i % 4 == 0) {
+			remove_leap_year++;
+		}
+	}
+	yrsofexps.Format(_T("%d"), ((getDifference(dt1, dt2) - remove_leap_year) / 365));
+
+
 	if (u_title.IsEmpty()) {
 		AfxMessageBox(L"Title Must Be Required ...!");
 	}
@@ -124,7 +178,7 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 
 	SqlString.Append(L"Age = ");
 	SqlString.Append(quo);
-	SqlString.Append(u_age);
+	SqlString.Append(age_);
 	SqlString.Append(quo);
 	SqlString.Append(out);
 
@@ -196,7 +250,7 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 
 	SqlString.Append(L"YearsOfExp = ");
 	SqlString.Append(quo);
-	SqlString.Append(u_yrsofexp);
+	SqlString.Append(yrsofexps);
 	SqlString.Append(quo);
 
 	SqlString.Append(_T(" WHERE EmpID = " + u_id));
@@ -212,4 +266,49 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 		END_CATCH;
 	}
 	CUpdateDlg::OnOK();
+}
+
+int CUpdateDlg::countLeapYears(Date d)
+{
+	int years = d.y;
+
+	// Check if the current year needs to be
+	//  considered for the count of leap years
+	// or not
+	if (d.m <= 2)
+		years--;
+
+	// An year is a leap year if it
+	// is a multiple of 4,
+	// multiple of 400 and not a
+	 // multiple of 100.
+	return years / 4
+		- years / 100
+		+ years / 400;
+	return 0;
+}
+
+int CUpdateDlg::getDifference(Date dt1, Date dt2)
+{
+	long int n1 = dt1.y * 365 + dt1.d;
+
+	// Add days for months in given date
+	for (int i = 0; i < dt1.m - 1; i++)
+		n1 += monthDays[i];
+
+	// Since every leap year is of 366 days,
+	// Add a day for every leap year
+	n1 += countLeapYears(dt1);
+
+	// SIMILARLY, COUNT TOTAL NUMBER OF
+	// DAYS BEFORE 'dt2'
+
+	long int n2 = dt2.y * 365 + dt2.d;
+	for (int i = 0; i < dt2.m - 1; i++)
+		n2 += monthDays[i];
+	n2 += countLeapYears(dt2);
+
+	// return difference between two counts
+	return (n2 - n1);
+	return 0;
 }

@@ -26,12 +26,14 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 public:
 	void m_ResetListControl();
+	void ResetListControl();
 	void emp_data_load();
 	void bargraph_loaded();
 	void bargraph_update();
 	void bargraph_empty();
 	void linegraph_loaded();
-
+	void linegraph_update();
+	void linegraph_empty();
 
 	// Implementation
 protected:
@@ -59,4 +61,10 @@ public:
 	CChartStandardAxis* pLeftAxis;
 	CChartLineSerie* pSeries;
 
+	afx_msg void OnBnClickedRadioBargraph();
+	afx_msg void OnBnClickedRadioLineGraphRepresentation();
+	CButton m_bar_graph_control;
+	CButton m_line_graph_control;
+	CString S_choose_filed;
+	CString S_choose_filed_value;
 };

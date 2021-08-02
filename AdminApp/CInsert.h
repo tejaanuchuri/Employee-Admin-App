@@ -2,6 +2,13 @@
 
 
 // CInsert dialog
+struct DT {
+	int d, m, y;
+};
+
+const int monthdays[12]
+= { 31, 28, 31, 30, 31, 30,
+   31, 31, 30, 31, 30, 31 };
 
 class CInsert : public CDialogEx
 {
@@ -46,4 +53,7 @@ public:
 	virtual BOOL OnInitDialog();
 	CString e_yrsofexp;
 	CEdit CYrsOfExp;
+	int countLeapYears(DT d);
+	int getDifference(DT dt1, DT dt2);
+
 };

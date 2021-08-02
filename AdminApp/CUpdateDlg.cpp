@@ -81,7 +81,7 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 	int hireyear = _wtoi(u_hiredate.Format(_T("%Y")));
 	int cur_month = _wtoi(date.Format(_T("%m")));
 	int hire_month = _wtoi(u_hiredate.Format(_T("%m")));
-	int cur_date = _wtoi(u_hiredate.Format(_T("%d")));
+	int cur_date = _wtoi(date.Format(_T("%d")));
 	int hire_date = _wtoi(u_hiredate.Format(_T("%d")));
 	int b_date = _wtoi(u_dateofbirthdate.Format(_T("%d")));
 	int b_month = _wtoi(u_dateofbirthdate.Format(_T("%m")));
@@ -130,9 +130,6 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 
 	if (u_title.IsEmpty()) {
 		AfxMessageBox(L"Title Must Be Required ...!");
-	}
-	else if (u_age.IsEmpty()) {
-		AfxMessageBox(L"Age Must Be Required ...!");
 	}
 	else if (u_firstname.IsEmpty()) {
 		AfxMessageBox(L"First Name Must Be Required ...!");

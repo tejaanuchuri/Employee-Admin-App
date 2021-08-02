@@ -344,7 +344,8 @@ int CGraphCtrl::DrawGraph(void)
 	for (i = 0; i < NumOfBars; i++)
 	{
 		BAR_DATA cBar = listBars.GetAt(listBars.FindIndex(i));
-		int pixVal = ((float)(cBar.iVal - iStart) / (float)scale) * (float)iDiv;
+		float val_p = ((float)(cBar.iVal - iStart) / (float)scale) * (float)iDiv;
+		int pixVal = (int)val_p;
 		bx = ((Width - offsetx) / NumOfBars) * i + offsetx;
 		if (pixVal > 0)
 		{

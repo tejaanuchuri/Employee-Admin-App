@@ -67,4 +67,6 @@ public:
 	CButton m_line_graph_control;
 	CString S_choose_filed;
 	CString S_choose_filed_value;
+	CComboBox CChooseType;
+	CEdit CChoosetypevalue;
 };

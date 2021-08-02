@@ -46,6 +46,9 @@ CAdminAppDlg::CAdminAppDlg(CWnd* pParent /*=nullptr*/)
 	, m_iYScale(0)
 	, S_choose_filed(_T(""))
 	, S_choose_filed_value(_T(""))
+	, pBottomAxis()
+	, pLeftAxis()
+	, pSeries()
 {
 	m_iYScale = 1;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -61,6 +64,8 @@ void CAdminAppDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_LINE_GRAPH_REPRESENTATION, m_line_graph_control);
 	DDX_CBString(pDX, IDC_COMBO_CHHOSEFIELDOPTIONS, S_choose_filed);
 	DDX_Text(pDX, IDC_EDIT_CHOOSEVALUE, S_choose_filed_value);
+	DDX_Control(pDX, IDC_COMBO_CHHOSEFIELDOPTIONS, CChooseType);
+	DDX_Control(pDX, IDC_EDIT_CHOOSEVALUE, CChoosetypevalue);
 }
 
 BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
@@ -93,10 +98,13 @@ BOOL CAdminAppDlg::OnInitDialog()
 	SetMenu(&m_Menu);
 	emp_data_load();
 	bargraph_loaded();
+	linegraph_empty();
 	linegraph_loaded();
-	GetDlgItem(IDC_STATIC_GRAPH_CHART)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_CUSTOM_LINE_GRAPH)->ShowWindow(SW_SHOW);
 
+	GetDlgItem(IDC_STATIC_GRAPH_CHART)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_GRAPH_CHART)->ShowWindow(SW_HIDE);
+	m_line_graph_control.SetState(true);
+	m_line_graph_control.SetCheck(1);
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 void CAdminAppDlg::emp_data_load() {
@@ -644,7 +652,11 @@ void CAdminAppDlg::OnBnClickedButtonSearch()
 		CRecordset recset(&database);
 		database.Open(NULL,false,false,sDsn);
 		if (EnterValue.IsEmpty()) {
-			SqlString = L"SELECT * FROM EmployeeTable";
+			//SqlString = L"SELECT * FROM EmployeeTable";
+			emp_data_load();
+
+			CChooseType.SetWindowText(_T(""));
+			CChoosetypevalue.SetWindowText(_T(""));
 		}
 		else {
 
@@ -657,79 +669,74 @@ void CAdminAppDlg::OnBnClickedButtonSearch()
 			else {
 				SqlString.Append(_T("'%" + EnterValue + "%'"));
 			}
+
+			//AfxMessageBox(SqlString);
+			//database.ExecuteSQL(SqlString);
+
+			recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
+			ResetListControl();
+			ListView_SetExtendedListViewStyle(emp_list, LVS_EX_GRIDLINES);
+			emp_list.InsertColumn(
+				0,              // Rank/order of item
+				L"EmpID",          // Caption for this header
+				LVCFMT_LEFT,    // Relative position of items under header
+				42);           // Width of items under header
+
+			emp_list.InsertColumn(1, L"Title", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(2, L"Age", LVCFMT_LEFT, 100);
+			emp_list.InsertColumn(3, L"FirstName", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(4, L"LastName", LVCFMT_LEFT, 100);
+			emp_list.InsertColumn(5, L"Gender", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(6, L"MobilePhone", LVCFMT_LEFT, 100);
+			emp_list.InsertColumn(7, L"EMail", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(8, L"BirthDate", LVCFMT_LEFT, 100);
+			emp_list.InsertColumn(9, L"Address", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(10, L"JobTitle", LVCFMT_LEFT, 100);
+			emp_list.InsertColumn(11, L"Salary", LVCFMT_CENTER, 80);
+			emp_list.InsertColumn(12, L"HireDate", LVCFMT_LEFT, 100);
+			int count = 0;
+			while (!recset.IsEOF()) {
+				count++;
+				// Copy each column into a variable
+				recset.GetFieldValue(L"EmpID", e_id);
+				recset.GetFieldValue(L"Title", e_title);
+				recset.GetFieldValue(L"Age", e_age);
+				recset.GetFieldValue(L"FirstName", e_firstname);
+				recset.GetFieldValue(L"LastName", e_lastname);
+				recset.GetFieldValue(L"Gender", e_gender);
+				recset.GetFieldValue(L"MobilePhone", e_phonenumber);
+				recset.GetFieldValue(L"EMail", e_email);
+				recset.GetFieldValue(L"BirthDate", e_birthdate);
+				recset.GetFieldValue(L"Address", e_address);
+				recset.GetFieldValue(L"JobTitle", e_jobtitle);
+				recset.GetFieldValue(L"Salary", e_salary);
+				recset.GetFieldValue(L"Hiredate", e_hiredate);
+
+				// Insert values into the list control
+				iRec = emp_list.InsertItem(0, e_id, 0);
+				emp_list.SetItemText(0, 1, e_title);
+				emp_list.SetItemText(0, 2, e_age);
+				emp_list.SetItemText(0, 3, e_firstname);
+				emp_list.SetItemText(0, 4, e_lastname);
+				emp_list.SetItemText(0, 5, e_gender);
+				emp_list.SetItemText(0, 6, e_phonenumber);
+				emp_list.SetItemText(0, 7, e_email);
+				emp_list.SetItemText(0, 8, e_birthdate);
+				emp_list.SetItemText(0, 9, e_address);
+				emp_list.SetItemText(0, 10, e_jobtitle);
+				emp_list.SetItemText(0, 11, e_salary);
+				emp_list.SetItemText(0, 12, e_hiredate);
+
+				// goto next record
+				recset.MoveNext();
+			}
 		}
-		//AfxMessageBox(SqlString);
-		//database.ExecuteSQL(SqlString);
-
-		recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
-		ResetListControl();
-		ListView_SetExtendedListViewStyle(emp_list, LVS_EX_GRIDLINES);
-		emp_list.InsertColumn(
-			0,              // Rank/order of item
-			L"EmpID",          // Caption for this header
-			LVCFMT_LEFT,    // Relative position of items under header
-			42);           // Width of items under header
-
-		emp_list.InsertColumn(1, L"Title", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(2, L"Age", LVCFMT_LEFT, 100);
-		emp_list.InsertColumn(3, L"FirstName", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(4, L"LastName", LVCFMT_LEFT, 100);
-		emp_list.InsertColumn(5, L"Gender", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(6, L"MobilePhone", LVCFMT_LEFT, 100);
-		emp_list.InsertColumn(7, L"EMail", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(8, L"BirthDate", LVCFMT_LEFT, 100);
-		emp_list.InsertColumn(9, L"Address", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(10, L"JobTitle", LVCFMT_LEFT, 100);
-		emp_list.InsertColumn(11, L"Salary", LVCFMT_CENTER, 80);
-		emp_list.InsertColumn(12, L"HireDate", LVCFMT_LEFT, 100);
-		int count = 0;
-		while (!recset.IsEOF()) {
-			count++;
-			// Copy each column into a variable
-			recset.GetFieldValue(L"EmpID", e_id);
-			recset.GetFieldValue(L"Title",e_title);
-			recset.GetFieldValue(L"Age", e_age);
-			recset.GetFieldValue(L"FirstName", e_firstname);
-			recset.GetFieldValue(L"LastName", e_lastname);
-			recset.GetFieldValue(L"Gender", e_gender);
-			recset.GetFieldValue(L"MobilePhone", e_phonenumber);
-			recset.GetFieldValue(L"EMail", e_email);
-			recset.GetFieldValue(L"BirthDate", e_birthdate);
-			recset.GetFieldValue(L"Address", e_address);
-			recset.GetFieldValue(L"JobTitle", e_jobtitle);
-			recset.GetFieldValue(L"Salary", e_salary);
-			recset.GetFieldValue(L"Hiredate", e_hiredate);
-
-			// Insert values into the list control
-			iRec = emp_list.InsertItem(0, e_id, 0);
-			emp_list.SetItemText(0, 1, e_title);
-			emp_list.SetItemText(0, 2, e_age);
-			emp_list.SetItemText(0, 3, e_firstname);
-			emp_list.SetItemText(0, 4, e_lastname);
-			emp_list.SetItemText(0, 5, e_gender);
-			emp_list.SetItemText(0, 6, e_phonenumber);
-			emp_list.SetItemText(0, 7, e_email);
-			emp_list.SetItemText(0, 8, e_birthdate);
-			emp_list.SetItemText(0, 9, e_address);
-			emp_list.SetItemText(0, 10, e_jobtitle);
-			emp_list.SetItemText(0, 11, e_salary);
-			emp_list.SetItemText(0, 12, e_hiredate);
-
-			// goto next record
-			recset.MoveNext();
-		}
-		/*if (count == 0) {
-			AfxMessageBox(L"Record Not Found...!");
-		}*/
-		// Close the database
 		database.Close();
 	}CATCH(CDBException, e) {
 		// If a database exception occured, show error msg
 		AfxMessageBox(L"Database error: " + e->m_strError);
 	}
 	END_CATCH;
-	//s_choose_field.SetWindowText(_T(""));
-	//s_entervalue.SetWindowText(_T(""));
 	UpdateWindow();
 }
 
@@ -785,8 +792,8 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 		bargraph_loaded();
 		//m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row);
 		m_Graph.DrawGraph();
-		//linegraph_empty();
-		m_ChartCtrl.RemoveSerie(_wtoi(id) + 1);
+		linegraph_empty();
+		linegraph_loaded();
 		m_ChartCtrl.EnableRefresh(true);
 
 		UpdateWindow();

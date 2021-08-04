@@ -69,4 +69,6 @@ public:
 	CString S_choose_filed_value;
 	CComboBox CChooseType;
 	CEdit CChoosetypevalue;
+	afx_msg void OnOperationsExport();
+	afx_msg void OnOperationsImport();
 };

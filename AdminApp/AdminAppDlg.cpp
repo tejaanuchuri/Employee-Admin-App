@@ -34,7 +34,7 @@
 
 #include "ChartCtrl\ChartCrossHairCursor.h"
 #include "ChartCtrl\ChartDragLineCursor.h"
-
+#include "xml_library/Markup.h"
 
 // CAdminAppDlg dialog
 
@@ -80,6 +80,8 @@ BEGIN_MESSAGE_MAP(CAdminAppDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_LOADBRAGRAPH, &CAdminAppDlg::OnBnClickedButtonLoadbragraph)
 	ON_BN_CLICKED(IDC_RADIO_BARGRAPH, &CAdminAppDlg::OnBnClickedRadioBargraph)
 	ON_BN_CLICKED(IDC_RADIO_LINE_GRAPH_REPRESENTATION, &CAdminAppDlg::OnBnClickedRadioLineGraphRepresentation)
+	ON_COMMAND(ID_OPERATIONS_EXPORT, &CAdminAppDlg::OnOperationsExport)
+	ON_COMMAND(ID_OPERATIONS_IMPORT, &CAdminAppDlg::OnOperationsImport)
 END_MESSAGE_MAP()
 
 
@@ -105,6 +107,7 @@ BOOL CAdminAppDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC_GRAPH_CHART)->ShowWindow(SW_HIDE);
 	m_line_graph_control.SetState(true);
 	m_line_graph_control.SetCheck(1);
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 void CAdminAppDlg::emp_data_load() {
@@ -854,8 +857,6 @@ void CAdminAppDlg::OnBnClickedButtonSelectgraph()
 		int n = 0;
 
 
-
-
 		CChartCtrl ref;
 		ref.RemoveAllSeries();
 		m_ChartCtrl.EnableRefresh(true);
@@ -966,5 +967,94 @@ void CAdminAppDlg::OnBnClickedRadioLineGraphRepresentation()
 	GetDlgItem(IDC_STATIC_GRAPH_CHART)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_CUSTOM_LINE_GRAPH)->ShowWindow(SW_SHOW);
 	UpdateWindow();
+
+}
+
+
+void CAdminAppDlg::OnOperationsExport()
+{
+	CMarkup xml;
+	POSITION pos = emp_list.GetFirstSelectedItemPosition();
+	if (pos == NULL) {
+		AfxMessageBox(L"No row Selected");
+	}
+	else {
+
+		POSITION pos = emp_list.GetFirstSelectedItemPosition();
+
+		if (pos != NULL) {
+			while (pos)
+			{
+				int row = emp_list.GetNextSelectedItem(pos);
+				CString id = emp_list.GetItemText(row, 0);
+				int e_id = _wtoi(id);
+				CString emp_title = emp_list.GetItemText(row, 3);
+				CString emp_age = emp_list.GetItemText(row, 4);
+				CString emp_firstname = emp_list.GetItemText(row, 5);
+				CString emp_lastname = emp_list.GetItemText(row, 6);
+				CString emp_gender = emp_list.GetItemText(row, 7);
+				CString emp_phonenumber = emp_list.GetItemText(row, 8);
+				CString emp_email = emp_list.GetItemText(row, 9);
+				CString emp_address = emp_list.GetItemText(row, 11);
+				CString emp_jobtitle = emp_list.GetItemText(row, 12);
+				CString emp_salary = emp_list.GetItemText(row, 13);
+				COleDateTime emp_datebirth;
+				emp_datebirth.ParseDateTime(emp_list.GetItemText(row, 10));
+				CString emp_date_birth = emp_datebirth.Format(_T("%d-%m-%Y"));
+
+				COleDateTime employee_hiredate;
+				employee_hiredate.ParseDateTime(emp_list.GetItemText(row, 1));
+				CString Hiredate = employee_hiredate.Format(_T("%d-%m-%Y"));
+				CString emp_yrsofexp = emp_list.GetItemText(row, 2);
+				CString xml_filename = L"D:\\DECOS\\XML Features\\Employee AdminApp\\AdminApp\\AdminApp\\Xml_Files\\Employee Record - ";
+				xml_filename.Append(id + L".xml");
+				//CString code = L"<?xml version=\"1,0\"";
+				//xml.AddElem(L"<?xml version=\"1.0\" encoding=\"UTF - 8\"?>");
+
+				xml.AddElem(MCD_STR(L"Employee-Record"));
+				xml.IntoElem();
+				xml.AddElem(MCD_STR(L"Id"), MCD_STR(id));
+				xml.AddElem(MCD_STR(L"Title"), MCD_STR(emp_title));
+				xml.AddElem(MCD_STR(L"Age"), MCD_STR(emp_age));
+				xml.AddElem(MCD_STR(L"First Name"), MCD_STR(emp_firstname));
+				xml.AddElem(MCD_STR(L"Last Name"), MCD_STR(emp_lastname));
+				xml.AddElem(MCD_STR(L"Gender"), MCD_STR(emp_gender));
+				xml.AddElem(MCD_STR(L"Phone Number"), MCD_STR(emp_phonenumber));
+				xml.AddElem(MCD_STR(L"Email"), MCD_STR(emp_email));
+				xml.AddElem(MCD_STR(L"Address"), MCD_STR(emp_address));
+				xml.AddElem(MCD_STR(L"Job Title"), MCD_STR(emp_jobtitle));
+				xml.AddElem(MCD_STR(L"Salary"), MCD_STR(emp_salary));
+				xml.AddElem(MCD_STR(L"Date of Birth"), MCD_STR(emp_date_birth));
+				xml.AddElem(MCD_STR(L"HireDate"), MCD_STR(Hiredate));
+				xml.AddElem(MCD_STR(L"Years of Experience"), MCD_STR(emp_yrsofexp));
+				xml.OutOfElem();
+				xml.Save(MCD_CSTR(xml_filename));
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+				xml.RemoveElem();
+
+			}
+		}MessageBox(L"Xml Files Generate Sucessfully...!");
+	}
+
+	return;
+}
+
+
+void CAdminAppDlg::OnOperationsImport()
+{
+
 
 }

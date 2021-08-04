@@ -147,6 +147,9 @@
     <ClInclude Include="ChartCtrl\PointsOrdering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="xml_library\Markup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdminApp.cpp">
@@ -246,6 +249,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ChartCtrl\ChartXYSerie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xml_library\Markup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

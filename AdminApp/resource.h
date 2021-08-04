@@ -92,13 +92,15 @@
 #define IDC_EDIT_FROM                   1095
 #define ID_FILE_CLOSE32771              32771
 #define ID_ABOUT_ADMINAPP               32772
+#define ID_OPERATIONS_IMPORT            32773
+#define ID_OPERATIONS_EXPORT            32774
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32773
+#define _APS_NEXT_COMMAND_VALUE         32775
 #define _APS_NEXT_CONTROL_VALUE         123
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

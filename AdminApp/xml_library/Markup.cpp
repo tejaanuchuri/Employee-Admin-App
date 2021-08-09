@@ -33,7 +33,7 @@
 
 #if defined(_DEBUG) && _MSC_VER > 1000 // VC++ DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #if defined(DEBUG_NEW)
 #define new DEBUG_NEW
 #endif // DEBUG_NEW
@@ -48,7 +48,7 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 // Internal static utility functions
 //
-void x_StrInsertReplace( MCD_STR& str, int nLeft, int nReplace, const MCD_STR& strInsert )
+void x_StrInsertReplace(MCD_STR& str, int nLeft, int nReplace, const MCD_STR& strInsert)
 {
 	// Insert strInsert into str at nLeft replacing nReplace chars
 	// Reduce reallocs on growing string by reserving string space
@@ -59,69 +59,69 @@ void x_StrInsertReplace( MCD_STR& str, int nLeft, int nReplace, const MCD_STR& s
 	int nNewLength = nInsLength + nStrLength - nReplace;
 	int nAllocLen = MCD_STRCAPACITY(str);
 #if defined(MCD_STRINSERTREPLACE) // STL, replace method
-	if ( nNewLength > nAllocLen )
-		MCD_BLDRESERVE( str, (nNewLength + nNewLength/2 + 128) );
-	MCD_STRINSERTREPLACE( str, nLeft, nReplace, strInsert );
+	if (nNewLength > nAllocLen)
+		MCD_BLDRESERVE(str, (nNewLength + nNewLength / 2 + 128));
+	MCD_STRINSERTREPLACE(str, nLeft, nReplace, strInsert);
 #else // MFC, no replace method
 	int nBufferLen = nNewLength;
-	if ( nNewLength > nAllocLen )
-		nBufferLen += nBufferLen/2 + 128;
-	MCD_CHAR* pDoc = MCD_GETBUFFER( str, nBufferLen );
-	if ( nInsLength != nReplace && nLeft+nReplace < nStrLength )
-		memmove( &pDoc[nLeft+nInsLength], &pDoc[nLeft+nReplace], (nStrLength-nLeft-nReplace)*sizeof(MCD_CHAR) );
-	if ( nInsLength )
-		memcpy( &pDoc[nLeft], strInsert, nInsLength*sizeof(MCD_CHAR) );
-	MCD_RELEASEBUFFER( str, pDoc, nNewLength );
+	if (nNewLength > nAllocLen)
+		nBufferLen += nBufferLen / 2 + 128;
+	MCD_CHAR* pDoc = MCD_GETBUFFER(str, nBufferLen);
+	if (nInsLength != nReplace && nLeft + nReplace < nStrLength)
+		memmove(&pDoc[nLeft + nInsLength], &pDoc[nLeft + nReplace], (nStrLength - nLeft - nReplace) * sizeof(MCD_CHAR));
+	if (nInsLength)
+		memcpy(&pDoc[nLeft], strInsert, nInsLength * sizeof(MCD_CHAR));
+	MCD_RELEASEBUFFER(str, pDoc, nNewLength);
 #endif // MFC, no replace method
 }
 
-int x_Hash( MCD_PCSZ p, int nSize )
+int x_Hash(MCD_PCSZ p, int nSize)
 {
-	unsigned int n=0;
+	unsigned int n = 0;
 	while (*p)
 		n += (unsigned int)(*p++);
 	return n % nSize;
 }
 
-MCD_STR x_IntToStr( int n )
+MCD_STR x_IntToStr(int n)
 {
 	MCD_CHAR sz[25];
-	MCD_SPRINTF(MCD_SSZ(sz),MCD_T("%d"),n);
-	MCD_STR s=sz;
+	MCD_SPRINTF(MCD_SSZ(sz), MCD_T("%d"), n);
+	MCD_STR s = sz;
 	return s;
 }
 
-int x_StrNCmp( MCD_PCSZ p1, MCD_PCSZ p2, int n, int bIgnoreCase = 0 )
+int x_StrNCmp(MCD_PCSZ p1, MCD_PCSZ p2, int n, int bIgnoreCase = 0)
 {
 	// Fast string compare to determine equality
-	if ( bIgnoreCase )
+	if (bIgnoreCase)
 	{
 		bool bNonAsciiFound = false;
 		MCD_CHAR c1, c2;
-		while ( n-- )
+		while (n--)
 		{
 			c1 = *p1++;
 			c2 = *p2++;
-			if ( c1 != c2 )
+			if (c1 != c2)
 			{
-				if ( bNonAsciiFound )
+				if (bNonAsciiFound)
 					return c1 - c2;
-				if ( c1 >= 'a' && c1 <= 'z' )
-					c1 = (MCD_CHAR)( c1 - ('a'-'A') );
-				if ( c2 >= 'a' && c2 <= 'z' )
-					c2 = (MCD_CHAR)( c2 - ('a'-'A') );
-				if ( c1 != c2 )
+				if (c1 >= 'a' && c1 <= 'z')
+					c1 = (MCD_CHAR)(c1 - ('a' - 'A'));
+				if (c2 >= 'a' && c2 <= 'z')
+					c2 = (MCD_CHAR)(c2 - ('a' - 'A'));
+				if (c1 != c2)
 					return c1 - c2;
 			}
-			else if ( (unsigned int)c1 > 127 )
+			else if ((unsigned int)c1 > 127)
 				bNonAsciiFound = true;
 		}
 	}
 	else
 	{
-		while ( n-- )
+		while (n--)
 		{
-			if ( *p1 != *p2 )
+			if (*p1 != *p2)
 				return *p1 - *p2;
 			p1++;
 			p2++;
@@ -132,47 +132,47 @@ int x_StrNCmp( MCD_PCSZ p1, MCD_PCSZ p2, int n, int bIgnoreCase = 0 )
 
 enum MarkupResultCode
 {
-	MRC_COUNT    = 1,
-	MRC_TYPE     = 2,
-	MRC_NUMBER   = 4,
+	MRC_COUNT = 1,
+	MRC_TYPE = 2,
+	MRC_NUMBER = 4,
 	MRC_ENCODING = 8,
-	MRC_LENGTH   = 16,
-	MRC_MODIFY   = 32,
-	MRC_MSG      = 64
+	MRC_LENGTH = 16,
+	MRC_MODIFY = 32,
+	MRC_MSG = 64
 };
 
-void x_AddResult( MCD_STR& strResult, MCD_CSTR pszID, MCD_CSTR pszVal = NULL, int nResultCode = 0, int n = -1, int n2 = -1 )
+void x_AddResult(MCD_STR& strResult, MCD_CSTR pszID, MCD_CSTR pszVal = NULL, int nResultCode = 0, int n = -1, int n2 = -1)
 {
 	// Call this to append an error result to strResult, discard if accumulating too large
-	if ( MCD_STRLENGTH(strResult) < 1000 )
+	if (MCD_STRLENGTH(strResult) < 1000)
 	{
 		// Use a temporary CMarkup object but keep strResult in a string to minimize memory footprint
-		CMarkup mResult( strResult );
-		if ( nResultCode & MRC_MODIFY )
-			mResult.FindElem( pszID );
+		CMarkup mResult(strResult);
+		if (nResultCode & MRC_MODIFY)
+			mResult.FindElem(pszID);
 		else
-			mResult.AddElem( pszID, MCD_T(""), CMarkup::MNF_WITHNOLINES );
-		if ( pszVal.pcsz )
+			mResult.AddElem(pszID, MCD_T(""), CMarkup::MNF_WITHNOLINES);
+		if (pszVal.pcsz)
 		{
-			if ( nResultCode & MRC_TYPE )
-				mResult.SetAttrib( MCD_T("type"), pszVal );
-			else if ( nResultCode & MRC_ENCODING )
-				mResult.SetAttrib( MCD_T("encoding"), pszVal );
-			else if ( nResultCode & MRC_MSG )
-				mResult.SetAttrib( MCD_T("msg"), pszVal );
+			if (nResultCode & MRC_TYPE)
+				mResult.SetAttrib(MCD_T("type"), pszVal);
+			else if (nResultCode & MRC_ENCODING)
+				mResult.SetAttrib(MCD_T("encoding"), pszVal);
+			else if (nResultCode & MRC_MSG)
+				mResult.SetAttrib(MCD_T("msg"), pszVal);
 			else
-				mResult.SetAttrib( MCD_T("tagname"), pszVal );
+				mResult.SetAttrib(MCD_T("tagname"), pszVal);
 		}
-		if ( nResultCode & MRC_NUMBER )
-			mResult.SetAttrib( MCD_T("n"), n );
-		else if ( nResultCode & MRC_COUNT )
-			mResult.SetAttrib( MCD_T("count"), n );
-		else if ( nResultCode & MRC_LENGTH )
-			mResult.SetAttrib( MCD_T("length"), n );
-		else if ( n != -1 )
-			mResult.SetAttrib( MCD_T("offset"), n );
-		if ( n2 != -1 )
-			mResult.SetAttrib( MCD_T("offset2"), n2 );
+		if (nResultCode & MRC_NUMBER)
+			mResult.SetAttrib(MCD_T("n"), n);
+		else if (nResultCode & MRC_COUNT)
+			mResult.SetAttrib(MCD_T("count"), n);
+		else if (nResultCode & MRC_LENGTH)
+			mResult.SetAttrib(MCD_T("length"), n);
+		else if (n != -1)
+			mResult.SetAttrib(MCD_T("offset"), n);
+		if (n2 != -1)
+			mResult.SetAttrib(MCD_T("offset2"), n2);
 		strResult = mResult.GetDoc();
 	}
 }
@@ -182,7 +182,7 @@ void x_AddResult( MCD_STR& strResult, MCD_CSTR pszID, MCD_CSTR pszVal = NULL, in
 //
 struct TextEncoding
 {
-	TextEncoding( MCD_CSTR pszFromEncoding, const void* pFromBuffer, int nFromBufferLen )
+	TextEncoding(MCD_CSTR pszFromEncoding, const void* pFromBuffer, int nFromBufferLen)
 	{
 		m_strFromEncoding = pszFromEncoding;
 		m_pFrom = pFromBuffer;
@@ -190,14 +190,14 @@ struct TextEncoding
 		m_nFailedChars = 0;
 		m_nToCount = 0;
 	};
-	int PerformConversion( void* pTo, MCD_CSTR pszToEncoding = NULL );
-	bool FindRaggedEnd( int& nTruncBeforeBytes );
+	int PerformConversion(void* pTo, MCD_CSTR pszToEncoding = NULL);
+	bool FindRaggedEnd(int& nTruncBeforeBytes);
 #if defined(MARKUP_ICONV)
-	static const char* IConvName( char* szEncoding, MCD_CSTR pszEncoding );
-	int IConv( void* pTo, int nToCharSize, int nFromCharSize );
+	static const char* IConvName(char* szEncoding, MCD_CSTR pszEncoding);
+	int IConv(void* pTo, int nToCharSize, int nFromCharSize);
 #endif // ICONV
 #if ! defined(MARKUP_WCHAR)
-	static bool CanConvert( MCD_CSTR pszToEncoding, MCD_CSTR pszFromEncoding );
+	static bool CanConvert(MCD_CSTR pszToEncoding, MCD_CSTR pszFromEncoding);
 #endif // WCHAR
 	MCD_STR m_strToEncoding;
 	MCD_STR m_strFromEncoding;
@@ -329,28 +329,28 @@ MCD_PCSZ EncodingNameTable[155] =
 	MCD_T("1620127iso_646.irv:19911351932windows-519320920001x-cp20001")
 };
 
-int x_GetEncodingCodePage( MCD_CSTR pszEncoding )
+int x_GetEncodingCodePage(MCD_CSTR pszEncoding)
 {
 	// redo for completeness, the iconv set, UTF-32, and uppercase
 
 	// Lookup strEncoding in EncodingNameTable and return Windows code page
 	int nCodePage = -1;
-	int nEncLen = MCD_PSZLEN( pszEncoding );
-	if ( ! nEncLen )
+	int nEncLen = MCD_PSZLEN(pszEncoding);
+	if (!nEncLen)
 		nCodePage = MCD_ACP;
-	else if ( x_StrNCmp(pszEncoding,MCD_T("UTF-32"),6) == 0 )
+	else if (x_StrNCmp(pszEncoding, MCD_T("UTF-32"), 6) == 0)
 		nCodePage = MCD_UTF32;
-	else if ( nEncLen < 100 )
+	else if (nEncLen < 100)
 	{
 		MCD_CHAR szEncodingLower[100];
-		for ( int nEncChar=0; nEncChar<nEncLen; ++nEncChar )
+		for (int nEncChar = 0; nEncChar < nEncLen; ++nEncChar)
 		{
 			MCD_CHAR cEncChar = pszEncoding[nEncChar];
-			szEncodingLower[nEncChar] = (cEncChar>='A' && cEncChar<='Z')? (MCD_CHAR)(cEncChar+('a'-'A')) : cEncChar;
+			szEncodingLower[nEncChar] = (cEncChar >= 'A' && cEncChar <= 'Z') ? (MCD_CHAR)(cEncChar + ('a' - 'A')) : cEncChar;
 		}
 		szEncodingLower[nEncLen] = '\0';
-		MCD_PCSZ pEntry = EncodingNameTable[x_Hash(szEncodingLower,sizeof(EncodingNameTable)/sizeof(MCD_PCSZ))];
-		while ( *pEntry )
+		MCD_PCSZ pEntry = EncodingNameTable[x_Hash(szEncodingLower, sizeof(EncodingNameTable) / sizeof(MCD_PCSZ))];
+		while (*pEntry)
 		{
 			// e.g. entry: 0565001utf-8 means length 05, code page 65001, encoding name utf-8
 			int nEntryLen = (*pEntry - '0') * 10;
@@ -359,10 +359,10 @@ int x_GetEncodingCodePage( MCD_CSTR pszEncoding )
 			++pEntry;
 			MCD_PCSZ pCodePage = pEntry;
 			pEntry += 5;
-			if ( nEntryLen == nEncLen && x_StrNCmp(szEncodingLower,pEntry,nEntryLen) == 0 )
+			if (nEntryLen == nEncLen && x_StrNCmp(szEncodingLower, pEntry, nEntryLen) == 0)
 			{
 				// Convert digits to integer up to code name which always starts with alpha 
-				nCodePage = MCD_PSZTOL( pCodePage, NULL, 10 );
+				nCodePage = MCD_PSZTOL(pCodePage, NULL, 10);
 				break;
 			}
 			pEntry += nEntryLen;
@@ -372,35 +372,35 @@ int x_GetEncodingCodePage( MCD_CSTR pszEncoding )
 }
 
 #if ! defined(MARKUP_WCHAR)
-bool TextEncoding::CanConvert( MCD_CSTR pszToEncoding, MCD_CSTR pszFromEncoding )
+bool TextEncoding::CanConvert(MCD_CSTR pszToEncoding, MCD_CSTR pszFromEncoding)
 {
 	// Return true if MB to MB conversion is possible
 #if defined(MARKUP_ICONV)
 	// iconv_open should fail if either encoding not supported or one is alias for other
 	char szTo[100], szFrom[100];
-	iconv_t cd = iconv_open( IConvName(szTo,pszToEncoding), IConvName(szFrom,pszFromEncoding) );
-	if ( cd == (iconv_t)-1 )
+	iconv_t cd = iconv_open(IConvName(szTo, pszToEncoding), IConvName(szFrom, pszFromEncoding));
+	if (cd == (iconv_t)-1)
 		return false;
 	iconv_close(cd);
 #else
-	int nToCP = x_GetEncodingCodePage( pszToEncoding );
-	int nFromCP = x_GetEncodingCodePage( pszFromEncoding );
-	if ( nToCP == -1 || nFromCP == -1 )
+	int nToCP = x_GetEncodingCodePage(pszToEncoding);
+	int nFromCP = x_GetEncodingCodePage(pszFromEncoding);
+	if (nToCP == -1 || nFromCP == -1)
 		return false;
 #if defined(MARKUP_WINCONV)
-	if ( nToCP == MCD_ACP || nFromCP == MCD_ACP ) // either ACP ANSI?
+	if (nToCP == MCD_ACP || nFromCP == MCD_ACP) // either ACP ANSI?
 	{
 		int nACP = GetACP();
-		if ( nToCP == MCD_ACP )
+		if (nToCP == MCD_ACP)
 			nToCP = nACP;
-		if ( nFromCP == MCD_ACP )
+		if (nFromCP == MCD_ACP)
 			nFromCP = nACP;
 	}
 #else // no conversion API, but we can do AToUTF8 and UTF8ToA
-	if ( nToCP != MCD_UTF8 && nFromCP != MCD_UTF8 ) // either UTF-8?
+	if (nToCP != MCD_UTF8 && nFromCP != MCD_UTF8) // either UTF-8?
 		return false;
 #endif // no conversion API
-	if ( nToCP == nFromCP )
+	if (nToCP == nFromCP)
 		return false;
 #endif // not ICONV
 	return true;
@@ -408,17 +408,17 @@ bool TextEncoding::CanConvert( MCD_CSTR pszToEncoding, MCD_CSTR pszFromEncoding 
 #endif // not WCHAR
 
 #if defined(MARKUP_ICONV)
-const char* TextEncoding::IConvName( char* szEncoding, MCD_CSTR pszEncoding )
+const char* TextEncoding::IConvName(char* szEncoding, MCD_CSTR pszEncoding)
 {
 	// Make upper case char-based name from strEncoding which consists only of characters in the ASCII range
 	int nEncChar = 0;
-	while ( pszEncoding[nEncChar] )
+	while (pszEncoding[nEncChar])
 	{
 		char cEncChar = (char)pszEncoding[nEncChar];
-		szEncoding[nEncChar] = (cEncChar>='a' && cEncChar<='z')? (cEncChar-('a'-'A')) : cEncChar;
+		szEncoding[nEncChar] = (cEncChar >= 'a' && cEncChar <= 'z') ? (cEncChar - ('a' - 'A')) : cEncChar;
 		++nEncChar;
 	}
-	if ( nEncChar == 6 && x_StrNCmp(szEncoding,"UTF-16",6) == 0 )
+	if (nEncChar == 6 && x_StrNCmp(szEncoding, "UTF-16", 6) == 0)
 	{
 		szEncoding[nEncChar++] = 'B';
 		szEncoding[nEncChar++] = 'E';
@@ -427,13 +427,13 @@ const char* TextEncoding::IConvName( char* szEncoding, MCD_CSTR pszEncoding )
 	return szEncoding;
 }
 
-int TextEncoding::IConv( void* pTo, int nToCharSize, int nFromCharSize )
+int TextEncoding::IConv(void* pTo, int nToCharSize, int nFromCharSize)
 {
 	// Converts from m_pFrom to pTo
 	char szTo[100], szFrom[100];
-	iconv_t cd = iconv_open( IConvName(szTo,m_strToEncoding), IConvName(szFrom,m_strFromEncoding) );
+	iconv_t cd = iconv_open(IConvName(szTo, m_strToEncoding), IConvName(szFrom, m_strFromEncoding));
 	int nToLenBytes = 0;
-	if ( cd != (iconv_t)-1 )
+	if (cd != (iconv_t)-1)
 	{
 		size_t nFromLenRemaining = (size_t)m_nFromLen * nFromCharSize;
 		size_t nToCountRemaining = (size_t)m_nToCount * nToCharSize;
@@ -443,51 +443,51 @@ int TextEncoding::IConv( void* pTo, int nToCharSize, int nFromCharSize )
 		char* pToTempBuffer = NULL;
 		const size_t nTempBufferSize = 2048;
 		size_t nResult;
-		if ( ! pTo )
+		if (!pTo)
 		{
 			pToTempBuffer = new char[nTempBufferSize];
 			pToChar = pToTempBuffer;
 			nToCountRemaining = nTempBufferSize;
 		}
-		while ( nFromLenRemaining )
+		while (nFromLenRemaining)
 		{
 			nToCountRemainingBefore = nToCountRemaining;
-			nResult = iconv( cd, &pFromChar, &nFromLenRemaining, &pToChar, &nToCountRemaining );
+			nResult = iconv(cd, &pFromChar, &nFromLenRemaining, &pToChar, &nToCountRemaining);
 			nToLenBytes += (int)(nToCountRemainingBefore - nToCountRemaining);
-			if ( nResult == (size_t)-1 )
+			if (nResult == (size_t)-1)
 			{
 				int nErrno = errno;
-				if ( nErrno == EILSEQ  )
+				if (nErrno == EILSEQ)
 				{
 					// Bypass bad char, question mark denotes problem in source string
 					pFromChar += nFromCharSize;
 					nFromLenRemaining -= nFromCharSize;
-					if ( nToCharSize == 1 )
+					if (nToCharSize == 1)
 						*pToChar = '?';
-					else if ( nToCharSize == 2 )
+					else if (nToCharSize == 2)
 						*((unsigned short*)pToChar) = (unsigned short)'?';
-					else if ( nToCharSize == 4 )
+					else if (nToCharSize == 4)
 						*((unsigned int*)pToChar) = (unsigned int)'?';
 					pToChar += nToCharSize;
 					nToCountRemaining -= nToCharSize;
 					nToLenBytes += nToCharSize;
 					size_t nInitFromLen = 0, nInitToCount = 0;
-					iconv(cd, NULL, &nInitFromLen ,NULL, &nInitToCount );
+					iconv(cd, NULL, &nInitFromLen, NULL, &nInitToCount);
 				}
-				else if ( nErrno == EINVAL )
+				else if (nErrno == EINVAL)
 					break; // incomplete character or shift sequence at end of input
-				else if ( nErrno == E2BIG && !pToTempBuffer )
+				else if (nErrno == E2BIG && !pToTempBuffer)
 					break; // output buffer full should only happen when using a temp buffer
 			}
 			else
 				m_nFailedChars += nResult;
-			if ( pToTempBuffer && nToCountRemaining < 10 )
+			if (pToTempBuffer && nToCountRemaining < 10)
 			{
 				nToCountRemaining = nTempBufferSize;
 				pToChar = pToTempBuffer;
 			}
 		}
-		if ( pToTempBuffer )
+		if (pToTempBuffer)
 			delete[] pToTempBuffer;
 		iconv_close(cd);
 	}
@@ -496,145 +496,145 @@ int TextEncoding::IConv( void* pTo, int nToCharSize, int nFromCharSize )
 #endif
 
 #if defined(MARKUP_WINCONV)
-bool x_NoDefaultChar( int nCP )
+bool x_NoDefaultChar(int nCP)
 {
 	// WideCharToMultiByte fails if lpUsedDefaultChar is non-NULL for these code pages:
-    return (bool)(nCP == 65000 || nCP == 65001 || nCP == 50220 || nCP == 50221 || nCP == 50222 || nCP == 50225 ||
-            nCP == 50227 || nCP == 50229 || nCP == 52936 || nCP == 54936 || (nCP >= 57002 && nCP <= 57011) );
+	return (bool)(nCP == 65000 || nCP == 65001 || nCP == 50220 || nCP == 50221 || nCP == 50222 || nCP == 50225 ||
+		nCP == 50227 || nCP == 50229 || nCP == 52936 || nCP == 54936 || (nCP >= 57002 && nCP <= 57011));
 }
 #endif
 
-int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ )
+int TextEncoding::PerformConversion(void* pTo, MCD_CSTR pszToEncoding/*=NULL*/)
 {
 	// If pTo is not NULL, it must be large enough to hold result, length of result is returned
 	// m_nFailedChars will be set to >0 if characters not supported in strToEncoding
 	int nToLen = 0;
-	if ( pszToEncoding.pcsz )
+	if (pszToEncoding.pcsz)
 		m_strToEncoding = pszToEncoding;
-	int nToCP = x_GetEncodingCodePage( m_strToEncoding );
-	if ( nToCP == -1 )
+	int nToCP = x_GetEncodingCodePage(m_strToEncoding);
+	if (nToCP == -1)
 		nToCP = MCD_ACP;
-	int nFromCP = x_GetEncodingCodePage( m_strFromEncoding );
-	if ( nFromCP == -1 )
+	int nFromCP = x_GetEncodingCodePage(m_strFromEncoding);
+	if (nFromCP == -1)
 		nFromCP = MCD_ACP;
 	m_nFailedChars = 0;
 
 #if ! defined(MARKUP_WINCONV) && ! defined(MARKUP_ICONV)
 	// Only non-Unicode encoding supported is locale charset, must call setlocale
-	if ( nToCP != MCD_UTF8 && nToCP != MCD_UTF16 && nToCP != MCD_UTF32 )
+	if (nToCP != MCD_UTF8 && nToCP != MCD_UTF16 && nToCP != MCD_UTF32)
 		nToCP = MCD_ACP;
-	if ( nFromCP != MCD_UTF8 && nFromCP != MCD_UTF16 && nFromCP != MCD_UTF32 )
+	if (nFromCP != MCD_UTF8 && nFromCP != MCD_UTF16 && nFromCP != MCD_UTF32)
 		nFromCP = MCD_ACP;
-	if ( nFromCP == MCD_ACP )
+	if (nFromCP == MCD_ACP)
 	{
 		const char* pA = (const char*)m_pFrom;
 		int nALenRemaining = m_nFromLen;
 		int nCharLen;
 		wchar_t wcChar;
 		char* pU = (char*)pTo;
-		while ( nALenRemaining )
+		while (nALenRemaining)
 		{
-			nCharLen = mbtowc( &wcChar, pA, nALenRemaining );
-			if ( nCharLen < 1 )
+			nCharLen = mbtowc(&wcChar, pA, nALenRemaining);
+			if (nCharLen < 1)
 			{
 				wcChar = (wchar_t)'?';
 				nCharLen = 1;
 			}
 			pA += nCharLen;
 			nALenRemaining -= nCharLen;
-			if ( nToCP == MCD_UTF8 )
-				CMarkup::EncodeCharUTF8( (int)wcChar, pU, nToLen );
-			else if ( nToCP == MCD_UTF16 )
-				CMarkup::EncodeCharUTF16( (int)wcChar, (unsigned short*)pU, nToLen );
+			if (nToCP == MCD_UTF8)
+				CMarkup::EncodeCharUTF8((int)wcChar, pU, nToLen);
+			else if (nToCP == MCD_UTF16)
+				CMarkup::EncodeCharUTF16((int)wcChar, (unsigned short*)pU, nToLen);
 			else // UTF32
 			{
-				if ( pU )
+				if (pU)
 					((unsigned int*)pU)[nToLen] = (unsigned int)wcChar;
 				++nToLen;
 			}
 		}
 	}
-	else if ( nToCP == MCD_ACP )
+	else if (nToCP == MCD_ACP)
 	{
 		union pUnicodeUnion { const char* p8; const unsigned short* p16; const unsigned int* p32; } pU;
 		pU.p8 = (const char*)m_pFrom;
 		const char* pUEnd = pU.p8 + m_nFromLen;
-		if ( nFromCP == MCD_UTF16 )
-			pUEnd = (char*)( pU.p16 + m_nFromLen );
-		else if ( nFromCP == MCD_UTF32 )
-			pUEnd = (char*)( pU.p32 + m_nFromLen );
+		if (nFromCP == MCD_UTF16)
+			pUEnd = (char*)(pU.p16 + m_nFromLen);
+		else if (nFromCP == MCD_UTF32)
+			pUEnd = (char*)(pU.p32 + m_nFromLen);
 		int nCharLen;
 		char* pA = (char*)pTo;
 		char szA[8];
 		int nUChar;
-		while ( pU.p8 != pUEnd )
+		while (pU.p8 != pUEnd)
 		{
-			if ( nFromCP == MCD_UTF8 )
-				nUChar = CMarkup::DecodeCharUTF8( pU.p8, pUEnd );
-			else if ( nFromCP == MCD_UTF16 )
-				nUChar = CMarkup::DecodeCharUTF16( pU.p16, (const unsigned short*)pUEnd );
+			if (nFromCP == MCD_UTF8)
+				nUChar = CMarkup::DecodeCharUTF8(pU.p8, pUEnd);
+			else if (nFromCP == MCD_UTF16)
+				nUChar = CMarkup::DecodeCharUTF16(pU.p16, (const unsigned short*)pUEnd);
 			else // UTF32
 				nUChar = *(pU.p32)++;
-			if ( nUChar == -1 )
+			if (nUChar == -1)
 				nCharLen = -2;
-			else if ( nUChar & ~0xffff )
+			else if (nUChar & ~0xffff)
 				nCharLen = -1;
 			else
-				nCharLen = wctomb( pA?pA:szA, (wchar_t)nUChar );
-			if ( nCharLen < 0 )
+				nCharLen = wctomb(pA ? pA : szA, (wchar_t)nUChar);
+			if (nCharLen < 0)
 			{
-				if ( nCharLen == -1 )
+				if (nCharLen == -1)
 					++m_nFailedChars;
 				nCharLen = 1;
-				if ( pA )
+				if (pA)
 					*pA = '?';
 			}
-			if ( pA )
+			if (pA)
 				pA += nCharLen;
 			nToLen += nCharLen;
 		}
 	}
 #endif // not WINCONV and not ICONV
 
-	if ( nFromCP == MCD_UTF32 )
+	if (nFromCP == MCD_UTF32)
 	{
 		const unsigned int* p32 = (const unsigned int*)m_pFrom;
 		const unsigned int* p32End = p32 + m_nFromLen;
-		if ( nToCP == MCD_UTF8 )
+		if (nToCP == MCD_UTF8)
 		{
 			char* p8 = (char*)pTo;
-			while ( p32 != p32End )
-				CMarkup::EncodeCharUTF8( *p32++, p8, nToLen );
+			while (p32 != p32End)
+				CMarkup::EncodeCharUTF8(*p32++, p8, nToLen);
 		}
-		else if ( nToCP == MCD_UTF16 )
+		else if (nToCP == MCD_UTF16)
 		{
 			unsigned short* p16 = (unsigned short*)pTo;
-			while ( p32 != p32End )
-				CMarkup::EncodeCharUTF16( (int)*p32++, p16, nToLen );
+			while (p32 != p32End)
+				CMarkup::EncodeCharUTF16((int)*p32++, p16, nToLen);
 		}
 		else // to ANSI
 		{
 			// WINCONV not supported for 32To8, since only used for sizeof(wchar_t) == 4
 #if defined(MARKUP_ICONV)
-			nToLen = IConv( pTo, 1, 4 );
+			nToLen = IConv(pTo, 1, 4);
 #endif // ICONV
 		}
 	}
-	else if ( nFromCP == MCD_UTF16 )
+	else if (nFromCP == MCD_UTF16)
 	{
 		// UTF16To8 will be deprecated since weird output buffer size sensitivity not worth implementing here
 		const unsigned short* p16 = (const unsigned short*)m_pFrom;
 		const unsigned short* p16End = p16 + m_nFromLen;
 		int nUChar;
-		if ( nToCP == MCD_UTF32 )
+		if (nToCP == MCD_UTF32)
 		{
 			unsigned int* p32 = (unsigned int*)pTo;
-			while ( p16 != p16End )
+			while (p16 != p16End)
 			{
-				nUChar = CMarkup::DecodeCharUTF16( p16, p16End );
-				if ( nUChar == -1 )
+				nUChar = CMarkup::DecodeCharUTF16(p16, p16End);
+				if (nUChar == -1)
 					nUChar = '?';
-				if ( p32 )
+				if (p32)
 					p32[nToLen] = (unsigned int)nUChar;
 				++nToLen;
 			}
@@ -642,46 +642,46 @@ int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ 
 #if defined(MARKUP_WINCONV)
 		else // to UTF-8 or other multi-byte
 		{
-			nToLen = WideCharToMultiByte(nToCP,0,(const wchar_t*)m_pFrom,m_nFromLen,(char*)pTo,
-					m_nToCount?m_nToCount+1:0,NULL,x_NoDefaultChar(nToCP)?NULL:&m_nFailedChars);
+			nToLen = WideCharToMultiByte(nToCP, 0, (const wchar_t*)m_pFrom, m_nFromLen, (char*)pTo,
+				m_nToCount ? m_nToCount + 1 : 0, NULL, x_NoDefaultChar(nToCP) ? NULL : &m_nFailedChars);
 		}
 #else // not WINCONV
-		else if ( nToCP == MCD_UTF8 )
+		else if (nToCP == MCD_UTF8)
 		{
 			char* p8 = (char*)pTo;
-			while ( p16 != p16End )
+			while (p16 != p16End)
 			{
-				nUChar = CMarkup::DecodeCharUTF16( p16, p16End );
-				if ( nUChar == -1 )
+				nUChar = CMarkup::DecodeCharUTF16(p16, p16End);
+				if (nUChar == -1)
 					nUChar = '?';
-				CMarkup::EncodeCharUTF8( nUChar, p8, nToLen );
+				CMarkup::EncodeCharUTF8(nUChar, p8, nToLen);
 			}
 		}
 		else // to ANSI
 		{
 #if defined(MARKUP_ICONV)
-			nToLen = IConv( pTo, 1, 2 );
+			nToLen = IConv(pTo, 1, 2);
 #endif // ICONV
 		}
 #endif // not WINCONV
 	}
-	else if ( nToCP == MCD_UTF16  ) // to UTF-16 from UTF-8/ANSI
+	else if (nToCP == MCD_UTF16) // to UTF-16 from UTF-8/ANSI
 	{
 #if defined(MARKUP_WINCONV)
-		nToLen = MultiByteToWideChar(nFromCP,0,(const char*)m_pFrom,m_nFromLen,(wchar_t*)pTo,m_nToCount);
+		nToLen = MultiByteToWideChar(nFromCP, 0, (const char*)m_pFrom, m_nFromLen, (wchar_t*)pTo, m_nToCount);
 #else // not WINCONV
-		if ( nFromCP == MCD_UTF8 )
+		if (nFromCP == MCD_UTF8)
 		{
 			const char* p8 = (const char*)m_pFrom;
 			const char* p8End = p8 + m_nFromLen;
 			int nUChar;
 			unsigned short* p16 = (unsigned short*)pTo;
-			while ( p8 != p8End )
+			while (p8 != p8End)
 			{
-				nUChar = CMarkup::DecodeCharUTF8( p8, p8End );
-				if ( nUChar == -1 )
+				nUChar = CMarkup::DecodeCharUTF8(p8, p8End);
+				if (nUChar == -1)
 					nUChar = '?';
-				if ( p16 )
+				if (p16)
 					p16[nToLen] = (unsigned short)nUChar;
 				++nToLen;
 			}
@@ -689,25 +689,25 @@ int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ 
 		else // from ANSI
 		{
 #if defined(MARKUP_ICONV)
-			nToLen = IConv( pTo, 2, 1 );
+			nToLen = IConv(pTo, 2, 1);
 #endif // ICONV
 		}
 #endif // not WINCONV
 	}
-	else if ( nToCP == MCD_UTF32  ) // to UTF-32 from UTF-8/ANSI
+	else if (nToCP == MCD_UTF32) // to UTF-32 from UTF-8/ANSI
 	{
-		if ( nFromCP == MCD_UTF8 )
+		if (nFromCP == MCD_UTF8)
 		{
 			const char* p8 = (const char*)m_pFrom;
 			const char* p8End = p8 + m_nFromLen;
 			int nUChar;
 			unsigned int* p32 = (unsigned int*)pTo;
-			while ( p8 != p8End )
+			while (p8 != p8End)
 			{
-				nUChar = CMarkup::DecodeCharUTF8( p8, p8End );
-				if ( nUChar == -1 )
+				nUChar = CMarkup::DecodeCharUTF8(p8, p8End);
+				if (nUChar == -1)
 					nUChar = '?';
-				if ( p32 )
+				if (p32)
 					p32[nToLen] = (unsigned int)nUChar;
 				++nToLen;
 			}
@@ -723,21 +723,21 @@ int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ 
 			MCD_STR strToEncoding = m_strToEncoding;
 			m_strToEncoding = MCD_T("UTF-16BE");
 			short nEndianTest = 1;
-			if ( ((char*)&nEndianTest)[0] ) // Little-endian?
+			if (((char*)&nEndianTest)[0]) // Little-endian?
 				m_strToEncoding = MCD_T("UTF-16LE");
 			m_nToCount = m_nFromLen;
-			int nUTF16Len = IConv( pwszUTF16, 2, 1 );
+			int nUTF16Len = IConv(pwszUTF16, 2, 1);
 			m_strToEncoding = strToEncoding;
 			const unsigned short* p16 = (const unsigned short*)pwszUTF16;
 			const unsigned short* p16End = p16 + nUTF16Len;
 			int nUChar;
 			unsigned int* p32 = (unsigned int*)pTo;
-			while ( p16 != p16End )
+			while (p16 != p16End)
 			{
-				nUChar = CMarkup::DecodeCharUTF16( p16, p16End );
-				if ( nUChar == -1 )
+				nUChar = CMarkup::DecodeCharUTF16(p16, p16End);
+				if (nUChar == -1)
 					nUChar = '?';
-				if ( p32 )
+				if (p32)
 					*p32++ = (unsigned int)nUChar;
 				++nToLen;
 			}
@@ -748,12 +748,12 @@ int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ 
 	else
 	{
 #if defined(MARKUP_ICONV)
-		nToLen = IConv( pTo, 1, 1 );
+		nToLen = IConv(pTo, 1, 1);
 #elif defined(MARKUP_WINCONV)
 		wchar_t* pwszUTF16 = new wchar_t[m_nFromLen];
-		int nUTF16Len = MultiByteToWideChar(nFromCP,0,(const char*)m_pFrom,m_nFromLen,pwszUTF16,m_nFromLen);
-		nToLen = WideCharToMultiByte(nToCP,0,pwszUTF16,nUTF16Len,(char*)pTo,m_nToCount,NULL,
-			x_NoDefaultChar(nToCP)?NULL:&m_nFailedChars);
+		int nUTF16Len = MultiByteToWideChar(nFromCP, 0, (const char*)m_pFrom, m_nFromLen, pwszUTF16, m_nFromLen);
+		nToLen = WideCharToMultiByte(nToCP, 0, pwszUTF16, nUTF16Len, (char*)pTo, m_nToCount, NULL,
+			x_NoDefaultChar(nToCP) ? NULL : &m_nFailedChars);
 		delete[] pwszUTF16;
 #endif // WINCONV
 	}
@@ -763,28 +763,28 @@ int TextEncoding::PerformConversion( void* pTo, MCD_CSTR pszToEncoding/*=NULL*/ 
 	return nToLen;
 }
 
-bool TextEncoding::FindRaggedEnd( int& nTruncBeforeBytes )
+bool TextEncoding::FindRaggedEnd(int& nTruncBeforeBytes)
 {
 	// Check for ragged end UTF-16 or multi-byte according to m_strToEncoding, expects at least 40 bytes to work with
 	bool bSuccess = true;
 	nTruncBeforeBytes = 0;
-	int nCP = x_GetEncodingCodePage( m_strFromEncoding );
-	if ( nCP == MCD_UTF16 )
+	int nCP = x_GetEncodingCodePage(m_strFromEncoding);
+	if (nCP == MCD_UTF16)
 	{
 		unsigned short* pUTF16Buffer = (unsigned short*)m_pFrom;
-		const unsigned short* pUTF16Last = &pUTF16Buffer[m_nFromLen-1];
-		if ( CMarkup::DecodeCharUTF16(pUTF16Last,&pUTF16Buffer[m_nFromLen]) == -1 )
+		const unsigned short* pUTF16Last = &pUTF16Buffer[m_nFromLen - 1];
+		if (CMarkup::DecodeCharUTF16(pUTF16Last, &pUTF16Buffer[m_nFromLen]) == -1)
 			nTruncBeforeBytes = 2;
 	}
 	else // UTF-8, SBCS DBCS
 	{
-		if ( nCP == MCD_UTF8 )
+		if (nCP == MCD_UTF8)
 		{
 			char* pUTF8Buffer = (char*)m_pFrom;
 			char* pUTF8End = &pUTF8Buffer[m_nFromLen];
 			int nLast = m_nFromLen - 1;
 			const char* pUTF8Last = &pUTF8Buffer[nLast];
-			while ( nLast > 0 && CMarkup::DecodeCharUTF8(pUTF8Last,pUTF8End) == -1 )
+			while (nLast > 0 && CMarkup::DecodeCharUTF8(pUTF8Last, pUTF8End) == -1)
 				pUTF8Last = &pUTF8Buffer[--nLast];
 			nTruncBeforeBytes = (int)(pUTF8End - pUTF8Last);
 		}
@@ -793,81 +793,81 @@ bool TextEncoding::FindRaggedEnd( int& nTruncBeforeBytes )
 			// Do a conversion-based test unless we can determine it is not multi-byte
 			// If m_strEncoding="" default code page then GetACP can tell us the code page, otherwise just do the test
 #if defined(MARKUP_WINCONV)
-			if ( nCP == 0 )
+			if (nCP == 0)
 				nCP = GetACP();
 #endif
 			int nMultibyteCharsToTest = 2;
-			switch ( nCP )
+			switch (nCP)
 			{
-				case 54936:
-					nMultibyteCharsToTest = 4;
-				case 932: case 51932: case 20932: case 50220: case 50221: case 50222: case 10001: // Japanese
-				case 949: case 51949: case 50225: case 1361: case 10003: case 20949: // Korean
-				case 874: case 20001: case 20004: case 10021: case 20003: // Taiwan
-				case 50930: case 50939: case 50931: case 50933: case 20833: case 50935: case 50937: // EBCDIC
-				case 936: case 51936: case 20936: case 52936: // Chinese
-				case 950: case 50227: case 10008: case 20000: case 20002: case 10002: // Chinese
-					nCP = 0;
-					break;
+			case 54936:
+				nMultibyteCharsToTest = 4;
+			case 932: case 51932: case 20932: case 50220: case 50221: case 50222: case 10001: // Japanese
+			case 949: case 51949: case 50225: case 1361: case 10003: case 20949: // Korean
+			case 874: case 20001: case 20004: case 10021: case 20003: // Taiwan
+			case 50930: case 50939: case 50931: case 50933: case 20833: case 50935: case 50937: // EBCDIC
+			case 936: case 51936: case 20936: case 52936: // Chinese
+			case 950: case 50227: case 10008: case 20000: case 20002: case 10002: // Chinese
+				nCP = 0;
+				break;
 			}
-			if ( nMultibyteCharsToTest > m_nFromLen )
+			if (nMultibyteCharsToTest > m_nFromLen)
 				nMultibyteCharsToTest = m_nFromLen;
-			if ( nCP == 0 && nMultibyteCharsToTest )
+			if (nCP == 0 && nMultibyteCharsToTest)
 			{
 				/*
-				1. convert the piece to Unicode with MultiByteToWideChar 
-				2. Identify at least two Unicode code point boundaries at the end of 
-				the converted piece by stepping backwards from the end and re- 
-				converting the final 2 bytes, 3 bytes, 4 bytes etc, comparing the 
-				converted end string to the end of the entire converted piece to find 
-				a valid code point boundary. 
-				3. Upon finding a code point boundary, I still want to make sure it 
-				will convert the same separately on either side of the divide as it 
-				does together, so separately convert the first byte and the remaining 
-				bytes and see if the result together is the same as the whole end, if 
-				not try the first two bytes and the remaining bytes. etc., until I 
-				find a useable dividing point. If none found, go back to step 2 and 
-				get a longer end string to try. 
+				1. convert the piece to Unicode with MultiByteToWideChar
+				2. Identify at least two Unicode code point boundaries at the end of
+				the converted piece by stepping backwards from the end and re-
+				converting the final 2 bytes, 3 bytes, 4 bytes etc, comparing the
+				converted end string to the end of the entire converted piece to find
+				a valid code point boundary.
+				3. Upon finding a code point boundary, I still want to make sure it
+				will convert the same separately on either side of the divide as it
+				does together, so separately convert the first byte and the remaining
+				bytes and see if the result together is the same as the whole end, if
+				not try the first two bytes and the remaining bytes. etc., until I
+				find a useable dividing point. If none found, go back to step 2 and
+				get a longer end string to try.
 				*/
 				m_strToEncoding = MCD_T("UTF-16");
-				m_nToCount = m_nFromLen*2;
+				m_nToCount = m_nFromLen * 2;
 				unsigned short* pUTF16Buffer = new unsigned short[m_nToCount];
-				int nUTF16Len = PerformConversion( (void*)pUTF16Buffer );
+				int nUTF16Len = PerformConversion((void*)pUTF16Buffer);
 				int nOriginalByteLen = m_nFromLen;
 
 				// Guaranteed to have at least MARKUP_FILEBLOCKSIZE/2 bytes to work with
 				const int nMaxBytesToTry = 40;
-				unsigned short wsz16End[nMaxBytesToTry*2];
-				unsigned short wsz16EndDivided[nMaxBytesToTry*2];
+				unsigned short wsz16End[nMaxBytesToTry * 2];
+				unsigned short wsz16EndDivided[nMaxBytesToTry * 2];
 				const char* pszOriginalBytes = (const char*)m_pFrom;
 				int nBoundariesFound = 0;
 				bSuccess = false;
-				while ( nTruncBeforeBytes < nMaxBytesToTry && ! bSuccess )
+				while (nTruncBeforeBytes < nMaxBytesToTry && !bSuccess)
 				{
 					++nTruncBeforeBytes;
-					m_pFrom = &pszOriginalBytes[nOriginalByteLen-nTruncBeforeBytes];
+					m_pFrom = &pszOriginalBytes[nOriginalByteLen - nTruncBeforeBytes];
 					m_nFromLen = nTruncBeforeBytes;
-					m_nToCount = nMaxBytesToTry*2;
-					int nEndUTF16Len = PerformConversion( (void*)wsz16End );
-					if ( nEndUTF16Len && memcmp(wsz16End,&pUTF16Buffer[nUTF16Len-nEndUTF16Len],nEndUTF16Len*2) == 0 )
+					m_nToCount = nMaxBytesToTry * 2;
+					int nEndUTF16Len = PerformConversion((void*)wsz16End);
+					if (nEndUTF16Len && memcmp(wsz16End, &pUTF16Buffer[nUTF16Len - nEndUTF16Len], nEndUTF16Len * 2) == 0)
 					{
 						++nBoundariesFound;
-						if ( nBoundariesFound > 2 )
+						if (nBoundariesFound > 2)
 						{
 							int nDivideAt = 1;
-							while ( nDivideAt < nTruncBeforeBytes )
+							while (nDivideAt < nTruncBeforeBytes)
 							{
-								m_pFrom = &pszOriginalBytes[nOriginalByteLen-nTruncBeforeBytes];
+								m_pFrom = &pszOriginalBytes[nOriginalByteLen - nTruncBeforeBytes];
 								m_nFromLen = nDivideAt;
-								m_nToCount = nMaxBytesToTry*2;
-								int nDividedUTF16Len = PerformConversion( (void*)wsz16EndDivided );
-								if ( nDividedUTF16Len )
+								m_nToCount = nMaxBytesToTry * 2;
+								int nDividedUTF16Len = PerformConversion((void*)wsz16EndDivided);
+								if (nDividedUTF16Len)
 								{
-									m_pFrom = &pszOriginalBytes[nOriginalByteLen-nTruncBeforeBytes+nDivideAt];
-									m_nFromLen = nTruncBeforeBytes-nDivideAt;
-									m_nToCount = nMaxBytesToTry*2-nDividedUTF16Len;
-									nDividedUTF16Len += PerformConversion( (void*)&wsz16EndDivided[nDividedUTF16Len] );
-									if ( m_nToCount && nEndUTF16Len == nDividedUTF16Len && memcmp(wsz16End,wsz16EndDivided,nEndUTF16Len) == 0 )
+									m_pFrom = &pszOriginalBytes[nOriginalByteLen - nTruncBeforeBytes + nDivideAt];
+									m_nFromLen = nTruncBeforeBytes - nDivideAt;
+									m_nToCount = nMaxBytesToTry * 2 - nDividedUTF16Len;
+									nDividedUTF16Len += PerformConversion((void*)&wsz16EndDivided[nDividedUTF16Len]);
+									if (m_nToCount && nEndUTF16Len == nDividedUTF16Len && memcmp(wsz16End, wsz16EndDivided, nEndUTF16Len) == 0)
 									{
 										nTruncBeforeBytes -= nDivideAt;
 										bSuccess = true;
@@ -879,34 +879,34 @@ bool TextEncoding::FindRaggedEnd( int& nTruncBeforeBytes )
 						}
 					}
 				}
-				delete [] pUTF16Buffer;
+				delete[] pUTF16Buffer;
 			}
 		}
 	}
 	return bSuccess;
 }
 
-bool x_EndianSwapRequired( int nDocFlags )
+bool x_EndianSwapRequired(int nDocFlags)
 {
 	short nWord = 1;
 	char cFirstByte = ((char*)&nWord)[0];
-	if ( cFirstByte ) // LE
+	if (cFirstByte) // LE
 	{
-		if ( nDocFlags & CMarkup::MDF_UTF16BEFILE )
+		if (nDocFlags & CMarkup::MDF_UTF16BEFILE)
 			return true;
 	}
-	else if ( nDocFlags & CMarkup::MDF_UTF16LEFILE )
+	else if (nDocFlags & CMarkup::MDF_UTF16LEFILE)
 		return true;
 	return false;
 }
 
-void x_EndianSwapUTF16( unsigned short* pBuffer, int nCharLen )
+void x_EndianSwapUTF16(unsigned short* pBuffer, int nCharLen)
 {
 	unsigned short cChar;
-	while ( nCharLen-- )
+	while (nCharLen--)
 	{
 		cChar = pBuffer[nCharLen];
-		pBuffer[nCharLen] = (unsigned short)((cChar<<8) | (cChar>>8));
+		pBuffer[nCharLen] = (unsigned short)((cChar << 8) | (cChar >> 8));
 	}
 }
 
@@ -917,19 +917,19 @@ void x_EndianSwapUTF16( unsigned short* pBuffer, int nCharLen )
 struct ElemPos
 {
 	ElemPos() {};
-	ElemPos( const ElemPos& pos ) { *this = pos; };
+	ElemPos(const ElemPos& pos) { *this = pos; };
 	int StartTagLen() const { return nStartTagLen; };
-	void SetStartTagLen( int n ) { nStartTagLen = n; };
-	void AdjustStartTagLen( int n ) { nStartTagLen += n; };
+	void SetStartTagLen(int n) { nStartTagLen = n; };
+	void AdjustStartTagLen(int n) { nStartTagLen += n; };
 	int EndTagLen() const { return nEndTagLen; };
-	void SetEndTagLen( int n ) { nEndTagLen = n; };
-	bool IsEmptyElement() { return (StartTagLen()==nLength)?true:false; };
+	void SetEndTagLen(int n) { nEndTagLen = n; };
+	bool IsEmptyElement() { return (StartTagLen() == nLength) ? true : false; };
 	int StartContent() const { return nStart + StartTagLen(); };
 	int ContentLen() const { return nLength - StartTagLen() - EndTagLen(); };
 	int StartAfter() const { return nStart + nLength; };
-    int Level() const { return nFlags & 0xffff; };
-    void SetLevel( int nLev ) { nFlags = (nFlags & ~0xffff) | nLev; };
-	void ClearVirtualParent() { memset(this,0,sizeof(ElemPos)); };
+	int Level() const { return nFlags & 0xffff; };
+	void SetLevel(int nLev) { nFlags = (nFlags & ~0xffff) | nLev; };
+	void ClearVirtualParent() { memset(this, 0, sizeof(ElemPos)); };
 	void SetEndTagLenUnparsed() { SetEndTagLen(1); };
 	bool IsUnparsed() { return EndTagLen() == 1; };
 
@@ -938,7 +938,7 @@ struct ElemPos
 	int nLength;
 	unsigned int nStartTagLen : 22; // 4MB limit for start tag
 	unsigned int nEndTagLen : 10; // 1K limit for end tag
-    int nFlags; // 16 bits flags, 16 bits level 65536 depth limit
+	int nFlags; // 16 bits flags, 16 bits level 65536 depth limit
 	int iElemParent;
 	int iElemChild; // first child
 	int iElemNext; // next sibling
@@ -947,14 +947,14 @@ struct ElemPos
 
 enum MarkupNodeFlagsInternal2
 {
-	MNF_REPLACE    = 0x001000,
-	MNF_QUOTED     = 0x008000,
-	MNF_EMPTY      = 0x010000,
-	MNF_DELETED    = 0x020000,
-	MNF_FIRST      = 0x080000,
-	MNF_PUBLIC     = 0x300000,
-	MNF_ILLFORMED  = 0x800000,
-	MNF_USER      = 0xf000000
+	MNF_REPLACE = 0x001000,
+	MNF_QUOTED = 0x008000,
+	MNF_EMPTY = 0x010000,
+	MNF_DELETED = 0x020000,
+	MNF_FIRST = 0x080000,
+	MNF_PUBLIC = 0x300000,
+	MNF_ILLFORMED = 0x800000,
+	MNF_USER = 0xf000000
 };
 
 struct ElemPosTree
@@ -963,41 +963,41 @@ struct ElemPosTree
 	~ElemPosTree() { Release(); };
 	enum { PA_SEGBITS = 16, PA_SEGMASK = 0xffff };
 	void ReleaseElemPosTree() { Release(); Clear(); };
-	void Release() { for (int n=0;n<SegsUsed();++n) delete[] (char*)m_pSegs[n]; if (m_pSegs) delete[] (char*)m_pSegs; };
-	void Clear() { m_nSegs=0; m_nSize=0; m_pSegs=NULL; };
+	void Release() { for (int n = 0; n < SegsUsed(); ++n) delete[](char*)m_pSegs[n]; if (m_pSegs) delete[](char*)m_pSegs; };
+	void Clear() { m_nSegs = 0; m_nSize = 0; m_pSegs = NULL; };
 	int GetSize() const { return m_nSize; };
-	int SegsUsed() const { return ((m_nSize-1)>>PA_SEGBITS) + 1; };
-	ElemPos& GetRefElemPosAt(int i) const { return m_pSegs[i>>PA_SEGBITS][i&PA_SEGMASK]; };
-	void CopyElemPosTree( ElemPosTree* pOtherTree, int n );
-	void GrowElemPosTree( int nNewSize );
+	int SegsUsed() const { return ((m_nSize - 1) >> PA_SEGBITS) + 1; };
+	ElemPos& GetRefElemPosAt(int i) const { return m_pSegs[i >> PA_SEGBITS][i & PA_SEGMASK]; };
+	void CopyElemPosTree(ElemPosTree* pOtherTree, int n);
+	void GrowElemPosTree(int nNewSize);
 private:
 	ElemPos** m_pSegs;
 	int m_nSize;
 	int m_nSegs;
 };
 
-void ElemPosTree::CopyElemPosTree( ElemPosTree* pOtherTree, int n )
+void ElemPosTree::CopyElemPosTree(ElemPosTree* pOtherTree, int n)
 {
 	ReleaseElemPosTree();
 	m_nSize = n;
-	if ( m_nSize < 8 )
+	if (m_nSize < 8)
 		m_nSize = 8;
 	m_nSegs = SegsUsed();
-	if ( m_nSegs )
+	if (m_nSegs)
 	{
-		m_pSegs = (ElemPos**)(new char[m_nSegs*sizeof(char*)]);
+		m_pSegs = (ElemPos**)(new char[m_nSegs * sizeof(char*)]);
 		int nSegSize = 1 << PA_SEGBITS;
-		for ( int nSeg=0; nSeg < m_nSegs; ++nSeg )
+		for (int nSeg = 0; nSeg < m_nSegs; ++nSeg)
 		{
-			if ( nSeg + 1 == m_nSegs )
+			if (nSeg + 1 == m_nSegs)
 				nSegSize = m_nSize - (nSeg << PA_SEGBITS);
-			m_pSegs[nSeg] = (ElemPos*)(new char[nSegSize*sizeof(ElemPos)]);
-			memcpy( m_pSegs[nSeg], pOtherTree->m_pSegs[nSeg], nSegSize*sizeof(ElemPos) );
+			m_pSegs[nSeg] = (ElemPos*)(new char[nSegSize * sizeof(ElemPos)]);
+			memcpy(m_pSegs[nSeg], pOtherTree->m_pSegs[nSeg], nSegSize * sizeof(ElemPos));
 		}
 	}
 }
 
-void ElemPosTree::GrowElemPosTree( int nNewSize )
+void ElemPosTree::GrowElemPosTree(int nNewSize)
 {
 	// Called by x_AllocElemPos when the document is created or the array is filled
 	// The ElemPosTree class is implemented using segments to reduce contiguous memory requirements
@@ -1005,23 +1005,23 @@ void ElemPosTree::GrowElemPosTree( int nNewSize )
 	// The "Grow By" algorithm ensures there are no reallocations after 2 segments
 	//
 	// Grow By: new size can be at most one more complete segment
-	int nSeg = (m_nSize?m_nSize-1:0) >> PA_SEGBITS;
-	int nNewSeg = (nNewSize-1) >> PA_SEGBITS;
-	if ( nNewSeg > nSeg + 1 )
+	int nSeg = (m_nSize ? m_nSize - 1 : 0) >> PA_SEGBITS;
+	int nNewSeg = (nNewSize - 1) >> PA_SEGBITS;
+	if (nNewSeg > nSeg + 1)
 	{
 		nNewSeg = nSeg + 1;
-		nNewSize = (nNewSeg+1) << PA_SEGBITS;
+		nNewSize = (nNewSeg + 1) << PA_SEGBITS;
 	}
 
 	// Allocate array of segments
-	if ( m_nSegs <= nNewSeg )
+	if (m_nSegs <= nNewSeg)
 	{
 		int nNewSegments = 4 + nNewSeg * 2;
-		char* pNewSegments = new char[nNewSegments*sizeof(char*)];
-		if ( SegsUsed() )
-			memcpy( pNewSegments, m_pSegs, SegsUsed()*sizeof(char*) );
-		if ( m_pSegs )
-			delete[] (char*)m_pSegs;
+		char* pNewSegments = new char[nNewSegments * sizeof(char*)];
+		if (SegsUsed())
+			memcpy(pNewSegments, m_pSegs, SegsUsed() * sizeof(char*));
+		if (m_pSegs)
+			delete[](char*)m_pSegs;
 		m_pSegs = (ElemPos**)pNewSegments;
 		m_nSegs = nNewSegments;
 	}
@@ -1032,25 +1032,25 @@ void ElemPosTree::GrowElemPosTree( int nNewSize )
 
 	// Complete first segment
 	int nFullSegSize = 1 << PA_SEGBITS;
-	if ( nSeg < nNewSeg && nSegSize < nFullSegSize )
+	if (nSeg < nNewSeg && nSegSize < nFullSegSize)
 	{
-		char* pNewFirstSeg = new char[ nFullSegSize * sizeof(ElemPos) ];
-		if ( nSegSize )
+		char* pNewFirstSeg = new char[nFullSegSize * sizeof(ElemPos)];
+		if (nSegSize)
 		{
 			// Reallocate
-			memcpy( pNewFirstSeg, m_pSegs[nSeg], nSegSize * sizeof(ElemPos) );
-			delete[] (char*)m_pSegs[nSeg];
+			memcpy(pNewFirstSeg, m_pSegs[nSeg], nSegSize * sizeof(ElemPos));
+			delete[](char*)m_pSegs[nSeg];
 		}
 		m_pSegs[nSeg] = (ElemPos*)pNewFirstSeg;
 	}
 
 	// New segment
-	char* pNewSeg = new char[ nNewSegSize * sizeof(ElemPos) ];
-	if ( nNewSeg == nSeg && nSegSize )
+	char* pNewSeg = new char[nNewSegSize * sizeof(ElemPos)];
+	if (nNewSeg == nSeg && nSegSize)
 	{
 		// Reallocate
-		memcpy( pNewSeg, m_pSegs[nSeg], nSegSize * sizeof(ElemPos) );
-		delete[] (char*)m_pSegs[nSeg];
+		memcpy(pNewSeg, m_pSegs[nSeg], nSegSize * sizeof(ElemPos));
+		delete[](char*)m_pSegs[nSeg];
 	}
 	m_pSegs[nNewSeg] = (ElemPos*)pNewSeg;
 	m_nSize = nNewSize;
@@ -1064,7 +1064,7 @@ void ElemPosTree::GrowElemPosTree( int nNewSize )
 struct NodePos
 {
 	NodePos() {};
-	NodePos( int n ) { nNodeFlags=n; nNodeType=0; nStart=0; nLength=0; };
+	NodePos(int n) { nNodeFlags = n; nNodeType = 0; nStart = 0; nLength = 0; };
 	int nNodeType;
 	int nStart;
 	int nLength;
@@ -1108,43 +1108,43 @@ struct NodePos
 //
 struct TokenPos
 {
-	TokenPos( MCD_CSTR sz, int n, FilePos* p=NULL ) { Clear(); m_pDocText=sz; m_nTokenFlags=n; m_pReaderFilePos=p; };
-	void Clear() { m_nL=0; m_nR=-1; m_nNext=0; };
+	TokenPos(MCD_CSTR sz, int n, FilePos* p = NULL) { Clear(); m_pDocText = sz; m_nTokenFlags = n; m_pReaderFilePos = p; };
+	void Clear() { m_nL = 0; m_nR = -1; m_nNext = 0; };
 	int Length() const { return m_nR - m_nL + 1; };
 	MCD_PCSZ GetTokenPtr() const { return &m_pDocText[m_nL]; };
-	MCD_STR GetTokenText() const { return MCD_STR( GetTokenPtr(), Length() ); };
+	MCD_STR GetTokenText() const { return MCD_STR(GetTokenPtr(), Length()); };
 	MCD_CHAR NextChar() { m_nNext += MCD_CLEN(&m_pDocText[m_nNext]); return m_pDocText[m_nNext]; };
-	int WhitespaceToTag( int n ) { m_nNext = n; if (FindAny()&&m_pDocText[m_nNext]!='<') { m_nNext=n; m_nR=n-1; } return m_nNext; };
+	int WhitespaceToTag(int n) { m_nNext = n; if (FindAny() && m_pDocText[m_nNext] != '<') { m_nNext = n; m_nR = n - 1; } return m_nNext; };
 	bool FindAny()
 	{
 		// Go to non-whitespace or end
 		MCD_CHAR cNext = m_pDocText[m_nNext];
-		while ( cNext && x_ISWHITESPACE(cNext) )
+		while (cNext && x_ISWHITESPACE(cNext))
 			cNext = m_pDocText[++m_nNext];
 		m_nL = m_nNext;
-		m_nR = m_nNext-1;
-		return m_pDocText[m_nNext]!='\0';
+		m_nR = m_nNext - 1;
+		return m_pDocText[m_nNext] != '\0';
 	};
 	bool FindName()
 	{
-		if ( ! FindAny() ) // go to first non-whitespace
+		if (!FindAny()) // go to first non-whitespace
 			return false;
 		MCD_CHAR cNext = m_pDocText[m_nNext];
-		while ( cNext && ! x_ISENDANYNAME(cNext) )
+		while (cNext && !x_ISENDANYNAME(cNext))
 			cNext = NextChar();
-		if ( m_nNext == m_nL )
+		if (m_nNext == m_nL)
 			++m_nNext; // it is a special char
 		m_nR = m_nNext - 1;
 		return true;
 	}
-	bool Match( MCD_CSTR szName )
+	bool Match(MCD_CSTR szName)
 	{
 		int nLen = Length();
-		return ( (x_StrNCmp( GetTokenPtr(), szName, nLen, m_nTokenFlags & CMarkup::MDF_IGNORECASE ) == 0)
-			&& ( szName[nLen] == '\0' || x_ISENDPATHWORD(szName[nLen]) ) );
+		return ((x_StrNCmp(GetTokenPtr(), szName, nLen, m_nTokenFlags & CMarkup::MDF_IGNORECASE) == 0)
+			&& (szName[nLen] == '\0' || x_ISENDPATHWORD(szName[nLen])));
 	};
-	bool FindAttrib( MCD_PCSZ pAttrib, int n = 0, MCD_STR* pstrAttrib = NULL );
-	int ParseNode( NodePos& node );
+	bool FindAttrib(MCD_PCSZ pAttrib, int n = 0, MCD_STR* pstrAttrib = NULL);
+	int ParseNode(NodePos& node);
 	int m_nL;
 	int m_nR;
 	int m_nNext;
@@ -1155,7 +1155,7 @@ struct TokenPos
 	FilePos* m_pReaderFilePos;
 };
 
-bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=NULL*/ )
+bool TokenPos::FindAttrib(MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=NULL*/)
 {
 	// Return true if found, otherwise false and token.m_nNext is new insertion point
 	// If pAttrib is NULL find attrib n and leave token at attrib name
@@ -1169,17 +1169,17 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 	int nAttrib = -1; // starts at tag name
 	int nFoundAttribNameR = 0;
 	bool bAfterEqual = false;
-	while ( 1 )
+	while (1)
 	{
 		// Starting at m_nNext, bypass whitespace and find the next token
 		nTempPreSpaceStart = m_nNext;
-		if ( ! FindAny() )
+		if (!FindAny())
 			break;
 		nTempPreSpaceLength = m_nNext - nTempPreSpaceStart;
 
 		// Is it an opening quote?
 		cFirstChar = m_pDocText[m_nNext];
-		if ( cFirstChar == '\"' || cFirstChar == '\'' )
+		if (cFirstChar == '\"' || cFirstChar == '\'')
 		{
 			m_nTokenFlags |= MNF_QUOTED;
 
@@ -1189,14 +1189,14 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 
 			// Look for closing quote
 			cNext = m_pDocText[m_nNext];
-			while ( cNext && cNext != cFirstChar )
+			while (cNext && cNext != cFirstChar)
 				cNext = NextChar();
 
 			// Set right to before closing quote
 			m_nR = m_nNext - 1;
 
 			// Set m_nNext past closing quote unless at end of document
-			if ( cNext )
+			if (cNext)
 				++m_nNext;
 		}
 		else
@@ -1206,52 +1206,52 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 			// Go until special char or whitespace
 			m_nL = m_nNext;
 			cNext = m_pDocText[m_nNext];
-			if ( bAfterEqual )
+			if (bAfterEqual)
 			{
-				while ( cNext && ! x_ISENDUNQUOTED(cNext) )
+				while (cNext && !x_ISENDUNQUOTED(cNext))
 					cNext = NextChar();
 			}
 			else
 			{
-				while ( cNext && ! x_ISENDATTRIBNAME(cNext) )
+				while (cNext && !x_ISENDATTRIBNAME(cNext))
 					cNext = NextChar();
 			}
 
 			// Adjust end position if it is one special char
-			if ( m_nNext == m_nL )
+			if (m_nNext == m_nL)
 				++m_nNext; // it is a special char
 			m_nR = m_nNext - 1;
 		}
 
-		if ( ! bAfterEqual && ! (m_nTokenFlags&MNF_QUOTED) )
+		if (!bAfterEqual && !(m_nTokenFlags & MNF_QUOTED))
 		{
 			// Is it an equal sign?
 			MCD_CHAR cChar = m_pDocText[m_nL];
-			if ( cChar == '=' )
+			if (cChar == '=')
 			{
 				bAfterEqual = true;
 				continue;
 			}
 
 			// Is it the end of the tag?
-			if ( cChar == '>' || cChar == '/' || cChar == '?' )
+			if (cChar == '>' || cChar == '/' || cChar == '?')
 			{
 				m_nNext = nTempPreSpaceStart;
 				break; // attrib not found
 			}
 
-			if ( nFoundAttribNameR )
+			if (nFoundAttribNameR)
 				break;
 
 			// Attribute name
-			if ( nAttrib != -1 )
+			if (nAttrib != -1)
 			{
-				if ( ! pAttrib )
+				if (!pAttrib)
 				{
-					if ( nAttrib == n )
+					if (nAttrib == n)
 					{
 						// found by number
-						if ( pstrAttrib )
+						if (pstrAttrib)
 						{
 							*pstrAttrib = GetTokenText();
 							nFoundAttribNameR = m_nR;
@@ -1260,12 +1260,12 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 							return true;
 					}
 				}
-				else if ( Match(pAttrib) )
+				else if (Match(pAttrib))
 				{
 					// Matched attrib name, go forward to value
 					nFoundAttribNameR = m_nR;
 				}
-				if ( nFoundAttribNameR ) // either by n or name match
+				if (nFoundAttribNameR) // either by n or name match
 				{
 					m_nPreSpaceStart = nTempPreSpaceStart;
 					m_nPreSpaceLength = nTempPreSpaceLength;
@@ -1273,14 +1273,14 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 			}
 			++nAttrib;
 		}
-		else if ( nFoundAttribNameR )
+		else if (nFoundAttribNameR)
 			break;
 		bAfterEqual = false;
 	}
 
-	if ( nFoundAttribNameR )
+	if (nFoundAttribNameR)
 	{
-		if ( ! bAfterEqual )
+		if (!bAfterEqual)
 		{
 			// when attribute has no value the value is the attribute name
 			m_nL = m_nPreSpaceStart + m_nPreSpaceLength;
@@ -1301,8 +1301,8 @@ bool TokenPos::FindAttrib( MCD_PCSZ pAttrib, int n/*=0*/, MCD_STR* pstrAttrib/*=
 struct TagPos
 {
 	TagPos() { Init(); };
-	void SetTagName( MCD_PCSZ pName, int n ) { MCD_STRASSIGN(strTagName,pName,n); };
-	void Init( int i=0, int n=1 ) { nCount=1; nTagNames=n; iNext=i; iPrev=0; nSlot=-1; iSlotPrev=0; iSlotNext=0; };
+	void SetTagName(MCD_PCSZ pName, int n) { MCD_STRASSIGN(strTagName, pName, n); };
+	void Init(int i = 0, int n = 1) { nCount = 1; nTagNames = n; iNext = i; iPrev = 0; nSlot = -1; iSlotPrev = 0; iSlotNext = 0; };
 	void IncCount() { if (nCount) ++nCount; };
 	MCD_STR strTagName;
 	int nCount;
@@ -1318,76 +1318,76 @@ struct TagPos
 struct ElemStack
 {
 	enum { LS_TABLESIZE = 23 };
-	ElemStack() { iTop=0; iUsed=0; iPar=0; nLevel=0; nSize=0; pL=NULL; Alloc(7); pL[0].Init(); InitTable(); };
-	~ElemStack() { if (pL) delete [] pL; };
+	ElemStack() { iTop = 0; iUsed = 0; iPar = 0; nLevel = 0; nSize = 0; pL = NULL; Alloc(7); pL[0].Init(); InitTable(); };
+	~ElemStack() { if (pL) delete[] pL; };
 	TagPos& Current() { return pL[iTop]; };
-	void InitTable() { memset(anTable,0,sizeof(int)*LS_TABLESIZE); };
-	TagPos& NextParent( int& i ) { int iCur=i; i=pL[i].iParent; return pL[iCur]; };
-	TagPos& GetRefTagPosAt( int i ) { return pL[i]; };
-	void Push( MCD_PCSZ pName, int n ) { ++iUsed; if (iUsed==nSize) Alloc(nSize*2); pL[iUsed].SetTagName(pName,n); pL[iUsed].iParent=iPar; iTop=iUsed; };
+	void InitTable() { memset(anTable, 0, sizeof(int) * LS_TABLESIZE); };
+	TagPos& NextParent(int& i) { int iCur = i; i = pL[i].iParent; return pL[iCur]; };
+	TagPos& GetRefTagPosAt(int i) { return pL[i]; };
+	void Push(MCD_PCSZ pName, int n) { ++iUsed; if (iUsed == nSize) Alloc(nSize * 2); pL[iUsed].SetTagName(pName, n); pL[iUsed].iParent = iPar; iTop = iUsed; };
 	void IntoLevel() { iPar = iTop; ++nLevel; };
-	void OutOfLevel() { if (iPar!=iTop) Pop(); iPar = pL[iTop].iParent; --nLevel; };
-	void PushIntoLevel( MCD_PCSZ pName, int n ) { ++iTop; if (iTop==nSize) Alloc(nSize*2); pL[iTop].SetTagName(pName,n); };
+	void OutOfLevel() { if (iPar != iTop) Pop(); iPar = pL[iTop].iParent; --nLevel; };
+	void PushIntoLevel(MCD_PCSZ pName, int n) { ++iTop; if (iTop == nSize) Alloc(nSize * 2); pL[iTop].SetTagName(pName, n); };
 	void PopOutOfLevel() { --iTop; };
-	void Pop() { iTop = iPar; while (iUsed && pL[iUsed].iParent==iPar) { if (pL[iUsed].nSlot!=-1) Unslot(pL[iUsed]); --iUsed; } };
-	void Slot( int n ) { pL[iUsed].nSlot=n; int i=anTable[n]; anTable[n]=iUsed; pL[iUsed].iSlotNext=i; if (i) pL[i].iSlotPrev=iUsed; };
-	void Unslot( TagPos& lp ) { int n=lp.iSlotNext,p=lp.iSlotPrev; if (n) pL[n].iSlotPrev=p; if (p) pL[p].iSlotNext=n; else anTable[lp.nSlot]=n; };
-	static int CalcSlot( MCD_PCSZ pName, int n, bool bIC );
-	void PushTagAndCount( TokenPos& token );
+	void Pop() { iTop = iPar; while (iUsed && pL[iUsed].iParent == iPar) { if (pL[iUsed].nSlot != -1) Unslot(pL[iUsed]); --iUsed; } };
+	void Slot(int n) { pL[iUsed].nSlot = n; int i = anTable[n]; anTable[n] = iUsed; pL[iUsed].iSlotNext = i; if (i) pL[i].iSlotPrev = iUsed; };
+	void Unslot(TagPos& lp) { int n = lp.iSlotNext, p = lp.iSlotPrev; if (n) pL[n].iSlotPrev = p; if (p) pL[p].iSlotNext = n; else anTable[lp.nSlot] = n; };
+	static int CalcSlot(MCD_PCSZ pName, int n, bool bIC);
+	void PushTagAndCount(TokenPos& token);
 	int iTop;
 	int nLevel;
 	int iPar;
 protected:
-	void Alloc( int nNewSize ) { TagPos* pLNew = new TagPos[nNewSize]; Copy(pLNew); nSize=nNewSize; };
-	void Copy( TagPos* pLNew ) { for(int n=0;n<nSize;++n) pLNew[n]=pL[n]; if (pL) delete [] pL; pL=pLNew; };
+	void Alloc(int nNewSize) { TagPos* pLNew = new TagPos[nNewSize]; Copy(pLNew); nSize = nNewSize; };
+	void Copy(TagPos* pLNew) { for (int n = 0; n < nSize; ++n) pLNew[n] = pL[n]; if (pL) delete[] pL; pL = pLNew; };
 	TagPos* pL;
 	int iUsed;
 	int nSize;
 	int anTable[LS_TABLESIZE];
 };
 
-int ElemStack::CalcSlot( MCD_PCSZ pName, int n, bool bIC )
+int ElemStack::CalcSlot(MCD_PCSZ pName, int n, bool bIC)
 {
 	// If bIC (ASCII ignore case) then return an ASCII case insensitive hash
 	unsigned int nHash = 0;
 	MCD_PCSZ pEnd = pName + n;
-	while ( pName != pEnd )
+	while (pName != pEnd)
 	{
 		nHash += (unsigned int)(*pName);
-		if ( bIC && *pName >= 'A' && *pName <= 'Z' )
-			nHash += ('a'-'A');
+		if (bIC && *pName >= 'A' && *pName <= 'Z')
+			nHash += ('a' - 'A');
 		++pName;
 	}
-	return nHash%LS_TABLESIZE;
+	return nHash % LS_TABLESIZE;
 }
 
-void ElemStack::PushTagAndCount( TokenPos& token )
+void ElemStack::PushTagAndCount(TokenPos& token)
 {
 	// Check for a matching tag name at the top level and set current if found or add new one
 	// Calculate hash of tag name, support ignore ASCII case for MDF_IGNORECASE
 	int nSlot = -1;
 	int iNext = 0;
 	MCD_PCSZ pTagName = token.GetTokenPtr();
-	if ( iTop != iPar )
+	if (iTop != iPar)
 	{
 		// See if tag name is already used, first try previous sibling (almost always)
 		iNext = iTop;
-		if ( token.Match(Current().strTagName) )
+		if (token.Match(Current().strTagName))
 		{
 			iNext = -1;
 			Current().IncCount();
 		}
 		else
 		{
-			nSlot = CalcSlot( pTagName, token.Length(), (token.m_nTokenFlags & CMarkup::MDF_IGNORECASE)?true:false );
+			nSlot = CalcSlot(pTagName, token.Length(), (token.m_nTokenFlags & CMarkup::MDF_IGNORECASE) ? true : false);
 			int iLookup = anTable[nSlot];
-			while ( iLookup )
+			while (iLookup)
 			{
 				TagPos& tag = pL[iLookup];
-				if ( tag.iParent == iPar && token.Match(tag.strTagName) )
+				if (tag.iParent == iPar && token.Match(tag.strTagName))
 				{
 					pL[tag.iPrev].iNext = tag.iNext;
-					if ( tag.iNext )
+					if (tag.iNext)
 						pL[tag.iNext].iPrev = tag.iPrev;
 					tag.nTagNames = Current().nTagNames;
 					tag.iNext = iTop;
@@ -1400,26 +1400,26 @@ void ElemStack::PushTagAndCount( TokenPos& token )
 			}
 		}
 	}
-	if ( iNext != -1 )
+	if (iNext != -1)
 	{
 		// Turn off in the rare case where a document uses unique tag names like record1, record2, etc, more than 256
 		int nTagNames = 0;
-		if ( iNext )
+		if (iNext)
 			nTagNames = Current().nTagNames;
-		if ( nTagNames == 256 )
+		if (nTagNames == 256)
 		{
-			MCD_STRASSIGN( (Current().strTagName), pTagName, (token.Length()) );
+			MCD_STRASSIGN((Current().strTagName), pTagName, (token.Length()));
 			Current().nCount = 0;
-			Unslot( Current() );
+			Unslot(Current());
 		}
 		else
 		{
-			Push( pTagName, token.Length() );
-			Current().Init( iNext, nTagNames+1 );
+			Push(pTagName, token.Length());
+			Current().Init(iNext, nTagNames + 1);
 		}
-		if ( nSlot == -1 )
-			nSlot = CalcSlot( pTagName, token.Length(), (token.m_nTokenFlags & CMarkup::MDF_IGNORECASE)?true:false );
-		Slot( nSlot );
+		if (nSlot == -1)
+			nSlot = CalcSlot(pTagName, token.Length(), (token.m_nTokenFlags & CMarkup::MDF_IGNORECASE) ? true : false);
+		Slot(nSlot);
 	}
 }
 
@@ -1431,21 +1431,21 @@ struct FilePos
 {
 	FilePos()
 	{
-		m_fp=NULL; m_nDocFlags=0; m_nFileByteLen=0; m_nFileByteOffset=0; m_nOpFileByteLen=0; m_nBlockSizeBasis=MARKUP_FILEBLOCKSIZE;
-		m_nFileCharUnitSize=0; m_nOpFileTextLen=0; m_pstrBuffer=NULL; m_nReadBufferStart=0; m_nReadBufferRemoved=0; m_nReadGatherStart=-1;
+		m_fp = NULL; m_nDocFlags = 0; m_nFileByteLen = 0; m_nFileByteOffset = 0; m_nOpFileByteLen = 0; m_nBlockSizeBasis = MARKUP_FILEBLOCKSIZE;
+		m_nFileCharUnitSize = 0; m_nOpFileTextLen = 0; m_pstrBuffer = NULL; m_nReadBufferStart = 0; m_nReadBufferRemoved = 0; m_nReadGatherStart = -1;
 	};
-	bool FileOpen( MCD_CSTR_FILENAME szFileName );
-	bool FileRead( void* pBuffer );
-	bool FileReadText( MCD_STR& strDoc );
-	bool FileCheckRaggedEnd( void* pBuffer );
+	bool FileOpen(MCD_CSTR_FILENAME szFileName);
+	bool FileRead(void* pBuffer);
+	bool FileReadText(MCD_STR& strDoc);
+	bool FileCheckRaggedEnd(void* pBuffer);
 	bool FileReadNextBuffer();
-	void FileGatherStart( int nStart );
-	int FileGatherEnd( MCD_STR& strSubDoc );
-	bool FileWrite( void* pBuffer, const void* pConstBuffer = NULL );
-	bool FileWriteText( const MCD_STR& strDoc, int nWriteStrLen = -1 );
-	bool FileFlush( MCD_STR& strBuffer, int nWriteStrLen = -1, bool bFflush = false );
+	void FileGatherStart(int nStart);
+	int FileGatherEnd(MCD_STR& strSubDoc);
+	bool FileWrite(void* pBuffer, const void* pConstBuffer = NULL);
+	bool FileWriteText(const MCD_STR& strDoc, int nWriteStrLen = -1);
+	bool FileFlush(MCD_STR& strBuffer, int nWriteStrLen = -1, bool bFflush = false);
 	bool FileClose();
-	void FileSpecifyEncoding( MCD_STR* pstrEncoding );
+	void FileSpecifyEncoding(MCD_STR* pstrEncoding);
 	bool FileAtTop();
 	bool FileErrorAddResult();
 
@@ -1486,44 +1486,44 @@ bool FilePos::FileErrorAddResult()
 	//
 	const int nErrorBufferSize = 100;
 	int nErr = 0;
-	MCD_CHAR szError[nErrorBufferSize+1];
+	MCD_CHAR szError[nErrorBufferSize + 1];
 #if defined(MCD_STRERROR) // C error routine
 	nErr = (int)errno;
 #if defined(MARKUP_WCHAR)
-	char szMBError[nErrorBufferSize+1];
-	strncpy( szMBError, MCD_STRERROR, nErrorBufferSize );
+	char szMBError[nErrorBufferSize + 1];
+	strncpy(szMBError, MCD_STRERROR, nErrorBufferSize);
 	szMBError[nErrorBufferSize] = '\0';
-	TextEncoding textencoding( MCD_T(""), (const void*)szMBError, strlen(szMBError) );
+	TextEncoding textencoding(MCD_T(""), (const void*)szMBError, strlen(szMBError));
 	textencoding.m_nToCount = nErrorBufferSize;
-	int nWideLen = textencoding.PerformConversion( (void*)szError, MCD_ENC );
+	int nWideLen = textencoding.PerformConversion((void*)szError, MCD_ENC);
 	szError[nWideLen] = '\0';
 #else
-	MCD_PSZNCPY( szError, MCD_STRERROR, nErrorBufferSize );
+	MCD_PSZNCPY(szError, MCD_STRERROR, nErrorBufferSize);
 	szError[nErrorBufferSize] = '\0';
 #endif
 #else // no C error routine, use Windows API
 	DWORD dwErr = ::GetLastError();
-	if ( ::FormatMessage(0x1200,0,dwErr,0,szError,nErrorBufferSize,0) < 1 )
+	if (::FormatMessage(0x1200, 0, dwErr, 0, szError, nErrorBufferSize, 0) < 1)
 		szError[0] = '\0';
 	nErr = (int)dwErr;
 #endif // no C error routine
 	MCD_STR strError = szError;
-	for ( int nChar=0; nChar<MCD_STRLENGTH(strError); ++nChar )
-		if ( strError[nChar] == '\r' || strError[nChar] == '\n' )
+	for (int nChar = 0; nChar < MCD_STRLENGTH(strError); ++nChar)
+		if (strError[nChar] == '\r' || strError[nChar] == '\n')
 		{
-			strError = MCD_STRMID( strError, 0, nChar ); // no trailing newline
+			strError = MCD_STRMID(strError, 0, nChar); // no trailing newline
 			break;
 		}
-	x_AddResult( m_strIOResult, MCD_T("file_error"), strError, MRC_MSG|MRC_NUMBER, nErr );
+	x_AddResult(m_strIOResult, MCD_T("file_error"), strError, MRC_MSG | MRC_NUMBER, nErr);
 	return false;
 }
 
-void FilePos::FileSpecifyEncoding( MCD_STR* pstrEncoding )
+void FilePos::FileSpecifyEncoding(MCD_STR* pstrEncoding)
 {
 	// In ReadTextFile, WriteTextFile and Open, the pstrEncoding argument can override or return the detected encoding
-	if ( pstrEncoding && m_strEncoding != *pstrEncoding )
+	if (pstrEncoding && m_strEncoding != *pstrEncoding)
 	{
-		if ( m_nFileCharUnitSize == 1 && *pstrEncoding != MCD_T("")  )
+		if (m_nFileCharUnitSize == 1 && *pstrEncoding != MCD_T(""))
 			m_strEncoding = *pstrEncoding; // override the encoding
 		else // just report the encoding
 			*pstrEncoding = m_strEncoding;
@@ -1533,64 +1533,64 @@ void FilePos::FileSpecifyEncoding( MCD_STR* pstrEncoding )
 bool FilePos::FileAtTop()
 {
 	// Return true if in the first block of file mode, max BOM < 5 bytes
-	if ( ((m_nDocFlags & CMarkup::MDF_READFILE) && m_nFileByteOffset < (MCD_INTFILEOFFSET)m_nOpFileByteLen + 5 )
-			|| ((m_nDocFlags & CMarkup::MDF_WRITEFILE) && m_nFileByteOffset < 5) )
+	if (((m_nDocFlags & CMarkup::MDF_READFILE) && m_nFileByteOffset < (MCD_INTFILEOFFSET)m_nOpFileByteLen + 5)
+		|| ((m_nDocFlags & CMarkup::MDF_WRITEFILE) && m_nFileByteOffset < 5))
 		return true;
 	return false;
 }
 
-bool FilePos::FileOpen( MCD_CSTR_FILENAME szFileName )
+bool FilePos::FileOpen(MCD_CSTR_FILENAME szFileName)
 {
-	MCD_STRCLEAR( m_strIOResult );
+	MCD_STRCLEAR(m_strIOResult);
 
 	// Open file
 	MCD_PCSZ_FILENAME pMode = MCD_T_FILENAME("rb");
-	if ( m_nDocFlags & CMarkup::MDF_APPENDFILE )
+	if (m_nDocFlags & CMarkup::MDF_APPENDFILE)
 		pMode = MCD_T_FILENAME("ab");
-	else if ( m_nDocFlags & CMarkup::MDF_WRITEFILE )
+	else if (m_nDocFlags & CMarkup::MDF_WRITEFILE)
 		pMode = MCD_T_FILENAME("wb");
 	m_fp = NULL;
-	MCD_FOPEN( m_fp, szFileName, pMode );
-	if ( ! m_fp )
+	MCD_FOPEN(m_fp, szFileName, pMode);
+	if (!m_fp)
 		return FileErrorAddResult();
 
 	// Prepare file
 	bool bSuccess = true;
 	int nBomLen = 0;
 	m_nFileCharUnitSize = 1; // unless UTF-16 BOM
-	if ( m_nDocFlags & CMarkup::MDF_READFILE )
+	if (m_nDocFlags & CMarkup::MDF_READFILE)
 	{
 		// Get file length
-		MCD_FSEEK( m_fp, 0, SEEK_END );
-		m_nFileByteLen = MCD_FTELL( m_fp );
-		MCD_FSEEK( m_fp, 0, SEEK_SET );
+		MCD_FSEEK(m_fp, 0, SEEK_END);
+		m_nFileByteLen = MCD_FTELL(m_fp);
+		MCD_FSEEK(m_fp, 0, SEEK_SET);
 
 		// Read the top of the file to check BOM and encoding
 		int nReadTop = 1024;
-		if ( m_nFileByteLen < nReadTop )
+		if (m_nFileByteLen < nReadTop)
 			nReadTop = (int)m_nFileByteLen;
-		if ( nReadTop )
+		if (nReadTop)
 		{
 			char* pFileTop = new char[nReadTop];
-			if ( nReadTop )
-				bSuccess = ( fread( pFileTop, nReadTop, 1, m_fp ) == 1 );
-			if ( bSuccess )
+			if (nReadTop)
+				bSuccess = (fread(pFileTop, nReadTop, 1, m_fp) == 1);
+			if (bSuccess)
 			{
 				// Check for Byte Order Mark (preamble)
 				int nBomCheck = 0;
-				m_nDocFlags &= ~( CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF8PREAMBLE );
-				while ( BomTable[nBomCheck].pszBom )
+				m_nDocFlags &= ~(CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF8PREAMBLE);
+				while (BomTable[nBomCheck].pszBom)
 				{
-					while ( nBomLen < BomTable[nBomCheck].nBomLen )
+					while (nBomLen < BomTable[nBomCheck].nBomLen)
 					{
-						if ( nBomLen >= nReadTop || pFileTop[nBomLen] != BomTable[nBomCheck].pszBom[nBomLen] )
+						if (nBomLen >= nReadTop || pFileTop[nBomLen] != BomTable[nBomCheck].pszBom[nBomLen])
 							break;
 						++nBomLen;
 					}
-					if ( nBomLen == BomTable[nBomCheck].nBomLen )
+					if (nBomLen == BomTable[nBomCheck].nBomLen)
 					{
 						m_nDocFlags |= BomTable[nBomCheck].nBomFlag;
-						if ( nBomLen == 2 )
+						if (nBomLen == 2)
 							m_nFileCharUnitSize = 2;
 						m_strEncoding = BomTable[nBomCheck].pszBomEnc;
 						break;
@@ -1598,77 +1598,77 @@ bool FilePos::FileOpen( MCD_CSTR_FILENAME szFileName )
 					++nBomCheck;
 					nBomLen = 0;
 				}
-				if ( nReadTop > nBomLen )
-					MCD_FSEEK( m_fp, nBomLen, SEEK_SET );
+				if (nReadTop > nBomLen)
+					MCD_FSEEK(m_fp, nBomLen, SEEK_SET);
 
 				// Encoding check
-				if ( ! nBomLen )
+				if (!nBomLen)
 				{
 					MCD_STR strDeclCheck;
 #if defined(MARKUP_WCHAR) // WCHAR
-					TextEncoding textencoding( MCD_T("UTF-8"), (const void*)pFileTop, nReadTop );
-					MCD_CHAR* pWideBuffer = MCD_GETBUFFER(strDeclCheck,nReadTop);
+					TextEncoding textencoding(MCD_T("UTF-8"), (const void*)pFileTop, nReadTop);
+					MCD_CHAR* pWideBuffer = MCD_GETBUFFER(strDeclCheck, nReadTop);
 					textencoding.m_nToCount = nReadTop;
-					int nDeclWideLen = textencoding.PerformConversion( (void*)pWideBuffer, MCD_ENC );
-					MCD_RELEASEBUFFER(strDeclCheck,pWideBuffer,nDeclWideLen);
+					int nDeclWideLen = textencoding.PerformConversion((void*)pWideBuffer, MCD_ENC);
+					MCD_RELEASEBUFFER(strDeclCheck, pWideBuffer, nDeclWideLen);
 #else // not WCHAR
-					MCD_STRASSIGN(strDeclCheck,pFileTop,nReadTop);
+					MCD_STRASSIGN(strDeclCheck, pFileTop, nReadTop);
 #endif // not WCHAR
-					m_strEncoding = CMarkup::GetDeclaredEncoding( strDeclCheck );
+					m_strEncoding = CMarkup::GetDeclaredEncoding(strDeclCheck);
 				}
 				// Assume markup files starting with < sign are UTF-8 if otherwise unknown
-				if ( MCD_STRISEMPTY(m_strEncoding) && pFileTop[0] == '<' )
+				if (MCD_STRISEMPTY(m_strEncoding) && pFileTop[0] == '<')
 					m_strEncoding = MCD_T("UTF-8");
 			}
-			delete [] pFileTop;
+			delete[] pFileTop;
 		}
 	}
-	else if ( m_nDocFlags & CMarkup::MDF_WRITEFILE )
+	else if (m_nDocFlags & CMarkup::MDF_WRITEFILE)
 	{
-		if ( m_nDocFlags & CMarkup::MDF_APPENDFILE )
+		if (m_nDocFlags & CMarkup::MDF_APPENDFILE)
 		{
 			// fopen for append does not move the file pointer to the end until first I/O operation
-			MCD_FSEEK( m_fp, 0, SEEK_END );
-			m_nFileByteLen = MCD_FTELL( m_fp );
+			MCD_FSEEK(m_fp, 0, SEEK_END);
+			m_nFileByteLen = MCD_FTELL(m_fp);
 		}
 		int nBomCheck = 0;
-		while ( BomTable[nBomCheck].pszBom )
+		while (BomTable[nBomCheck].pszBom)
 		{
-			if ( m_nDocFlags & BomTable[nBomCheck].nBomFlag )
+			if (m_nDocFlags & BomTable[nBomCheck].nBomFlag)
 			{
 				nBomLen = BomTable[nBomCheck].nBomLen;
-				if ( nBomLen == 2 )
+				if (nBomLen == 2)
 					m_nFileCharUnitSize = 2;
 				m_strEncoding = BomTable[nBomCheck].pszBomEnc;
-				if ( m_nFileByteLen ) // append
+				if (m_nFileByteLen) // append
 					nBomLen = 0;
 				else // write BOM
-					bSuccess = ( fwrite(BomTable[nBomCheck].pszBom,nBomLen,1,m_fp) == 1 );
+					bSuccess = (fwrite(BomTable[nBomCheck].pszBom, nBomLen, 1, m_fp) == 1);
 				break;
 			}
 			++nBomCheck;
 		}
 	}
-	if ( ! bSuccess )
+	if (!bSuccess)
 		return FileErrorAddResult();
 
-	if ( m_nDocFlags & CMarkup::MDF_APPENDFILE )
+	if (m_nDocFlags & CMarkup::MDF_APPENDFILE)
 		m_nFileByteOffset = m_nFileByteLen;
 	else
 		m_nFileByteOffset = (MCD_INTFILEOFFSET)nBomLen;
-	if ( nBomLen )
-		x_AddResult( m_strIOResult, MCD_T("bom") );
+	if (nBomLen)
+		x_AddResult(m_strIOResult, MCD_T("bom"));
 	return bSuccess;
 }
 
-bool FilePos::FileRead( void* pBuffer )
+bool FilePos::FileRead(void* pBuffer)
 {
-	bool bSuccess = ( fread( pBuffer,m_nOpFileByteLen,1,m_fp) == 1 );
+	bool bSuccess = (fread(pBuffer, m_nOpFileByteLen, 1, m_fp) == 1);
 	m_nOpFileTextLen = m_nOpFileByteLen / m_nFileCharUnitSize;
-	if ( bSuccess )
+	if (bSuccess)
 	{
 		m_nFileByteOffset += m_nOpFileByteLen;
-		x_AddResult( m_strIOResult, MCD_T("read"), m_strEncoding, MRC_ENCODING|MRC_LENGTH, m_nOpFileTextLen );
+		x_AddResult(m_strIOResult, MCD_T("read"), m_strEncoding, MRC_ENCODING | MRC_LENGTH, m_nOpFileTextLen);
 
 		// Microsoft components can produce apparently valid docs with some nulls at ends of values
 		int nNullCount = 0;
@@ -1676,311 +1676,311 @@ bool FilePos::FileRead( void* pBuffer )
 		char* pAfterNull = NULL;
 		char* pNullScan = (char*)pBuffer;
 		bool bSingleByteChar = m_nFileCharUnitSize == 1;
-		while ( nNullCheckCharsRemaining-- )
+		while (nNullCheckCharsRemaining--)
 		{
-			if ( bSingleByteChar? (! *pNullScan) : (! (*(unsigned short*)pNullScan)) )
+			if (bSingleByteChar ? (!*pNullScan) : (!(*(unsigned short*)pNullScan)))
 			{
-				if ( pAfterNull && pNullScan != pAfterNull )
-					memmove( pAfterNull - (nNullCount*m_nFileCharUnitSize), pAfterNull, pNullScan - pAfterNull );
-				pAfterNull = pNullScan  + m_nFileCharUnitSize;
+				if (pAfterNull && pNullScan != pAfterNull)
+					memmove(pAfterNull - (nNullCount * m_nFileCharUnitSize), pAfterNull, pNullScan - pAfterNull);
+				pAfterNull = pNullScan + m_nFileCharUnitSize;
 				++nNullCount;
 			}
 			pNullScan += m_nFileCharUnitSize;
 		}
-		if ( pAfterNull && pNullScan != pAfterNull )
-			memmove( pAfterNull - (nNullCount*m_nFileCharUnitSize), pAfterNull, pNullScan - pAfterNull );
-		if ( nNullCount )
+		if (pAfterNull && pNullScan != pAfterNull)
+			memmove(pAfterNull - (nNullCount * m_nFileCharUnitSize), pAfterNull, pNullScan - pAfterNull);
+		if (nNullCount)
 		{
-			x_AddResult( m_strIOResult, MCD_T("nulls_removed"), NULL, MRC_COUNT, nNullCount );
+			x_AddResult(m_strIOResult, MCD_T("nulls_removed"), NULL, MRC_COUNT, nNullCount);
 			m_nOpFileTextLen -= nNullCount;
 		}
 
 		// Big endian/little endian conversion
-		if ( m_nFileCharUnitSize > 1 && x_EndianSwapRequired(m_nDocFlags) )
+		if (m_nFileCharUnitSize > 1 && x_EndianSwapRequired(m_nDocFlags))
 		{
-			x_EndianSwapUTF16( (unsigned short*)pBuffer, m_nOpFileTextLen );
-			x_AddResult( m_strIOResult, MCD_T("endian_swap") );
+			x_EndianSwapUTF16((unsigned short*)pBuffer, m_nOpFileTextLen);
+			x_AddResult(m_strIOResult, MCD_T("endian_swap"));
 		}
 	}
-	if ( ! bSuccess )
+	if (!bSuccess)
 		FileErrorAddResult();
 	return bSuccess;
 }
 
-bool FilePos::FileCheckRaggedEnd( void* pBuffer )
+bool FilePos::FileCheckRaggedEnd(void* pBuffer)
 {
 	// In file read mode, piece of file text in memory must end on a character boundary
 	// This check must happen after the encoding has been decided, so after UTF-8 autodetection
 	// If ragged, adjust file position, m_nOpFileTextLen and m_nOpFileByteLen
 	int nTruncBeforeBytes = 0;
-	TextEncoding textencoding( m_strEncoding, pBuffer, m_nOpFileTextLen );
-	if ( ! textencoding.FindRaggedEnd(nTruncBeforeBytes) )
+	TextEncoding textencoding(m_strEncoding, pBuffer, m_nOpFileTextLen);
+	if (!textencoding.FindRaggedEnd(nTruncBeforeBytes))
 	{
 		// Input must be garbled? decoding error before potentially ragged end, add error result and continue
 		MCD_STR strEncoding = m_strEncoding;
-		if ( MCD_STRISEMPTY(strEncoding) )
+		if (MCD_STRISEMPTY(strEncoding))
 			strEncoding = MCD_T("ANSI");
-		x_AddResult( m_strIOResult, MCD_T("truncation_error"), strEncoding, MRC_ENCODING );
+		x_AddResult(m_strIOResult, MCD_T("truncation_error"), strEncoding, MRC_ENCODING);
 	}
-	else if ( nTruncBeforeBytes )
+	else if (nTruncBeforeBytes)
 	{
 		nTruncBeforeBytes *= -1;
 		m_nFileByteOffset += nTruncBeforeBytes;
-		MCD_FSEEK( m_fp, m_nFileByteOffset, SEEK_SET );
+		MCD_FSEEK(m_fp, m_nFileByteOffset, SEEK_SET);
 		m_nOpFileByteLen += nTruncBeforeBytes;
 		m_nOpFileTextLen += nTruncBeforeBytes / m_nFileCharUnitSize;
-		x_AddResult( m_strIOResult, MCD_T("read"), NULL, MRC_MODIFY|MRC_LENGTH, m_nOpFileTextLen );
+		x_AddResult(m_strIOResult, MCD_T("read"), NULL, MRC_MODIFY | MRC_LENGTH, m_nOpFileTextLen);
 	}
 	return true;
 }
 
-bool FilePos::FileReadText( MCD_STR& strDoc )
+bool FilePos::FileReadText(MCD_STR& strDoc)
 {
 	bool bSuccess = true;
-	MCD_STRCLEAR( m_strIOResult );
-	if ( ! m_nOpFileByteLen )
+	MCD_STRCLEAR(m_strIOResult);
+	if (!m_nOpFileByteLen)
 	{
-		x_AddResult( m_strIOResult, MCD_T("read"), m_strEncoding, MRC_ENCODING|MRC_LENGTH, 0 );
+		x_AddResult(m_strIOResult, MCD_T("read"), m_strEncoding, MRC_ENCODING | MRC_LENGTH, 0);
 		return bSuccess;
 	}
 
 	// Only read up to end of file (a single read byte length cannot be over the capacity of int)
 	bool bCheckRaggedEnd = true;
 	MCD_INTFILEOFFSET nBytesRemaining = m_nFileByteLen - m_nFileByteOffset;
-	if ( (MCD_INTFILEOFFSET)m_nOpFileByteLen >= nBytesRemaining )
+	if ((MCD_INTFILEOFFSET)m_nOpFileByteLen >= nBytesRemaining)
 	{
 		m_nOpFileByteLen = (int)nBytesRemaining;
 		bCheckRaggedEnd = false;
 	}
 
-	if ( m_nDocFlags & (CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF16BEFILE) )
+	if (m_nDocFlags & (CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF16BEFILE))
 	{
 		int nUTF16Len = m_nOpFileByteLen / 2;
 #if defined(MARKUP_WCHAR) // WCHAR
-		int nBufferSizeForGrow = nUTF16Len + nUTF16Len/100; // extra 1%
+		int nBufferSizeForGrow = nUTF16Len + nUTF16Len / 100; // extra 1%
 #if MARKUP_SIZEOFWCHAR == 4 // sizeof(wchar_t) == 4
-		unsigned short* pUTF16Buffer = new unsigned short[nUTF16Len+1];
-		bSuccess = FileRead( pUTF16Buffer );
-		if ( bSuccess )
+		unsigned short* pUTF16Buffer = new unsigned short[nUTF16Len + 1];
+		bSuccess = FileRead(pUTF16Buffer);
+		if (bSuccess)
 		{
-			if ( bCheckRaggedEnd )
-				FileCheckRaggedEnd( (void*)pUTF16Buffer );
-			TextEncoding textencoding( MCD_T("UTF-16"), (const void*)pUTF16Buffer, m_nOpFileTextLen );
+			if (bCheckRaggedEnd)
+				FileCheckRaggedEnd((void*)pUTF16Buffer);
+			TextEncoding textencoding(MCD_T("UTF-16"), (const void*)pUTF16Buffer, m_nOpFileTextLen);
 			textencoding.m_nToCount = nBufferSizeForGrow;
-			MCD_CHAR* pUTF32Buffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-			int nUTF32Len = textencoding.PerformConversion( (void*)pUTF32Buffer, MCD_T("UTF-32") );
-			MCD_RELEASEBUFFER(strDoc,pUTF32Buffer,nUTF32Len);
-			x_AddResult( m_strIOResult, MCD_T("converted_to"), MCD_T("UTF-32"), MRC_ENCODING|MRC_LENGTH, nUTF32Len );
+			MCD_CHAR* pUTF32Buffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+			int nUTF32Len = textencoding.PerformConversion((void*)pUTF32Buffer, MCD_T("UTF-32"));
+			MCD_RELEASEBUFFER(strDoc, pUTF32Buffer, nUTF32Len);
+			x_AddResult(m_strIOResult, MCD_T("converted_to"), MCD_T("UTF-32"), MRC_ENCODING | MRC_LENGTH, nUTF32Len);
 		}
 #else // sizeof(wchar_t) == 2
-		MCD_CHAR* pUTF16Buffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-		bSuccess = FileRead( pUTF16Buffer );
-		if ( bSuccess && bCheckRaggedEnd )
-			FileCheckRaggedEnd( (void*)pUTF16Buffer );
-		MCD_RELEASEBUFFER(strDoc,pUTF16Buffer,m_nOpFileTextLen);
+		MCD_CHAR* pUTF16Buffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+		bSuccess = FileRead(pUTF16Buffer);
+		if (bSuccess && bCheckRaggedEnd)
+			FileCheckRaggedEnd((void*)pUTF16Buffer);
+		MCD_RELEASEBUFFER(strDoc, pUTF16Buffer, m_nOpFileTextLen);
 #endif // sizeof(wchar_t) == 2
 #else // not WCHAR
 		// Convert file from UTF-16; it needs to be in memory as UTF-8 or MBCS
-		unsigned short* pUTF16Buffer = new unsigned short[nUTF16Len+1];
-		bSuccess = FileRead( pUTF16Buffer );
-		if ( bSuccess && bCheckRaggedEnd )
-			FileCheckRaggedEnd( (void*)pUTF16Buffer );
-		TextEncoding textencoding( MCD_T("UTF-16"), (const void*)pUTF16Buffer, m_nOpFileTextLen );
-		int nMBLen = textencoding.PerformConversion( NULL, MCD_ENC );
-		int nBufferSizeForGrow = nMBLen + nMBLen/100; // extra 1%
-		MCD_CHAR* pMBBuffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-		textencoding.PerformConversion( (void*)pMBBuffer );
-		delete [] pUTF16Buffer;
-		MCD_RELEASEBUFFER(strDoc,pMBBuffer,nMBLen);
-		x_AddResult( m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nMBLen );
-		if ( textencoding.m_nFailedChars )
-			x_AddResult( m_strIOResult, MCD_T("conversion_loss") );
+		unsigned short* pUTF16Buffer = new unsigned short[nUTF16Len + 1];
+		bSuccess = FileRead(pUTF16Buffer);
+		if (bSuccess && bCheckRaggedEnd)
+			FileCheckRaggedEnd((void*)pUTF16Buffer);
+		TextEncoding textencoding(MCD_T("UTF-16"), (const void*)pUTF16Buffer, m_nOpFileTextLen);
+		int nMBLen = textencoding.PerformConversion(NULL, MCD_ENC);
+		int nBufferSizeForGrow = nMBLen + nMBLen / 100; // extra 1%
+		MCD_CHAR* pMBBuffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+		textencoding.PerformConversion((void*)pMBBuffer);
+		delete[] pUTF16Buffer;
+		MCD_RELEASEBUFFER(strDoc, pMBBuffer, nMBLen);
+		x_AddResult(m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nMBLen);
+		if (textencoding.m_nFailedChars)
+			x_AddResult(m_strIOResult, MCD_T("conversion_loss"));
 #endif // not WCHAR
 	}
 	else // single or multibyte file (i.e. not UTF-16)
 	{
 #if defined(MARKUP_WCHAR) // WCHAR
 		char* pBuffer = new char[m_nOpFileByteLen];
-		bSuccess = FileRead( pBuffer );
-		if ( MCD_STRISEMPTY(m_strEncoding) )
+		bSuccess = FileRead(pBuffer);
+		if (MCD_STRISEMPTY(m_strEncoding))
 		{
 			int nNonASCII;
 			bool bErrorAtEnd;
-			if ( CMarkup::DetectUTF8(pBuffer,m_nOpFileByteLen,&nNonASCII,&bErrorAtEnd) || (bCheckRaggedEnd && bErrorAtEnd) )
+			if (CMarkup::DetectUTF8(pBuffer, m_nOpFileByteLen, &nNonASCII, &bErrorAtEnd) || (bCheckRaggedEnd && bErrorAtEnd))
 			{
 				m_strEncoding = MCD_T("UTF-8");
-				x_AddResult( m_strIOResult, MCD_T("read"), m_strEncoding, MRC_MODIFY|MRC_ENCODING );
+				x_AddResult(m_strIOResult, MCD_T("read"), m_strEncoding, MRC_MODIFY | MRC_ENCODING);
 			}
-			x_AddResult( m_strIOResult, MCD_T("utf8_detection") );
+			x_AddResult(m_strIOResult, MCD_T("utf8_detection"));
 		}
-		if ( bSuccess && bCheckRaggedEnd )
-			FileCheckRaggedEnd( (void*)pBuffer );
-		TextEncoding textencoding( m_strEncoding, (const void*)pBuffer, m_nOpFileTextLen );
-		int nWideLen = textencoding.PerformConversion( NULL, MCD_ENC );
-		int nBufferSizeForGrow = nWideLen + nWideLen/100; // extra 1%
-		MCD_CHAR* pWideBuffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-		textencoding.PerformConversion( (void*)pWideBuffer );
-		MCD_RELEASEBUFFER( strDoc, pWideBuffer, nWideLen );
-		delete [] pBuffer;
-		x_AddResult( m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nWideLen );
+		if (bSuccess && bCheckRaggedEnd)
+			FileCheckRaggedEnd((void*)pBuffer);
+		TextEncoding textencoding(m_strEncoding, (const void*)pBuffer, m_nOpFileTextLen);
+		int nWideLen = textencoding.PerformConversion(NULL, MCD_ENC);
+		int nBufferSizeForGrow = nWideLen + nWideLen / 100; // extra 1%
+		MCD_CHAR* pWideBuffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+		textencoding.PerformConversion((void*)pWideBuffer);
+		MCD_RELEASEBUFFER(strDoc, pWideBuffer, nWideLen);
+		delete[] pBuffer;
+		x_AddResult(m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nWideLen);
 #else // not WCHAR
 		// After loading a file with unknown multi-byte encoding
 		bool bAssumeUnknownIsNative = false;
-		if ( MCD_STRISEMPTY(m_strEncoding) )
+		if (MCD_STRISEMPTY(m_strEncoding))
 		{
 			bAssumeUnknownIsNative = true;
 			m_strEncoding = MCD_ENC;
 		}
-		if ( TextEncoding::CanConvert(MCD_ENC,m_strEncoding) )
+		if (TextEncoding::CanConvert(MCD_ENC, m_strEncoding))
 		{
 			char* pBuffer = new char[m_nOpFileByteLen];
-			bSuccess = FileRead( pBuffer );
-			if ( bSuccess && bCheckRaggedEnd )
-				FileCheckRaggedEnd( (void*)pBuffer );
-			TextEncoding textencoding( m_strEncoding, (const void*)pBuffer, m_nOpFileTextLen );
-			int nMBLen = textencoding.PerformConversion( NULL, MCD_ENC );
-			int nBufferSizeForGrow = nMBLen + nMBLen/100; // extra 1%
-			MCD_CHAR* pMBBuffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-			textencoding.PerformConversion( (void*)pMBBuffer );
-			MCD_RELEASEBUFFER( strDoc, pMBBuffer, nMBLen );
-			delete [] pBuffer;
-			x_AddResult( m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nMBLen );
-			if ( textencoding.m_nFailedChars )
-				x_AddResult( m_strIOResult, MCD_T("conversion_loss") );
+			bSuccess = FileRead(pBuffer);
+			if (bSuccess && bCheckRaggedEnd)
+				FileCheckRaggedEnd((void*)pBuffer);
+			TextEncoding textencoding(m_strEncoding, (const void*)pBuffer, m_nOpFileTextLen);
+			int nMBLen = textencoding.PerformConversion(NULL, MCD_ENC);
+			int nBufferSizeForGrow = nMBLen + nMBLen / 100; // extra 1%
+			MCD_CHAR* pMBBuffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+			textencoding.PerformConversion((void*)pMBBuffer);
+			MCD_RELEASEBUFFER(strDoc, pMBBuffer, nMBLen);
+			delete[] pBuffer;
+			x_AddResult(m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nMBLen);
+			if (textencoding.m_nFailedChars)
+				x_AddResult(m_strIOResult, MCD_T("conversion_loss"));
 		}
 		else // load directly into string
 		{
-			int nBufferSizeForGrow = m_nOpFileByteLen + m_nOpFileByteLen/100; // extra 1%
-			MCD_CHAR* pBuffer = MCD_GETBUFFER(strDoc,nBufferSizeForGrow);
-			bSuccess = FileRead( pBuffer );
+			int nBufferSizeForGrow = m_nOpFileByteLen + m_nOpFileByteLen / 100; // extra 1%
+			MCD_CHAR* pBuffer = MCD_GETBUFFER(strDoc, nBufferSizeForGrow);
+			bSuccess = FileRead(pBuffer);
 			bool bConvertMB = false;
-			if ( bAssumeUnknownIsNative )
+			if (bAssumeUnknownIsNative)
 			{
 				// Might need additional conversion if we assumed an encoding
 				int nNonASCII;
 				bool bErrorAtEnd;
-				bool bIsUTF8 = CMarkup::DetectUTF8( pBuffer, m_nOpFileByteLen, &nNonASCII, &bErrorAtEnd ) || (bCheckRaggedEnd && bErrorAtEnd);
-				MCD_STR strDetectedEncoding = bIsUTF8? MCD_T("UTF-8"): MCD_T("");
-				if ( nNonASCII && m_strEncoding != strDetectedEncoding ) // only need to convert non-ASCII
+				bool bIsUTF8 = CMarkup::DetectUTF8(pBuffer, m_nOpFileByteLen, &nNonASCII, &bErrorAtEnd) || (bCheckRaggedEnd && bErrorAtEnd);
+				MCD_STR strDetectedEncoding = bIsUTF8 ? MCD_T("UTF-8") : MCD_T("");
+				if (nNonASCII && m_strEncoding != strDetectedEncoding) // only need to convert non-ASCII
 					bConvertMB = true;
 				m_strEncoding = strDetectedEncoding;
-				if ( bIsUTF8 )
-					x_AddResult( m_strIOResult, MCD_T("read"), m_strEncoding, MRC_MODIFY|MRC_ENCODING );
+				if (bIsUTF8)
+					x_AddResult(m_strIOResult, MCD_T("read"), m_strEncoding, MRC_MODIFY | MRC_ENCODING);
 			}
-			if ( bSuccess && bCheckRaggedEnd )
-				FileCheckRaggedEnd( (void*)pBuffer );
-			MCD_RELEASEBUFFER( strDoc, pBuffer, m_nOpFileTextLen );
-			if ( bConvertMB )
+			if (bSuccess && bCheckRaggedEnd)
+				FileCheckRaggedEnd((void*)pBuffer);
+			MCD_RELEASEBUFFER(strDoc, pBuffer, m_nOpFileTextLen);
+			if (bConvertMB)
 			{
-				TextEncoding textencoding( m_strEncoding, MCD_2PCSZ(strDoc), m_nOpFileTextLen );
-				int nMBLen = textencoding.PerformConversion( NULL, MCD_ENC );
-				nBufferSizeForGrow = nMBLen + nMBLen/100; // extra 1%
+				TextEncoding textencoding(m_strEncoding, MCD_2PCSZ(strDoc), m_nOpFileTextLen);
+				int nMBLen = textencoding.PerformConversion(NULL, MCD_ENC);
+				nBufferSizeForGrow = nMBLen + nMBLen / 100; // extra 1%
 				MCD_STR strConvDoc;
-				pBuffer = MCD_GETBUFFER(strConvDoc,nBufferSizeForGrow);
-				textencoding.PerformConversion( (void*)pBuffer );
-				MCD_RELEASEBUFFER( strConvDoc, pBuffer, nMBLen );
+				pBuffer = MCD_GETBUFFER(strConvDoc, nBufferSizeForGrow);
+				textencoding.PerformConversion((void*)pBuffer);
+				MCD_RELEASEBUFFER(strConvDoc, pBuffer, nMBLen);
 				strDoc = strConvDoc;
-				x_AddResult( m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nMBLen );
-				if ( textencoding.m_nFailedChars )
-					x_AddResult( m_strIOResult, MCD_T("conversion_loss") );
+				x_AddResult(m_strIOResult, MCD_T("converted_to"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nMBLen);
+				if (textencoding.m_nFailedChars)
+					x_AddResult(m_strIOResult, MCD_T("conversion_loss"));
 			}
-			if ( bAssumeUnknownIsNative )
-				x_AddResult( m_strIOResult, MCD_T("utf8_detection") );
+			if (bAssumeUnknownIsNative)
+				x_AddResult(m_strIOResult, MCD_T("utf8_detection"));
 		}
 #endif // not WCHAR
 	}
 	return bSuccess;
 }
 
-bool FilePos::FileWrite( void* pBuffer, const void* pConstBuffer /*=NULL*/ )
+bool FilePos::FileWrite(void* pBuffer, const void* pConstBuffer /*=NULL*/)
 {
 	m_nOpFileByteLen = m_nOpFileTextLen * m_nFileCharUnitSize;
-	if ( ! pConstBuffer )
+	if (!pConstBuffer)
 		pConstBuffer = pBuffer;
 	unsigned short* pTempEndianBuffer = NULL;
-	if ( x_EndianSwapRequired(m_nDocFlags) )
+	if (x_EndianSwapRequired(m_nDocFlags))
 	{
-		if ( ! pBuffer )
+		if (!pBuffer)
 		{
 			pTempEndianBuffer = new unsigned short[m_nOpFileTextLen];
-			memcpy( pTempEndianBuffer, pConstBuffer, m_nOpFileTextLen * 2 );
+			memcpy(pTempEndianBuffer, pConstBuffer, m_nOpFileTextLen * 2);
 			pBuffer = pTempEndianBuffer;
 			pConstBuffer = pTempEndianBuffer;
 		}
-		x_EndianSwapUTF16( (unsigned short*)pBuffer, m_nOpFileTextLen );
-		x_AddResult( m_strIOResult, MCD_T("endian_swap") );
+		x_EndianSwapUTF16((unsigned short*)pBuffer, m_nOpFileTextLen);
+		x_AddResult(m_strIOResult, MCD_T("endian_swap"));
 	}
-	bool bSuccess = ( fwrite( pConstBuffer, m_nOpFileByteLen, 1, m_fp ) == 1 );
-	if ( pTempEndianBuffer )
-		delete [] pTempEndianBuffer;
-	if ( bSuccess )
+	bool bSuccess = (fwrite(pConstBuffer, m_nOpFileByteLen, 1, m_fp) == 1);
+	if (pTempEndianBuffer)
+		delete[] pTempEndianBuffer;
+	if (bSuccess)
 	{
 		m_nFileByteOffset += m_nOpFileByteLen;
-		x_AddResult( m_strIOResult, MCD_T("write"), m_strEncoding, MRC_ENCODING|MRC_LENGTH, m_nOpFileTextLen );
+		x_AddResult(m_strIOResult, MCD_T("write"), m_strEncoding, MRC_ENCODING | MRC_LENGTH, m_nOpFileTextLen);
 	}
 	else
 		FileErrorAddResult();
 	return bSuccess;
 }
 
-bool FilePos::FileWriteText( const MCD_STR& strDoc, int nWriteStrLen/*=-1*/ )
+bool FilePos::FileWriteText(const MCD_STR& strDoc, int nWriteStrLen/*=-1*/)
 {
 	bool bSuccess = true;
-	MCD_STRCLEAR( m_strIOResult );
+	MCD_STRCLEAR(m_strIOResult);
 	MCD_PCSZ pDoc = MCD_2PCSZ(strDoc);
-	if ( nWriteStrLen == -1 )
+	if (nWriteStrLen == -1)
 		nWriteStrLen = MCD_STRLENGTH(strDoc);
-	if ( ! nWriteStrLen )
+	if (!nWriteStrLen)
 	{
-		x_AddResult( m_strIOResult, MCD_T("write"), m_strEncoding, MRC_ENCODING|MRC_LENGTH, 0 );
+		x_AddResult(m_strIOResult, MCD_T("write"), m_strEncoding, MRC_ENCODING | MRC_LENGTH, 0);
 		return bSuccess;
 	}
 
-	if ( m_nDocFlags & (CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF16BEFILE) )
+	if (m_nDocFlags & (CMarkup::MDF_UTF16LEFILE | CMarkup::MDF_UTF16BEFILE))
 	{
 #if defined(MARKUP_WCHAR) // WCHAR
 #if MARKUP_SIZEOFWCHAR == 4 // sizeof(wchar_t) == 4
-		TextEncoding textencoding( MCD_T("UTF-32"), (const void*)pDoc, nWriteStrLen );
-		m_nOpFileTextLen = textencoding.PerformConversion( NULL, MCD_T("UTF-16") );
+		TextEncoding textencoding(MCD_T("UTF-32"), (const void*)pDoc, nWriteStrLen);
+		m_nOpFileTextLen = textencoding.PerformConversion(NULL, MCD_T("UTF-16"));
 		unsigned short* pUTF16Buffer = new unsigned short[m_nOpFileTextLen];
-		textencoding.PerformConversion( (void*)pUTF16Buffer );
-		x_AddResult( m_strIOResult, MCD_T("converted_from"), MCD_T("UTF-32"), MRC_ENCODING|MRC_LENGTH, nWriteStrLen );
-		bSuccess = FileWrite( pUTF16Buffer );
-		delete [] pUTF16Buffer;
+		textencoding.PerformConversion((void*)pUTF16Buffer);
+		x_AddResult(m_strIOResult, MCD_T("converted_from"), MCD_T("UTF-32"), MRC_ENCODING | MRC_LENGTH, nWriteStrLen);
+		bSuccess = FileWrite(pUTF16Buffer);
+		delete[] pUTF16Buffer;
 #else // sizeof(wchar_t) == 2
 		m_nOpFileTextLen = nWriteStrLen;
-		bSuccess = FileWrite( NULL, pDoc );
+		bSuccess = FileWrite(NULL, pDoc);
 #endif
 #else // not WCHAR
-		TextEncoding textencoding( MCD_ENC, (const void*)pDoc, nWriteStrLen );
-		m_nOpFileTextLen = textencoding.PerformConversion( NULL, MCD_T("UTF-16") );
+		TextEncoding textencoding(MCD_ENC, (const void*)pDoc, nWriteStrLen);
+		m_nOpFileTextLen = textencoding.PerformConversion(NULL, MCD_T("UTF-16"));
 		unsigned short* pUTF16Buffer = new unsigned short[m_nOpFileTextLen];
-		textencoding.PerformConversion( (void*)pUTF16Buffer );
-		x_AddResult( m_strIOResult, MCD_T("converted_from"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nWriteStrLen );
-		bSuccess = FileWrite( pUTF16Buffer );
-		delete [] pUTF16Buffer;
+		textencoding.PerformConversion((void*)pUTF16Buffer);
+		x_AddResult(m_strIOResult, MCD_T("converted_from"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nWriteStrLen);
+		bSuccess = FileWrite(pUTF16Buffer);
+		delete[] pUTF16Buffer;
 #endif // not WCHAR
 	}
 	else // single or multibyte file (i.e. not UTF-16)
 	{
 #if ! defined(MARKUP_WCHAR) // not WCHAR
-		if ( ! TextEncoding::CanConvert(m_strEncoding,MCD_ENC) )
+		if (!TextEncoding::CanConvert(m_strEncoding, MCD_ENC))
 		{
 			// Same or unsupported multi-byte to multi-byte, so save directly from string
 			m_nOpFileTextLen = nWriteStrLen;
-			bSuccess = FileWrite( NULL, pDoc );
+			bSuccess = FileWrite(NULL, pDoc);
 			return bSuccess;
 		}
 #endif // not WCHAR
-		TextEncoding textencoding( MCD_ENC, (const void*)pDoc, nWriteStrLen );
-		m_nOpFileTextLen = textencoding.PerformConversion( NULL, m_strEncoding );
+		TextEncoding textencoding(MCD_ENC, (const void*)pDoc, nWriteStrLen);
+		m_nOpFileTextLen = textencoding.PerformConversion(NULL, m_strEncoding);
 		char* pMBBuffer = new char[m_nOpFileTextLen];
-		textencoding.PerformConversion( (void*)pMBBuffer );
-		x_AddResult( m_strIOResult, MCD_T("converted_from"), MCD_ENC, MRC_ENCODING|MRC_LENGTH, nWriteStrLen );
-		if ( textencoding.m_nFailedChars )
-			x_AddResult( m_strIOResult, MCD_T("conversion_loss") );
-		bSuccess = FileWrite( pMBBuffer );
-		delete [] pMBBuffer;
+		textencoding.PerformConversion((void*)pMBBuffer);
+		x_AddResult(m_strIOResult, MCD_T("converted_from"), MCD_ENC, MRC_ENCODING | MRC_LENGTH, nWriteStrLen);
+		if (textencoding.m_nFailedChars)
+			x_AddResult(m_strIOResult, MCD_T("conversion_loss"));
+		bSuccess = FileWrite(pMBBuffer);
+		delete[] pMBBuffer;
 	}
 
 	return bSuccess;
@@ -1988,12 +1988,12 @@ bool FilePos::FileWriteText( const MCD_STR& strDoc, int nWriteStrLen/*=-1*/ )
 
 bool FilePos::FileClose()
 {
-	if ( m_fp )
+	if (m_fp)
 	{
-		if ( fclose(m_fp) )
+		if (fclose(m_fp))
 			FileErrorAddResult();
 		m_fp = NULL;
-		m_nDocFlags &= ~(CMarkup::MDF_WRITEFILE|CMarkup::MDF_READFILE|CMarkup::MDF_APPENDFILE);
+		m_nDocFlags &= ~(CMarkup::MDF_WRITEFILE | CMarkup::MDF_READFILE | CMarkup::MDF_APPENDFILE);
 		return true;
 	}
 	return false;
@@ -2002,78 +2002,78 @@ bool FilePos::FileClose()
 bool FilePos::FileReadNextBuffer()
 {
 	// If not end of file, returns amount to subtract from offsets
-	if ( m_nFileByteOffset < m_nFileByteLen )
+	if (m_nFileByteOffset < m_nFileByteLen)
 	{
 		// Prepare to put this node at beginning
 		MCD_STR& str = *m_pstrBuffer;
-		int nDocLength = MCD_STRLENGTH( str );
+		int nDocLength = MCD_STRLENGTH(str);
 		int nRemove = m_nReadBufferStart;
 		m_nReadBufferRemoved = nRemove;
 
 		// Gather
-		if ( m_nReadGatherStart != -1 )
+		if (m_nReadGatherStart != -1)
 		{
-			if ( m_nReadBufferStart > m_nReadGatherStart )
+			if (m_nReadBufferStart > m_nReadGatherStart)
 			{
 				// In case it is a large subdoc, reduce reallocs by using x_StrInsertReplace
-				MCD_STR strAppend = MCD_STRMID( str, m_nReadGatherStart, m_nReadBufferStart - m_nReadGatherStart );
-				x_StrInsertReplace( m_strReadGatherMarkup, MCD_STRLENGTH(m_strReadGatherMarkup), 0, strAppend );
+				MCD_STR strAppend = MCD_STRMID(str, m_nReadGatherStart, m_nReadBufferStart - m_nReadGatherStart);
+				x_StrInsertReplace(m_strReadGatherMarkup, MCD_STRLENGTH(m_strReadGatherMarkup), 0, strAppend);
 			}
 			m_nReadGatherStart = 0;
 		}
 
 		// Increase capacity if keeping more than half of nDocLength
 		int nKeepLength = nDocLength - nRemove;
-		if ( nKeepLength > nDocLength / 2 )
+		if (nKeepLength > nDocLength / 2)
 			m_nBlockSizeBasis *= 2;
-		if ( nRemove )
-			x_StrInsertReplace( str, 0, nRemove, MCD_STR() );
+		if (nRemove)
+			x_StrInsertReplace(str, 0, nRemove, MCD_STR());
 		MCD_STR strRead;
 		m_nOpFileByteLen = m_nBlockSizeBasis - nKeepLength;
 		m_nOpFileByteLen += 4 - m_nOpFileByteLen % 4; // round up to 4-byte offset
-		FileReadText( strRead );
-		x_StrInsertReplace( str, nKeepLength, 0, strRead );
+		FileReadText(strRead);
+		x_StrInsertReplace(str, nKeepLength, 0, strRead);
 		m_nReadBufferStart = 0; // next time just elongate/increase capacity
 		return true;
 	}
 	return false;
 }
 
-void FilePos::FileGatherStart( int nStart )
+void FilePos::FileGatherStart(int nStart)
 {
 	m_nReadGatherStart = nStart;
 }
 
-int FilePos::FileGatherEnd( MCD_STR& strMarkup )
+int FilePos::FileGatherEnd(MCD_STR& strMarkup)
 {
 	int nStart = m_nReadGatherStart;
 	m_nReadGatherStart = -1;
 	strMarkup = m_strReadGatherMarkup;
-	MCD_STRCLEAR( m_strReadGatherMarkup );
+	MCD_STRCLEAR(m_strReadGatherMarkup);
 	return nStart;
 }
 
-bool FilePos::FileFlush( MCD_STR& strBuffer, int nWriteStrLen/*=-1*/, bool bFflush/*=false*/ )
+bool FilePos::FileFlush(MCD_STR& strBuffer, int nWriteStrLen/*=-1*/, bool bFflush/*=false*/)
 {
 	bool bSuccess = true;
-	MCD_STRCLEAR( m_strIOResult );
-	if ( nWriteStrLen == -1 )
-		nWriteStrLen = MCD_STRLENGTH( strBuffer );
-	if ( nWriteStrLen )
+	MCD_STRCLEAR(m_strIOResult);
+	if (nWriteStrLen == -1)
+		nWriteStrLen = MCD_STRLENGTH(strBuffer);
+	if (nWriteStrLen)
 	{
-		if ( (! m_nFileByteOffset) && MCD_STRISEMPTY(m_strEncoding) && ! MCD_STRISEMPTY(strBuffer) )
+		if ((!m_nFileByteOffset) && MCD_STRISEMPTY(m_strEncoding) && !MCD_STRISEMPTY(strBuffer))
 		{
-			m_strEncoding = CMarkup::GetDeclaredEncoding( strBuffer );
-			if ( MCD_STRISEMPTY(m_strEncoding) )
+			m_strEncoding = CMarkup::GetDeclaredEncoding(strBuffer);
+			if (MCD_STRISEMPTY(m_strEncoding))
 				m_strEncoding = MCD_T("UTF-8");
 		}
-		bSuccess = FileWriteText( strBuffer, nWriteStrLen );
-		if ( bSuccess )
-			x_StrInsertReplace( strBuffer, 0, nWriteStrLen, MCD_STR() );
+		bSuccess = FileWriteText(strBuffer, nWriteStrLen);
+		if (bSuccess)
+			x_StrInsertReplace(strBuffer, 0, nWriteStrLen, MCD_STR());
 	}
-	if ( bFflush && bSuccess )
+	if (bFflush && bSuccess)
 	{
-		if ( fflush(m_fp) )
+		if (fflush(m_fp))
 			bSuccess = FileErrorAddResult();
 	}
 	return bSuccess;
@@ -2084,28 +2084,28 @@ bool FilePos::FileFlush( MCD_STR& strBuffer, int nWriteStrLen/*=-1*/, bool bFflu
 //
 struct PathPos
 {
-	PathPos( MCD_PCSZ pszPath, bool b ) { p=pszPath; bReader=b; i=0; iPathAttribName=0; iSave=0; nPathType=0; if (!ParsePath()) nPathType=-1; };
-	int GetTypeAndInc() { i=-1; if (p) { if (p[0]=='/') { if (p[1]=='/') i=2; else i=1; } else if (p[0]) i=0; } nPathType=i+1; return nPathType; };
-	int GetNumAndInc() { int n=0; while (p[i]>='0'&&p[i]<='9') n=n*10+(int)p[i++]-(int)'0'; return n; };
-	MCD_PCSZ GetValAndInc() { ++i; MCD_CHAR cEnd=']'; if (p[i]=='\''||p[i]=='\"') cEnd=p[i++]; int iVal=i; IncWord(cEnd); nLen=i-iVal; if (cEnd!=']') ++i; return &p[iVal]; };
+	PathPos(MCD_PCSZ pszPath, bool b) { p = pszPath; bReader = b; i = 0; iPathAttribName = 0; iSave = 0; nPathType = 0; if (!ParsePath()) nPathType = -1; };
+	int GetTypeAndInc() { i = -1; if (p) { if (p[0] == '/') { if (p[1] == '/') i = 2; else i = 1; } else if (p[0]) i = 0; } nPathType = i + 1; return nPathType; };
+	int GetNumAndInc() { int n = 0; while (p[i] >= '0' && p[i] <= '9') n = n * 10 + (int)p[i++] - (int)'0'; return n; };
+	MCD_PCSZ GetValAndInc() { ++i; MCD_CHAR cEnd = ']'; if (p[i] == '\'' || p[i] == '\"') cEnd = p[i++]; int iVal = i; IncWord(cEnd); nLen = i - iVal; if (cEnd != ']') ++i; return &p[iVal]; };
 	int GetValOrWordLen() { return nLen; };
 	MCD_CHAR GetChar() { return p[i]; };
-	bool IsAtPathEnd() { return ((!p[i])||(iPathAttribName&&i+2>=iPathAttribName))?true:false; }; 
+	bool IsAtPathEnd() { return ((!p[i]) || (iPathAttribName && i + 2 >= iPathAttribName)) ? true : false; };
 	MCD_PCSZ GetPtr() { return &p[i]; };
-	void SaveOffset() { iSave=i; };
-	void RevertOffset() { i=iSave; };
-	void RevertOffsetAsName() { i=iSave; nPathType=1; };
-	MCD_PCSZ GetWordAndInc() { int iWord=i; IncWord(); nLen=i-iWord; return &p[iWord]; };
-	void IncWord() { while (p[i]&&!x_ISENDPATHWORD(p[i])) i+=MCD_CLEN(&p[i]); };
-	void IncWord( MCD_CHAR c ) { while (p[i]&&p[i]!=c) i+=MCD_CLEN(&p[i]); };
+	void SaveOffset() { iSave = i; };
+	void RevertOffset() { i = iSave; };
+	void RevertOffsetAsName() { i = iSave; nPathType = 1; };
+	MCD_PCSZ GetWordAndInc() { int iWord = i; IncWord(); nLen = i - iWord; return &p[iWord]; };
+	void IncWord() { while (p[i] && !x_ISENDPATHWORD(p[i])) i += MCD_CLEN(&p[i]); };
+	void IncWord(MCD_CHAR c) { while (p[i] && p[i] != c) i += MCD_CLEN(&p[i]); };
 	void IncChar() { ++i; };
-	void Inc( int n ) { i+=n; };
+	void Inc(int n) { i += n; };
 	bool IsAnywherePath() { return nPathType == 3; };
 	bool IsAbsolutePath() { return nPathType == 2; };
 	bool IsPath() { return nPathType > 0; };
 	bool ValidPath() { return nPathType != -1; };
 	MCD_PCSZ GetPathAttribName() { if (iPathAttribName) return &p[iPathAttribName]; return NULL; };
-	bool AttribPredicateMatch( TokenPos& token );
+	bool AttribPredicateMatch(TokenPos& token);
 private:
 	bool ParsePath();
 	int nPathType; // -1 invalid, 0 empty, 1 name, 2 absolute path, 3 anywhere path
@@ -2120,60 +2120,60 @@ private:
 bool PathPos::ParsePath()
 {
 	// Determine if the path seems to be in a valid format before attempting to find
-	if ( GetTypeAndInc() )
+	if (GetTypeAndInc())
 	{
 		SaveOffset();
-		while ( 1 )
+		while (1)
 		{
-			if ( ! GetChar() )
+			if (!GetChar())
 				return false;
 			IncWord(); // Tag name
-			if ( GetChar() == '[' ) // predicate
+			if (GetChar() == '[') // predicate
 			{
 				IncChar(); // [
-				if ( GetChar() >= '1' && GetChar() <= '9' )
+				if (GetChar() >= '1' && GetChar() <= '9')
 					GetNumAndInc();
 				else // attrib or child tag name
 				{
-					if ( GetChar() == '@' )
+					if (GetChar() == '@')
 					{
 						IncChar(); // @
 						IncWord(); // attrib name
-						if ( GetChar() == '=' )
+						if (GetChar() == '=')
 							GetValAndInc();
 					}
 					else
 					{
-						if ( bReader )
+						if (bReader)
 							return false;
 						IncWord();
 					}
 				}
-				if ( GetChar() != ']' )
+				if (GetChar() != ']')
 					return false;
 				IncChar(); // ]
 			}
 
 			// Another level of path
-			if ( GetChar() == '/' )
+			if (GetChar() == '/')
 			{
-				if ( IsAnywherePath() )
+				if (IsAnywherePath())
 					return false; // multiple levels not supported for // path
 				IncChar();
-				if ( GetChar() == '@' )
+				if (GetChar() == '@')
 				{
 					// FindGetData and FindSetData support paths ending in attribute
 					IncChar(); // @
 					iPathAttribName = i;
 					IncWord(); // attrib name
-					if ( GetChar() )
+					if (GetChar())
 						return false; // it should have ended with attribute name
 					break;
 				}
 			}
 			else
 			{
-				if ( GetChar() )
+				if (GetChar())
 					return false; // not a slash, so it should have ended here
 				break;
 			}
@@ -2183,20 +2183,20 @@ bool PathPos::ParsePath()
 	return true;
 }
 
-bool PathPos::AttribPredicateMatch( TokenPos& token )
+bool PathPos::AttribPredicateMatch(TokenPos& token)
 {
 	// Support attribute predicate matching in regular and file read mode
 	// token.m_nNext must already be set to node.nStart + 1 or ELEM(i).nStart + 1
 	IncChar(); // @
-	if ( token.FindAttrib(GetPtr()) )
+	if (token.FindAttrib(GetPtr()))
 	{
 		IncWord();
-		if ( GetChar() == '=' )
+		if (GetChar() == '=')
 		{
 			MCD_PCSZ pszVal = GetValAndInc();
-			MCD_STR strPathValue = CMarkup::UnescapeText( pszVal, GetValOrWordLen() );
-			MCD_STR strAttribValue = CMarkup::UnescapeText( token.GetTokenPtr(), token.Length(), token.m_nTokenFlags );
-			if ( strPathValue != strAttribValue )
+			MCD_STR strPathValue = CMarkup::UnescapeText(pszVal, GetValOrWordLen());
+			MCD_STR strAttribValue = CMarkup::UnescapeText(token.GetTokenPtr(), token.Length(), token.m_nTokenFlags);
+			if (strPathValue != strAttribValue)
 				return false;
 		}
 		return true;
@@ -2210,7 +2210,7 @@ bool PathPos::AttribPredicateMatch( TokenPos& token )
 struct SavedPos
 {
 	// SavedPos is an entry in the SavedPosMap hash table
-	SavedPos() { nSavedPosFlags=0; iPos=0; };
+	SavedPos() { nSavedPosFlags = 0; iPos = 0; };
 	MCD_STR strName;
 	int iPos;
 	enum { SPM_MAIN = 1, SPM_CHILD = 2, SPM_USED = 4, SPM_LAST = 8 };
@@ -2220,8 +2220,8 @@ struct SavedPos
 struct SavedPosMap
 {
 	// SavedPosMap is only created if SavePos/RestorePos are used
-	SavedPosMap( int nSize ) { nMapSize=nSize; pTable = new SavedPos*[nSize]; memset(pTable,0,nSize*sizeof(SavedPos*)); };
-	~SavedPosMap() { if (pTable) { for (int n=0;n<nMapSize;++n) if (pTable[n]) delete[] pTable[n]; delete[] pTable; } };
+	SavedPosMap(int nSize) { nMapSize = nSize; pTable = new SavedPos * [nSize]; memset(pTable, 0, nSize * sizeof(SavedPos*)); };
+	~SavedPosMap() { if (pTable) { for (int n = 0; n < nMapSize; ++n) if (pTable[n]) delete[] pTable[n]; delete[] pTable; } };
 	SavedPos** pTable;
 	int nMapSize;
 };
@@ -2231,26 +2231,26 @@ struct SavedPosMapArray
 	// SavedPosMapArray keeps pointers to SavedPosMap instances
 	SavedPosMapArray() { m_pMaps = NULL; };
 	~SavedPosMapArray() { ReleaseMaps(); };
-	void ReleaseMaps() { SavedPosMap**p = m_pMaps; if (p) { while (*p) delete *p++; delete[] m_pMaps; m_pMaps=NULL; } };
-	bool GetMap( SavedPosMap*& pMap, int nMap, int nMapSize = 7 );
-	void CopySavedPosMaps( SavedPosMapArray* pOtherMaps );
+	void ReleaseMaps() { SavedPosMap** p = m_pMaps; if (p) { while (*p) delete* p++; delete[] m_pMaps; m_pMaps = NULL; } };
+	bool GetMap(SavedPosMap*& pMap, int nMap, int nMapSize = 7);
+	void CopySavedPosMaps(SavedPosMapArray* pOtherMaps);
 	SavedPosMap** m_pMaps; // NULL terminated array
 };
 
-bool SavedPosMapArray::GetMap( SavedPosMap*& pMap, int nMap, int nMapSize /*=7*/ )
+bool SavedPosMapArray::GetMap(SavedPosMap*& pMap, int nMap, int nMapSize /*=7*/)
 {
 	// Find or create map, returns true if map(s) created
 	SavedPosMap** pMapsExisting = m_pMaps;
 	int nMapIndex = 0;
-	if ( pMapsExisting )
+	if (pMapsExisting)
 	{
 		// Length of array is unknown, so loop through maps
-		while ( nMapIndex <= nMap )
+		while (nMapIndex <= nMap)
 		{
 			pMap = pMapsExisting[nMapIndex];
-			if ( ! pMap )
+			if (!pMap)
 				break;
-			if ( nMapIndex == nMap )
+			if (nMapIndex == nMap)
 				return false; // not created
 			++nMapIndex;
 		}
@@ -2259,19 +2259,19 @@ bool SavedPosMapArray::GetMap( SavedPosMap*& pMap, int nMap, int nMapSize /*=7*/
 
 	// Create map(s)
 	// If you access map 1 before map 0 created, then 2 maps will be created
-	m_pMaps = new SavedPosMap*[nMap+2];
-	if ( pMapsExisting )
+	m_pMaps = new SavedPosMap * [nMap + 2];
+	if (pMapsExisting)
 	{
-		while ( pMapsExisting[nMapIndex] )
+		while (pMapsExisting[nMapIndex])
 		{
 			m_pMaps[nMapIndex] = pMapsExisting[nMapIndex];
 			++nMapIndex;
 		}
 		delete[] pMapsExisting;
 	}
-	while ( nMapIndex <= nMap )
+	while (nMapIndex <= nMap)
 	{
-		m_pMaps[nMapIndex] = new SavedPosMap( nMapSize );
+		m_pMaps[nMapIndex] = new SavedPosMap(nMapSize);
 		++nMapIndex;
 	}
 	m_pMaps[nMapIndex] = NULL;
@@ -2279,35 +2279,35 @@ bool SavedPosMapArray::GetMap( SavedPosMap*& pMap, int nMap, int nMapSize /*=7*/
 	return true; // map(s) created
 }
 
-void SavedPosMapArray::CopySavedPosMaps( SavedPosMapArray* pOtherMaps )
+void SavedPosMapArray::CopySavedPosMaps(SavedPosMapArray* pOtherMaps)
 {
 	ReleaseMaps();
-	if ( pOtherMaps->m_pMaps )
+	if (pOtherMaps->m_pMaps)
 	{
 		int nMap = 0;
 		SavedPosMap* pMap = NULL;
-		while ( pOtherMaps->m_pMaps[nMap] )
+		while (pOtherMaps->m_pMaps[nMap])
 		{
 			SavedPosMap* pMapSrc = pOtherMaps->m_pMaps[nMap];
-			GetMap( pMap, nMap, pMapSrc->nMapSize );
-			for ( int nSlot=0; nSlot < pMap->nMapSize; ++nSlot )
+			GetMap(pMap, nMap, pMapSrc->nMapSize);
+			for (int nSlot = 0; nSlot < pMap->nMapSize; ++nSlot)
 			{
 				SavedPos* pCopySavedPos = pMapSrc->pTable[nSlot];
-				if ( pCopySavedPos )
+				if (pCopySavedPos)
 				{
 					int nCount = 0;
-					while ( pCopySavedPos[nCount].nSavedPosFlags & SavedPos::SPM_USED )
+					while (pCopySavedPos[nCount].nSavedPosFlags & SavedPos::SPM_USED)
 					{
 						++nCount;
-						if ( pCopySavedPos[nCount-1].nSavedPosFlags & SavedPos::SPM_LAST )
+						if (pCopySavedPos[nCount - 1].nSavedPosFlags & SavedPos::SPM_LAST)
 							break;
 					}
-					if ( nCount )
+					if (nCount)
 					{
 						SavedPos* pNewSavedPos = new SavedPos[nCount];
-						for ( int nCopy=0; nCopy<nCount; ++nCopy )
+						for (int nCopy = 0; nCopy < nCount; ++nCopy)
 							pNewSavedPos[nCopy] = pCopySavedPos[nCopy];
-						pNewSavedPos[nCount-1].nSavedPosFlags |= SavedPos::SPM_LAST;
+						pNewSavedPos[nCount - 1].nSavedPosFlags |= SavedPos::SPM_LAST;
 						pMap->pTable[nSlot] = pNewSavedPos;
 					}
 				}
@@ -2320,7 +2320,7 @@ void SavedPosMapArray::CopySavedPosMaps( SavedPosMapArray* pOtherMaps )
 //////////////////////////////////////////////////////////////////////
 // Core parser function
 //
-int TokenPos::ParseNode( NodePos& node )
+int TokenPos::ParseNode(NodePos& node)
 {
 	// Call this with m_nNext set to the start of the node or tag
 	// Upon return m_nNext points to the char after the node or tag
@@ -2360,35 +2360,35 @@ int TokenPos::ParseNode( NodePos& node )
 	int nName = 0;
 	int nNameLen = 0;
 	unsigned int cDminus1 = 0, cDminus2 = 0;
-	#define FINDNODETYPE(e,t) { pFindEnd=e; nEndLen=(sizeof(e)-1)/sizeof(MCD_CHAR); nNodeType=t; }
-	#define FINDNODETYPENAME(e,t,n) { FINDNODETYPE(e,t) nName=(int)(pD-m_pDocText)+n; }
-	#define FINDNODEBAD(e) { pFindEnd=MCD_T(">"); nEndLen=1; x_AddResult(node.strMeta,e,NULL,0,m_nNext); nNodeType=-1; }
+#define FINDNODETYPE(e,t) { pFindEnd=e; nEndLen=(sizeof(e)-1)/sizeof(MCD_CHAR); nNodeType=t; }
+#define FINDNODETYPENAME(e,t,n) { FINDNODETYPE(e,t) nName=(int)(pD-m_pDocText)+n; }
+#define FINDNODEBAD(e) { pFindEnd=MCD_T(">"); nEndLen=1; x_AddResult(node.strMeta,e,NULL,0,m_nNext); nNodeType=-1; }
 
 	node.nStart = m_nNext;
 	node.nNodeFlags = 0;
 
 	MCD_PCSZ pD = &m_pDocText[m_nNext];
 	unsigned int cD;
-	while ( 1 )
+	while (1)
 	{
 		cD = (unsigned int)*pD;
-		if ( ! cD )
+		if (!cD)
 		{
 			m_nNext = (int)(pD - m_pDocText);
-			if ( m_pReaderFilePos ) // read file mode
+			if (m_pReaderFilePos) // read file mode
 			{
 				// Read buffer may only be removed on the first FileReadNextBuffer in this node
 				int nRemovedAlready = m_pReaderFilePos->m_nReadBufferRemoved;
-				if ( m_pReaderFilePos->FileReadNextBuffer() ) // more text in file?
+				if (m_pReaderFilePos->FileReadNextBuffer()) // more text in file?
 				{
 					int nNodeLength = m_nNext - node.nStart;
 					int nRemove = m_pReaderFilePos->m_nReadBufferRemoved;
-					if ( nRemove )
+					if (nRemove)
 					{
 						node.nStart -= nRemove;
-						if ( nName )
+						if (nName)
 							nName -= nRemove;
-						else if ( nNameLen )
+						else if (nNameLen)
 						{
 							m_nL -= nRemove;
 							m_nR -= nRemove;
@@ -2397,46 +2397,46 @@ int TokenPos::ParseNode( NodePos& node )
 					}
 					int nNewOffset = node.nStart + nNodeLength;
 					MCD_STR& str = *m_pReaderFilePos->m_pstrBuffer;
-					m_pDocText = MCD_2PCSZ( str );
+					m_pDocText = MCD_2PCSZ(str);
 					pD = &m_pDocText[nNewOffset];
 					cD = (unsigned int)*pD; // loaded char replaces null terminator
 				}
 				if (nRemovedAlready) // preserve m_nReadBufferRemoved for caller of ParseNode
 					m_pReaderFilePos->m_nReadBufferRemoved = nRemovedAlready;
 			}
-			if ( ! cD )
+			if (!cD)
 			{
-				if ( m_nNext == node.nStart )
+				if (m_nNext == node.nStart)
 				{
 					node.nLength = 0;
 					node.nNodeType = 0;
 					return -2; // end of document
 				}
-				if ( nNodeType != CMarkup::MNT_WHITESPACE && nNodeType != CMarkup::MNT_TEXT )
+				if (nNodeType != CMarkup::MNT_WHITESPACE && nNodeType != CMarkup::MNT_TEXT)
 				{
 					MCD_PCSZ pType = MCD_T("tag");
-					if ( (nParseFlags & PD_DOCTYPE) || nNodeType == CMarkup::MNT_DOCUMENT_TYPE )
+					if ((nParseFlags & PD_DOCTYPE) || nNodeType == CMarkup::MNT_DOCUMENT_TYPE)
 						pType = MCD_T("document_type");
-					else if ( nNodeType == CMarkup::MNT_ELEMENT )
+					else if (nNodeType == CMarkup::MNT_ELEMENT)
 						pType = MCD_T("start_tag");
-					else if ( nNodeType == 0 )
+					else if (nNodeType == 0)
 						pType = MCD_T("end_tag");
-					else if ( nNodeType == CMarkup::MNT_CDATA_SECTION )
+					else if (nNodeType == CMarkup::MNT_CDATA_SECTION)
 						pType = MCD_T("cdata_section");
-					else if ( nNodeType == CMarkup::MNT_PROCESSING_INSTRUCTION )
+					else if (nNodeType == CMarkup::MNT_PROCESSING_INSTRUCTION)
 						pType = MCD_T("processing_instruction");
-					else if ( nNodeType == CMarkup::MNT_COMMENT )
+					else if (nNodeType == CMarkup::MNT_COMMENT)
 						pType = MCD_T("comment");
 					nNodeType = -1;
-					x_AddResult(node.strMeta,MCD_T("unterminated_tag_syntax"),pType,MRC_TYPE,node.nStart);
+					x_AddResult(node.strMeta, MCD_T("unterminated_tag_syntax"), pType, MRC_TYPE, node.nStart);
 				}
 				break;
 			}
 		}
 
-		if ( nName )
+		if (nName)
 		{
-			if ( x_ISENDNAME(cD) )
+			if (x_ISENDNAME(cD))
 			{
 				nNameLen = (int)(pD - m_pDocText) - nName;
 				m_nL = nName;
@@ -2447,151 +2447,151 @@ int TokenPos::ParseNode( NodePos& node )
 			}
 			else
 			{
-				pD += MCD_CLEN( pD );
+				pD += MCD_CLEN(pD);
 				continue;
 			}
 		}
 
-		if ( pFindEnd )
+		if (pFindEnd)
 		{
-			if ( cD == '>' && ! (nParseFlags & (PD_INQUOTE_S|PD_INQUOTE_D)) )
+			if (cD == '>' && !(nParseFlags & (PD_INQUOTE_S | PD_INQUOTE_D)))
 			{
 				m_nNext = (int)(pD - m_pDocText) + 1;
-				if ( nEndLen == 1 )
+				if (nEndLen == 1)
 				{
 					pFindEnd = NULL;
-					if ( nNodeType == CMarkup::MNT_ELEMENT && cDminus1 == '/' )
+					if (nNodeType == CMarkup::MNT_ELEMENT && cDminus1 == '/')
 					{
-						if ( (! cDminus2) || (!(nParseFlags&PD_NOQUOTEVAL)) || x_ISNOTSECONDLASTINVAL(cDminus2) )
+						if ((!cDminus2) || (!(nParseFlags & PD_NOQUOTEVAL)) || x_ISNOTSECONDLASTINVAL(cDminus2))
 							node.nNodeFlags |= MNF_EMPTY;
 					}
 				}
-				else if ( m_nNext - 1 > nEndLen )
+				else if (m_nNext - 1 > nEndLen)
 				{
 					// Test for end of PI or comment
 					MCD_PCSZ pEnd = pD - nEndLen + 1;
 					MCD_PCSZ pInFindEnd = pFindEnd;
 					int nLen = nEndLen;
-					while ( --nLen && *pEnd++ == *pInFindEnd++ );
-					if ( nLen == 0 )
+					while (--nLen && *pEnd++ == *pInFindEnd++);
+					if (nLen == 0)
 						pFindEnd = NULL;
 				}
 				nParseFlags &= ~PD_NOQUOTEVAL; // make sure PD_NOQUOTEVAL is off
-				if ( ! pFindEnd && ! (nParseFlags & PD_DOCTYPE) )
+				if (!pFindEnd && !(nParseFlags & PD_DOCTYPE))
 					break;
 			}
-			else if ( cD == '<' && (nNodeType == CMarkup::MNT_TEXT || nNodeType == -1) )
+			else if (cD == '<' && (nNodeType == CMarkup::MNT_TEXT || nNodeType == -1))
 			{
 				m_nNext = (int)(pD - m_pDocText);
 				break;
 			}
-			else if ( nNodeType & CMarkup::MNT_ELEMENT )
+			else if (nNodeType & CMarkup::MNT_ELEMENT)
 			{
-				if ( (nParseFlags & (PD_INQUOTE_S|PD_INQUOTE_D|PD_NOQUOTEVAL)) )
+				if ((nParseFlags & (PD_INQUOTE_S | PD_INQUOTE_D | PD_NOQUOTEVAL)))
 				{
-					if ( cD == '\"' && (nParseFlags&PD_INQUOTE_D) )
+					if (cD == '\"' && (nParseFlags & PD_INQUOTE_D))
 						nParseFlags ^= PD_INQUOTE_D; // off
-					else if ( cD == '\'' && (nParseFlags&PD_INQUOTE_S) )
+					else if (cD == '\'' && (nParseFlags & PD_INQUOTE_S))
 						nParseFlags ^= PD_INQUOTE_S; // off
-					else if ( (nParseFlags&PD_NOQUOTEVAL) && x_ISWHITESPACE(cD) )
+					else if ((nParseFlags & PD_NOQUOTEVAL) && x_ISWHITESPACE(cD))
 						nParseFlags ^= PD_NOQUOTEVAL; // off
 				}
 				else // not in attrib value
 				{
 					// Only set INQUOTE status when preceeded by equal sign
-					if ( cD == '\"' && (nParseFlags&PD_EQUALS) )
-						nParseFlags ^= PD_INQUOTE_D|PD_EQUALS; // D on, equals off
-					else if ( cD == '\'' && (nParseFlags&PD_EQUALS) )
-						nParseFlags ^= PD_INQUOTE_S|PD_EQUALS; // S on, equals off
-					else if ( cD == '=' && cDminus1 != '=' && ! (nParseFlags&PD_EQUALS) )
+					if (cD == '\"' && (nParseFlags & PD_EQUALS))
+						nParseFlags ^= PD_INQUOTE_D | PD_EQUALS; // D on, equals off
+					else if (cD == '\'' && (nParseFlags & PD_EQUALS))
+						nParseFlags ^= PD_INQUOTE_S | PD_EQUALS; // S on, equals off
+					else if (cD == '=' && cDminus1 != '=' && !(nParseFlags & PD_EQUALS))
 						nParseFlags ^= PD_EQUALS; // on
-					else if ( (nParseFlags&PD_EQUALS) && ! x_ISWHITESPACE(cD) )
-						nParseFlags ^= PD_NOQUOTEVAL|PD_EQUALS; // no quote val on, equals off
+					else if ((nParseFlags & PD_EQUALS) && !x_ISWHITESPACE(cD))
+						nParseFlags ^= PD_NOQUOTEVAL | PD_EQUALS; // no quote val on, equals off
 				}
 				cDminus2 = cDminus1;
 				cDminus1 = cD;
 			}
-			else if ( nNodeType & CMarkup::MNT_DOCUMENT_TYPE )
+			else if (nNodeType & CMarkup::MNT_DOCUMENT_TYPE)
 			{
-				if ( cD == '\"' && ! (nParseFlags&PD_INQUOTE_S) )
+				if (cD == '\"' && !(nParseFlags & PD_INQUOTE_S))
 					nParseFlags ^= PD_INQUOTE_D; // toggle
-				else if ( cD == '\'' && ! (nParseFlags&PD_INQUOTE_D) )
+				else if (cD == '\'' && !(nParseFlags & PD_INQUOTE_D))
 					nParseFlags ^= PD_INQUOTE_S; // toggle
 			}
 		}
-		else if ( nParseFlags )
+		else if (nParseFlags)
 		{
-			if ( nParseFlags & PD_TEXTORWS )
+			if (nParseFlags & PD_TEXTORWS)
 			{
-				if ( cD == '<' )
+				if (cD == '<')
 				{
 					m_nNext = (int)(pD - m_pDocText);
 					nNodeType = CMarkup::MNT_WHITESPACE;
 					break;
 				}
-				else if ( ! x_ISWHITESPACE(cD) )
+				else if (!x_ISWHITESPACE(cD))
 				{
 					nParseFlags ^= PD_TEXTORWS;
-					FINDNODETYPE( MCD_T("<"), CMarkup::MNT_TEXT )
+					FINDNODETYPE(MCD_T("<"), CMarkup::MNT_TEXT)
 				}
 			}
-			else if ( nParseFlags & PD_OPENTAG )
+			else if (nParseFlags & PD_OPENTAG)
 			{
 				nParseFlags ^= PD_OPENTAG;
-				if ( cD > 0x60 || ( cD > 0x40 && cD < 0x5b ) || cD == 0x5f || cD == 0x3a )
-					FINDNODETYPENAME( MCD_T(">"), CMarkup::MNT_ELEMENT, 0 )
-				else if ( cD == '/' )
-					FINDNODETYPENAME( MCD_T(">"), 0, 1 )
-				else if ( cD == '!' )
+				if (cD > 0x60 || (cD > 0x40 && cD < 0x5b) || cD == 0x5f || cD == 0x3a)
+					FINDNODETYPENAME(MCD_T(">"), CMarkup::MNT_ELEMENT, 0)
+				else if (cD == '/')
+					FINDNODETYPENAME(MCD_T(">"), 0, 1)
+				else if (cD == '!')
 					nParseFlags |= PD_BANG;
-				else if ( cD == '?' )
-					FINDNODETYPENAME( MCD_T("?>"), CMarkup::MNT_PROCESSING_INSTRUCTION, 1 )
+				else if (cD == '?')
+					FINDNODETYPENAME(MCD_T("?>"), CMarkup::MNT_PROCESSING_INSTRUCTION, 1)
 				else
-					FINDNODEBAD( MCD_T("first_tag_syntax") )
+					FINDNODEBAD(MCD_T("first_tag_syntax"))
 			}
-			else if ( nParseFlags & PD_BANG )
+			else if (nParseFlags & PD_BANG)
 			{
 				nParseFlags ^= PD_BANG;
-				if ( cD == '-' )
+				if (cD == '-')
 					nParseFlags |= PD_DASH;
-				else if ( nParseFlags & PD_DOCTYPE )
+				else if (nParseFlags & PD_DOCTYPE)
 				{
-					if ( x_ISDOCTYPESTART(cD) ) // <!ELEMENT ATTLIST ENTITY NOTATION
-						FINDNODETYPE( MCD_T(">"), CMarkup::MNT_DOCUMENT_TYPE )
+					if (x_ISDOCTYPESTART(cD)) // <!ELEMENT ATTLIST ENTITY NOTATION
+						FINDNODETYPE(MCD_T(">"), CMarkup::MNT_DOCUMENT_TYPE)
 					else
-						FINDNODEBAD( MCD_T("doctype_tag_syntax") )
+						FINDNODEBAD(MCD_T("doctype_tag_syntax"))
 				}
 				else
 				{
-					if ( cD == '[' )
+					if (cD == '[')
 						nParseFlags |= PD_BRACKET;
-					else if ( cD == 'D' )
+					else if (cD == 'D')
 						nParseFlags |= PD_DOCTYPE;
 					else
-						FINDNODEBAD( MCD_T("exclamation_tag_syntax") )
+						FINDNODEBAD(MCD_T("exclamation_tag_syntax"))
 				}
 			}
-			else if ( nParseFlags & PD_DASH )
+			else if (nParseFlags & PD_DASH)
 			{
 				nParseFlags ^= PD_DASH;
-				if ( cD == '-' )
-					FINDNODETYPE( MCD_T("-->"), CMarkup::MNT_COMMENT )
+				if (cD == '-')
+					FINDNODETYPE(MCD_T("-->"), CMarkup::MNT_COMMENT)
 				else
-					FINDNODEBAD( MCD_T("comment_tag_syntax") )
+					FINDNODEBAD(MCD_T("comment_tag_syntax"))
 			}
-			else if ( nParseFlags & PD_BRACKET )
+			else if (nParseFlags & PD_BRACKET)
 			{
 				nParseFlags ^= PD_BRACKET;
-				if ( cD == 'C' )
-					FINDNODETYPE( MCD_T("]]>"), CMarkup::MNT_CDATA_SECTION )
+				if (cD == 'C')
+					FINDNODETYPE(MCD_T("]]>"), CMarkup::MNT_CDATA_SECTION)
 				else
-					FINDNODEBAD( MCD_T("cdata_section_syntax") )
+					FINDNODEBAD(MCD_T("cdata_section_syntax"))
 			}
-			else if ( nParseFlags & PD_DOCTYPE )
+			else if (nParseFlags & PD_DOCTYPE)
 			{
-				if ( cD == '<' )
+				if (cD == '<')
 					nParseFlags |= PD_OPENTAG;
-				else if ( cD == '>' )
+				else if (cD == '>')
 				{
 					m_nNext = (int)(pD - m_pDocText) + 1;
 					nNodeType = CMarkup::MNT_DOCUMENT_TYPE;
@@ -2599,19 +2599,19 @@ int TokenPos::ParseNode( NodePos& node )
 				}
 			}
 		}
-		else if ( cD == '<' )
+		else if (cD == '<')
 		{
 			nParseFlags |= PD_OPENTAG;
 		}
 		else
 		{
 			nNodeType = CMarkup::MNT_WHITESPACE;
-			if ( x_ISWHITESPACE(cD) )
+			if (x_ISWHITESPACE(cD))
 				nParseFlags |= PD_TEXTORWS;
 			else
-				FINDNODETYPE( MCD_T("<"), CMarkup::MNT_TEXT )
+				FINDNODETYPE(MCD_T("<"), CMarkup::MNT_TEXT)
 		}
-		pD += MCD_CLEN( pD );
+		pD += MCD_CLEN(pD);
 	}
 	node.nLength = m_nNext - node.nStart;
 	node.nNodeType = nNodeType;
@@ -2627,10 +2627,10 @@ CMarkup::~CMarkup()
 	delete m_pElemPosTree;
 }
 
-void CMarkup::operator=( const CMarkup& markup )
+void CMarkup::operator=(const CMarkup& markup)
 {
 	// Copying not supported during file mode because of file pointer
-	if ( (m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE)) || (markup.m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE)) )
+	if ((m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE)) || (markup.m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE)))
 		return;
 	m_iPosParent = markup.m_iPosParent;
 	m_iPos = markup.m_iPos;
@@ -2643,22 +2643,22 @@ void CMarkup::operator=( const CMarkup& markup )
 	m_strDoc = markup.m_strDoc;
 	m_strResult = markup.m_strResult;
 	m_nDocFlags = markup.m_nDocFlags;
-	m_pElemPosTree->CopyElemPosTree( markup.m_pElemPosTree, m_iPosFree );
-	m_pSavedPosMaps->CopySavedPosMaps( markup.m_pSavedPosMaps );
+	m_pElemPosTree->CopyElemPosTree(markup.m_pElemPosTree, m_iPosFree);
+	m_pSavedPosMaps->CopySavedPosMaps(markup.m_pSavedPosMaps);
 	MARKUP_SETDEBUGSTATE;
 }
 
-bool CMarkup::SetDoc( MCD_PCSZ pDoc )
+bool CMarkup::SetDoc(MCD_PCSZ pDoc)
 {
 	// pDoc is markup text, not a filename!
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Set document text
-	if ( pDoc )
+	if (pDoc)
 		m_strDoc = pDoc;
 	else
 	{
-		MCD_STRCLEARSIZE( m_strDoc );
+		MCD_STRCLEARSIZE(m_strDoc);
 		m_pElemPosTree->ReleaseElemPosTree();
 	}
 
@@ -2666,10 +2666,10 @@ bool CMarkup::SetDoc( MCD_PCSZ pDoc )
 	return x_ParseDoc();
 }
 
-bool CMarkup::SetDoc( const MCD_STR& strDoc )
+bool CMarkup::SetDoc(const MCD_STR& strDoc)
 {
 	// strDoc is markup text, not a filename!
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	m_strDoc = strDoc;
 	MCD_STRCLEAR(m_strResult);
@@ -2678,17 +2678,17 @@ bool CMarkup::SetDoc( const MCD_STR& strDoc )
 
 bool CMarkup::IsWellFormed()
 {
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 		return true;
-	if ( m_nDocFlags & MDF_READFILE )
+	if (m_nDocFlags & MDF_READFILE)
 	{
-		if ( ! (ELEM(0).nFlags & MNF_ILLFORMED) )
+		if (!(ELEM(0).nFlags & MNF_ILLFORMED))
 			return true;
 	}
-	else if ( m_pElemPosTree->GetSize()
-			&& ! (ELEM(0).nFlags & MNF_ILLFORMED)
-			&& ELEM(0).iElemChild
-			&& ! ELEM(ELEM(0).iElemChild).iElemNext )
+	else if (m_pElemPosTree->GetSize()
+		&& !(ELEM(0).nFlags & MNF_ILLFORMED)
+		&& ELEM(0).iElemChild
+		&& !ELEM(ELEM(0).iElemChild).iElemNext)
 		return true;
 	return false;
 }
@@ -2697,82 +2697,82 @@ MCD_STR CMarkup::GetError() const
 {
 	// For backwards compatibility, return a readable English string built from m_strResult
 	// In release 11.0 you can use GetResult and examine result in XML format
-	CMarkup mResult( m_strResult );
+	CMarkup mResult(m_strResult);
 	MCD_STR strError;
 	int nSyntaxErrors = 0;
-	while ( mResult.FindElem() )
+	while (mResult.FindElem())
 	{
 		MCD_STR strItem;
 		MCD_STR strID = mResult.GetTagName();
 
 		// Parse result
-		if ( strID == MCD_T("root_has_sibling") )
+		if (strID == MCD_T("root_has_sibling"))
 			strItem = MCD_T("root element has sibling");
-		else if ( strID == MCD_T("no_root_element") )
+		else if (strID == MCD_T("no_root_element"))
 			strItem = MCD_T("no root element");
-		else if ( strID == MCD_T("lone_end_tag") )
+		else if (strID == MCD_T("lone_end_tag"))
 			strItem = MCD_T("lone end tag '") + mResult.GetAttrib(MCD_T("tagname")) + MCD_T("' at offset ")
-				+ mResult.GetAttrib(MCD_T("offset"));
-		else if ( strID == MCD_T("unended_start_tag") )
+			+ mResult.GetAttrib(MCD_T("offset"));
+		else if (strID == MCD_T("unended_start_tag"))
 			strItem = MCD_T("start tag '") + mResult.GetAttrib(MCD_T("tagname")) + MCD_T("' at offset ")
-				+ mResult.GetAttrib(MCD_T("offset")) + MCD_T(" expecting end tag at offset ") + mResult.GetAttrib(MCD_T("offset2"));
-		else if ( strID == MCD_T("first_tag_syntax") )
+			+ mResult.GetAttrib(MCD_T("offset")) + MCD_T(" expecting end tag at offset ") + mResult.GetAttrib(MCD_T("offset2"));
+		else if (strID == MCD_T("first_tag_syntax"))
 			strItem = MCD_T("tag syntax error at offset ") + mResult.GetAttrib(MCD_T("offset"))
-				+ MCD_T(" expecting tag name / ! or ?");
-		else if ( strID == MCD_T("exclamation_tag_syntax") )
+			+ MCD_T(" expecting tag name / ! or ?");
+		else if (strID == MCD_T("exclamation_tag_syntax"))
 			strItem = MCD_T("tag syntax error at offset ") + mResult.GetAttrib(MCD_T("offset"))
-				+ MCD_T(" expecting 'DOCTYPE' [ or -");
-		else if ( strID == MCD_T("doctype_tag_syntax") )
+			+ MCD_T(" expecting 'DOCTYPE' [ or -");
+		else if (strID == MCD_T("doctype_tag_syntax"))
 			strItem = MCD_T("tag syntax error at offset ") + mResult.GetAttrib(MCD_T("offset"))
-				+ MCD_T(" expecting markup declaration"); // ELEMENT ATTLIST ENTITY NOTATION
-		else if ( strID == MCD_T("comment_tag_syntax") )
+			+ MCD_T(" expecting markup declaration"); // ELEMENT ATTLIST ENTITY NOTATION
+		else if (strID == MCD_T("comment_tag_syntax"))
 			strItem = MCD_T("tag syntax error at offset ") + mResult.GetAttrib(MCD_T("offset"))
-				+ MCD_T(" expecting - to begin comment");
-		else if ( strID == MCD_T("cdata_section_syntax") )
+			+ MCD_T(" expecting - to begin comment");
+		else if (strID == MCD_T("cdata_section_syntax"))
 			strItem = MCD_T("tag syntax error at offset ") + mResult.GetAttrib(MCD_T("offset"))
-				+ MCD_T(" expecting 'CDATA'");
-		else if ( strID == MCD_T("unterminated_tag_syntax") )
+			+ MCD_T(" expecting 'CDATA'");
+		else if (strID == MCD_T("unterminated_tag_syntax"))
 			strItem = MCD_T("unterminated tag at offset ") + mResult.GetAttrib(MCD_T("offset"));
 
 		// Report only the first syntax or well-formedness error
-		if ( ! MCD_STRISEMPTY(strItem) )
+		if (!MCD_STRISEMPTY(strItem))
 		{
 			++nSyntaxErrors;
-			if ( nSyntaxErrors > 1 )
+			if (nSyntaxErrors > 1)
 				continue;
 		}
 
 		// I/O results
-		if ( strID == MCD_T("file_error") )
+		if (strID == MCD_T("file_error"))
 			strItem = mResult.GetAttrib(MCD_T("msg"));
-		else if ( strID == MCD_T("bom") )
+		else if (strID == MCD_T("bom"))
 			strItem = MCD_T("BOM +");
-		else if ( strID == MCD_T("read") || strID == MCD_T("write") || strID == MCD_T("converted_to") || strID == MCD_T("converted_from") )
+		else if (strID == MCD_T("read") || strID == MCD_T("write") || strID == MCD_T("converted_to") || strID == MCD_T("converted_from"))
 		{
-			if ( strID == MCD_T("converted_to") )
+			if (strID == MCD_T("converted_to"))
 				strItem = MCD_T("to ");
-			MCD_STR strEncoding = mResult.GetAttrib( MCD_T("encoding") );
-			if ( ! MCD_STRISEMPTY(strEncoding) )
+			MCD_STR strEncoding = mResult.GetAttrib(MCD_T("encoding"));
+			if (!MCD_STRISEMPTY(strEncoding))
 				strItem += strEncoding + MCD_T(" ");
 			strItem += MCD_T("length ") + mResult.GetAttrib(MCD_T("length"));
-			if ( strID == MCD_T("converted_from") )
+			if (strID == MCD_T("converted_from"))
 				strItem += MCD_T(" to");
 		}
-		else if ( strID == MCD_T("nulls_removed") )
+		else if (strID == MCD_T("nulls_removed"))
 			strItem = MCD_T("removed ") + mResult.GetAttrib(MCD_T("count")) + MCD_T(" nulls");
-		else if ( strID == MCD_T("conversion_loss") )
+		else if (strID == MCD_T("conversion_loss"))
 			strItem = MCD_T("(chars lost in conversion!)");
-		else if ( strID == MCD_T("utf8_detection") )
+		else if (strID == MCD_T("utf8_detection"))
 			strItem = MCD_T("(used UTF-8 detection)");
-		else if ( strID == MCD_T("endian_swap") )
+		else if (strID == MCD_T("endian_swap"))
 			strItem = MCD_T("endian swap");
-		else if ( strID == MCD_T("truncation_error") )
+		else if (strID == MCD_T("truncation_error"))
 			strItem = MCD_T("encoding ") + mResult.GetAttrib(MCD_T("encoding")) + MCD_T(" adjustment error");
 
 		// Concatenate result item to error string
-		if ( ! MCD_STRISEMPTY(strItem) )
+		if (!MCD_STRISEMPTY(strItem))
 		{
-			if ( ! MCD_STRISEMPTY(strError) )
+			if (!MCD_STRISEMPTY(strError))
 				strError += MCD_T(" ");
 			strError += strItem;
 		}
@@ -2780,114 +2780,114 @@ MCD_STR CMarkup::GetError() const
 	return strError;
 }
 
-bool CMarkup::Load( MCD_CSTR_FILENAME szFileName )
+bool CMarkup::Load(MCD_CSTR_FILENAME szFileName)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
-	if ( ! ReadTextFile(szFileName, m_strDoc, &m_strResult, &m_nDocFlags) )
+	if (!ReadTextFile(szFileName, m_strDoc, &m_strResult, &m_nDocFlags))
 		return false;
 	return x_ParseDoc();
 }
 
-bool CMarkup::ReadTextFile( MCD_CSTR_FILENAME szFileName, MCD_STR& strDoc, MCD_STR* pstrResult, int* pnDocFlags, MCD_STR* pstrEncoding )
+bool CMarkup::ReadTextFile(MCD_CSTR_FILENAME szFileName, MCD_STR& strDoc, MCD_STR* pstrResult, int* pnDocFlags, MCD_STR* pstrEncoding)
 {
 	// Static utility method to load text file into strDoc
 	//
 	FilePos file;
-	file.m_nDocFlags = (pnDocFlags?*pnDocFlags:0) | MDF_READFILE;
-	bool bSuccess = file.FileOpen( szFileName );
-	if ( pstrResult )
+	file.m_nDocFlags = (pnDocFlags ? *pnDocFlags : 0) | MDF_READFILE;
+	bool bSuccess = file.FileOpen(szFileName);
+	if (pstrResult)
 		*pstrResult = file.m_strIOResult;
 	MCD_STRCLEAR(strDoc);
-	if ( bSuccess )
+	if (bSuccess)
 	{
-		file.FileSpecifyEncoding( pstrEncoding );
+		file.FileSpecifyEncoding(pstrEncoding);
 		file.m_nOpFileByteLen = (int)((MCD_INTFILEOFFSET)(file.m_nFileByteLen - file.m_nFileByteOffset));
-		bSuccess = file.FileReadText( strDoc );
+		bSuccess = file.FileReadText(strDoc);
 		file.FileClose();
-		if ( pstrResult )
+		if (pstrResult)
 			*pstrResult += file.m_strIOResult;
-		if ( pnDocFlags )
+		if (pnDocFlags)
 			*pnDocFlags = file.m_nDocFlags;
 	}
 	return bSuccess;
 }
 
-bool CMarkup::Save( MCD_CSTR_FILENAME szFileName )
+bool CMarkup::Save(MCD_CSTR_FILENAME szFileName)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
-	return WriteTextFile( szFileName, m_strDoc, &m_strResult, &m_nDocFlags );
+	return WriteTextFile(szFileName, m_strDoc, &m_strResult, &m_nDocFlags);
 }
 
-bool CMarkup::WriteTextFile( MCD_CSTR_FILENAME szFileName, const MCD_STR& strDoc, MCD_STR* pstrResult, int* pnDocFlags, MCD_STR* pstrEncoding )
+bool CMarkup::WriteTextFile(MCD_CSTR_FILENAME szFileName, const MCD_STR& strDoc, MCD_STR* pstrResult, int* pnDocFlags, MCD_STR* pstrEncoding)
 {
 	// Static utility method to save strDoc to text file
 	//
 	FilePos file;
-	file.m_nDocFlags = (pnDocFlags?*pnDocFlags:0) | MDF_WRITEFILE;
-	bool bSuccess = file.FileOpen( szFileName );
-	if ( pstrResult )
+	file.m_nDocFlags = (pnDocFlags ? *pnDocFlags : 0) | MDF_WRITEFILE;
+	bool bSuccess = file.FileOpen(szFileName);
+	if (pstrResult)
 		*pstrResult = file.m_strIOResult;
-	if ( bSuccess )
+	if (bSuccess)
 	{
-		if ( MCD_STRISEMPTY(file.m_strEncoding) && ! MCD_STRISEMPTY(strDoc) )
+		if (MCD_STRISEMPTY(file.m_strEncoding) && !MCD_STRISEMPTY(strDoc))
 		{
-			file.m_strEncoding = GetDeclaredEncoding( strDoc );
-			if ( MCD_STRISEMPTY(file.m_strEncoding) )
+			file.m_strEncoding = GetDeclaredEncoding(strDoc);
+			if (MCD_STRISEMPTY(file.m_strEncoding))
 				file.m_strEncoding = MCD_T("UTF-8"); // to do: MDF_ANSIFILE
 		}
-		file.FileSpecifyEncoding( pstrEncoding );
-		bSuccess = file.FileWriteText( strDoc );
+		file.FileSpecifyEncoding(pstrEncoding);
+		bSuccess = file.FileWriteText(strDoc);
 		file.FileClose();
-		if ( pstrResult )
+		if (pstrResult)
 			*pstrResult += file.m_strIOResult;
-		if ( pnDocFlags )
+		if (pnDocFlags)
 			*pnDocFlags = file.m_nDocFlags;
 	}
 	return bSuccess;
 }
 
-bool CMarkup::FindElem( MCD_CSTR szName )
+bool CMarkup::FindElem(MCD_CSTR szName)
 {
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 		return false;
-	if ( m_pElemPosTree->GetSize() )
+	if (m_pElemPosTree->GetSize())
 	{
 		// Change current position only if found
-		PathPos path( szName, false );
-		int iPos = x_FindElem( m_iPosParent, m_iPos, path );
-		if ( iPos )
+		PathPos path(szName, false);
+		int iPos = x_FindElem(m_iPosParent, m_iPos, path);
+		if (iPos)
 		{
 			// Assign new position
-			x_SetPos( ELEM(iPos).iElemParent, iPos, 0 );
+			x_SetPos(ELEM(iPos).iElemParent, iPos, 0);
 			return true;
 		}
 	}
 	return false;
 }
 
-bool CMarkup::FindChildElem( MCD_CSTR szName )
+bool CMarkup::FindChildElem(MCD_CSTR szName)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Shorthand: if no current main position, find first child under parent element
-	if ( ! m_iPos )
+	if (!m_iPos)
 		FindElem();
 	// Change current child position only if found
-	PathPos path( szName, false );
-	int iPosChild = x_FindElem( m_iPos, m_iPosChild, path );
-	if ( iPosChild )
+	PathPos path(szName, false);
+	int iPosChild = x_FindElem(m_iPos, m_iPosChild, path);
+	if (iPosChild)
 	{
 		// Assign new position
 		int iPos = ELEM(iPosChild).iElemParent;
-		x_SetPos( ELEM(iPos).iElemParent, iPos, iPosChild );
+		x_SetPos(ELEM(iPos).iElemParent, iPos, iPosChild);
 		return true;
 	}
 	return false;
 }
 
-MCD_STR CMarkup::EscapeText( MCD_CSTR szText, int nFlags )
+MCD_STR CMarkup::EscapeText(MCD_CSTR szText, int nFlags)
 {
 	// Convert text as seen outside XML document to XML friendly
 	// replacing special characters with ampersand escape codes
@@ -2907,53 +2907,53 @@ MCD_STR CMarkup::EscapeText( MCD_CSTR szText, int nFlags )
 	MCD_PCSZ pSource = szText;
 	int nDestSize = MCD_PSZLEN(pSource);
 	nDestSize += nDestSize / 10 + 7;
-	MCD_BLDRESERVE(strText,nDestSize);
+	MCD_BLDRESERVE(strText, nDestSize);
 	MCD_CHAR cSource = *pSource;
 	int nFound;
 	int nCharLen;
-	while ( cSource )
+	while (cSource)
 	{
-		MCD_BLDCHECK(strText,nDestSize,6);
-		nFound = ((nFlags&MNF_ESCAPEQUOTES)?x_ISATTRIBSPECIAL(cSource):x_ISSPECIAL(cSource));
-		if ( nFound )
+		MCD_BLDCHECK(strText, nDestSize, 6);
+		nFound = ((nFlags & MNF_ESCAPEQUOTES) ? x_ISATTRIBSPECIAL(cSource) : x_ISSPECIAL(cSource));
+		if (nFound)
 		{
 			bool bIgnoreAmpersand = false;
-			if ( (nFlags&MNF_WITHREFS) && cSource == '&' )
+			if ((nFlags & MNF_WITHREFS) && cSource == '&')
 			{
 				// Do not replace ampersand if it is start of any entity reference
 				// &[#_:A-Za-zU][_:-.A-Za-z0-9U]*; where U is > 0x7f
 				MCD_PCSZ pCheckEntity = pSource;
 				++pCheckEntity;
 				MCD_CHAR c = *pCheckEntity;
-				if ( x_ISSTARTENTREF(c) || ((unsigned int)c)>0x7f )
+				if (x_ISSTARTENTREF(c) || ((unsigned int)c) > 0x7f)
 				{
-					while ( 1 )
+					while (1)
 					{
-						pCheckEntity += MCD_CLEN( pCheckEntity );
+						pCheckEntity += MCD_CLEN(pCheckEntity);
 						c = *pCheckEntity;
-						if ( c == ';' )
+						if (c == ';')
 						{
 							int nEntityLen = (int)(pCheckEntity - pSource) + 1;
-							MCD_BLDAPPENDN(strText,pSource,nEntityLen);
+							MCD_BLDAPPENDN(strText, pSource, nEntityLen);
 							pSource = pCheckEntity;
 							bIgnoreAmpersand = true;
 						}
-						else if ( x_ISINENTREF(c) || ((unsigned int)c)>0x7f )
+						else if (x_ISINENTREF(c) || ((unsigned int)c) > 0x7f)
 							continue;
 						break;
 					}
 				}
 			}
-			if ( ! bIgnoreAmpersand )
+			if (!bIgnoreAmpersand)
 			{
-				MCD_BLDAPPEND(strText,apReplace[nFound]);
+				MCD_BLDAPPEND(strText, apReplace[nFound]);
 			}
 			++pSource; // ASCII, so 1 byte
 		}
 		else
 		{
-			nCharLen = MCD_CLEN( pSource );
-			MCD_BLDAPPENDN(strText,pSource,nCharLen);
+			nCharLen = MCD_CLEN(pSource);
+			MCD_BLDAPPENDN(strText, pSource, nCharLen);
 			pSource += nCharLen;
 		}
 		cSource = *pSource;
@@ -3036,7 +3036,7 @@ MCD_PCSZ PredefEntityTable[130] =
 	MCD_T("68240permil")
 };
 
-MCD_STR CMarkup::UnescapeText( MCD_CSTR szText, int nTextLength /*=-1*/, int nFlags /*=0*/ )
+MCD_STR CMarkup::UnescapeText(MCD_CSTR szText, int nTextLength /*=-1*/, int nFlags /*=0*/)
 {
 	// Convert XML friendly text to text as seen outside XML document
 	// ampersand escape codes replaced with special characters e.g. convert "6&gt;7" to "6>7"
@@ -3045,20 +3045,20 @@ MCD_STR CMarkup::UnescapeText( MCD_CSTR szText, int nTextLength /*=-1*/, int nFl
 	//
 	MCD_STR strText;
 	MCD_PCSZ pSource = szText;
-	if ( nTextLength == -1 )
+	if (nTextLength == -1)
 		nTextLength = MCD_PSZLEN(szText);
-	MCD_BLDRESERVE(strText,nTextLength);
+	MCD_BLDRESERVE(strText, nTextLength);
 	MCD_CHAR szCodeName[10];
-	bool bAlterWhitespace = (nFlags & (MDF_TRIMWHITESPACE|MDF_COLLAPSEWHITESPACE))?true:false;
-	bool bCollapseWhitespace = (nFlags & MDF_COLLAPSEWHITESPACE)?true:false;
+	bool bAlterWhitespace = (nFlags & (MDF_TRIMWHITESPACE | MDF_COLLAPSEWHITESPACE)) ? true : false;
+	bool bCollapseWhitespace = (nFlags & MDF_COLLAPSEWHITESPACE) ? true : false;
 	int nCharWhitespace = -1; // start of string
 	int nCharLen;
 	int nChar = 0;
-	while ( nChar < nTextLength )
+	while (nChar < nTextLength)
 	{
-		if ( pSource[nChar] == '&' )
+		if (pSource[nChar] == '&')
 		{
-			if ( bAlterWhitespace )
+			if (bAlterWhitespace)
 				nCharWhitespace = 0;
 
 			// Get corresponding unicode code point
@@ -3066,46 +3066,46 @@ MCD_STR CMarkup::UnescapeText( MCD_CSTR szText, int nTextLength /*=-1*/, int nFl
 
 			// Look for terminating semi-colon within 9 ASCII characters
 			int nCodeLen = 0;
-			MCD_CHAR cCodeChar = pSource[nChar+1];
-			while ( nCodeLen < 9 && ((unsigned int)cCodeChar) < 128 && cCodeChar != ';' )
+			MCD_CHAR cCodeChar = pSource[nChar + 1];
+			while (nCodeLen < 9 && ((unsigned int)cCodeChar) < 128 && cCodeChar != ';')
 			{
-				if ( cCodeChar >= 'A' && cCodeChar <= 'Z') // upper case?
+				if (cCodeChar >= 'A' && cCodeChar <= 'Z') // upper case?
 					cCodeChar += ('a' - 'A'); // make lower case
 				szCodeName[nCodeLen] = cCodeChar;
 				++nCodeLen;
-				cCodeChar = pSource[nChar+1+nCodeLen];
+				cCodeChar = pSource[nChar + 1 + nCodeLen];
 			}
-			if ( cCodeChar == ';' ) // found semi-colon?
+			if (cCodeChar == ';') // found semi-colon?
 			{
 				// Decode szCodeName
 				szCodeName[nCodeLen] = '\0';
-				if ( *szCodeName == '#' ) // numeric character reference?
+				if (*szCodeName == '#') // numeric character reference?
 				{
 					// Is it a hex number?
 					int nBase = 10; // decimal
 					int nNumberOffset = 1; // after #
-					if ( szCodeName[1] == 'x' )
+					if (szCodeName[1] == 'x')
 					{
 						nNumberOffset = 2; // after #x
 						nBase = 16; // hex
 					}
-					nUnicode = MCD_PSZTOL( &szCodeName[nNumberOffset], NULL, nBase );
+					nUnicode = MCD_PSZTOL(&szCodeName[nNumberOffset], NULL, nBase);
 				}
 				else // does not start with #
 				{
 					// Look for matching code name in PredefEntityTable
-					MCD_PCSZ pEntry = PredefEntityTable[x_Hash(szCodeName,sizeof(PredefEntityTable)/sizeof(MCD_PCSZ))];
-					while ( *pEntry )
+					MCD_PCSZ pEntry = PredefEntityTable[x_Hash(szCodeName, sizeof(PredefEntityTable) / sizeof(MCD_PCSZ))];
+					while (*pEntry)
 					{
 						// e.g. entry: 40039apos means length 4, code point 0039, code name apos
 						int nEntryLen = (*pEntry - '0');
 						++pEntry;
 						MCD_PCSZ pCodePoint = pEntry;
 						pEntry += 4;
-						if ( nEntryLen == nCodeLen && x_StrNCmp(szCodeName,pEntry,nEntryLen) == 0 )
+						if (nEntryLen == nCodeLen && x_StrNCmp(szCodeName, pEntry, nEntryLen) == 0)
 						{
 							// Convert digits to integer up to code name which always starts with alpha 
-							nUnicode = MCD_PSZTOL( pCodePoint, NULL, 10 );
+							nUnicode = MCD_PSZTOL(pCodePoint, NULL, 10);
 							break;
 						}
 						pEntry += nEntryLen;
@@ -3114,7 +3114,7 @@ MCD_STR CMarkup::UnescapeText( MCD_CSTR szText, int nTextLength /*=-1*/, int nFl
 			}
 
 			// If a code point found, encode it into text
-			if ( nUnicode )
+			if (nUnicode)
 			{
 				MCD_CHAR szChar[5];
 				nCharLen = 0;
@@ -3123,72 +3123,72 @@ MCD_STR CMarkup::UnescapeText( MCD_CSTR szText, int nTextLength /*=-1*/, int nFl
 				szChar[0] = (MCD_CHAR)nUnicode;
 				nCharLen = 1;
 #else // sizeof(wchar_t) == 2
-				EncodeCharUTF16( nUnicode, (unsigned short*)szChar, nCharLen );
+				EncodeCharUTF16(nUnicode, (unsigned short*)szChar, nCharLen);
 #endif
 #elif defined(MARKUP_MBCS) // MBCS/double byte
 #if defined(MARKUP_WINCONV)
 				int nUsedDefaultChar = 0;
 				wchar_t wszUTF16[2];
-				EncodeCharUTF16( nUnicode, (unsigned short*)wszUTF16, nCharLen );
-				nCharLen = WideCharToMultiByte( CP_ACP, 0, wszUTF16, nCharLen, szChar, 5, NULL, &nUsedDefaultChar );
-				if ( nUsedDefaultChar || nCharLen <= 0 )
+				EncodeCharUTF16(nUnicode, (unsigned short*)wszUTF16, nCharLen);
+				nCharLen = WideCharToMultiByte(CP_ACP, 0, wszUTF16, nCharLen, szChar, 5, NULL, &nUsedDefaultChar);
+				if (nUsedDefaultChar || nCharLen <= 0)
 					nUnicode = 0;
 #else // not WINCONV
 				wchar_t wcUnicode = (wchar_t)nUnicode;
-				nCharLen = wctomb( szChar, wcUnicode );
-				if ( nCharLen <= 0 )
+				nCharLen = wctomb(szChar, wcUnicode);
+				if (nCharLen <= 0)
 					nUnicode = 0;
 #endif // not WINCONV
 #else // not WCHAR and not MBCS/double byte
-				EncodeCharUTF8( nUnicode, szChar, nCharLen );
+				EncodeCharUTF8(nUnicode, szChar, nCharLen);
 #endif // not WCHAR and not MBCS/double byte
 				// Increment index past ampersand semi-colon
-				if ( nUnicode ) // must check since MBCS case can clear it
+				if (nUnicode) // must check since MBCS case can clear it
 				{
-					MCD_BLDAPPENDN(strText,szChar,nCharLen);
+					MCD_BLDAPPENDN(strText, szChar, nCharLen);
 					nChar += nCodeLen + 2;
 				}
 			}
-			if ( ! nUnicode )
+			if (!nUnicode)
 			{
 				// If the code is not converted, leave it as is
-				MCD_BLDAPPEND1(strText,'&');
+				MCD_BLDAPPEND1(strText, '&');
 				++nChar;
 			}
 		}
-		else if ( bAlterWhitespace && x_ISWHITESPACE(pSource[nChar]) )
+		else if (bAlterWhitespace && x_ISWHITESPACE(pSource[nChar]))
 		{
-			if ( nCharWhitespace == 0 && bCollapseWhitespace )
+			if (nCharWhitespace == 0 && bCollapseWhitespace)
 			{
 				nCharWhitespace = MCD_BLDLEN(strText);
-				MCD_BLDAPPEND1(strText,' ');
+				MCD_BLDAPPEND1(strText, ' ');
 			}
-			else if ( nCharWhitespace != -1 && ! bCollapseWhitespace )
+			else if (nCharWhitespace != -1 && !bCollapseWhitespace)
 			{
-				if ( nCharWhitespace == 0 )
+				if (nCharWhitespace == 0)
 					nCharWhitespace = MCD_BLDLEN(strText);
-				MCD_BLDAPPEND1(strText,pSource[nChar]);
+				MCD_BLDAPPEND1(strText, pSource[nChar]);
 			}
 			++nChar;
 		}
 		else // not &
 		{
-			if ( bAlterWhitespace )
+			if (bAlterWhitespace)
 				nCharWhitespace = 0;
 			nCharLen = MCD_CLEN(&pSource[nChar]);
-			MCD_BLDAPPENDN(strText,&pSource[nChar],nCharLen);
+			MCD_BLDAPPENDN(strText, &pSource[nChar], nCharLen);
 			nChar += nCharLen;
 		}
 	}
-	if ( bAlterWhitespace && nCharWhitespace > 0 )
+	if (bAlterWhitespace && nCharWhitespace > 0)
 	{
-		MCD_BLDTRUNC(strText,nCharWhitespace);
+		MCD_BLDTRUNC(strText, nCharWhitespace);
 	}
 	MCD_BLDRELEASE(strText);
 	return strText;
 }
 
-bool CMarkup::DetectUTF8( const char* pText, int nTextLen, int* pnNonASCII/*=NULL*/, bool* bErrorAtEnd/*=NULL*/ )
+bool CMarkup::DetectUTF8(const char* pText, int nTextLen, int* pnNonASCII/*=NULL*/, bool* bErrorAtEnd/*=NULL*/)
 {
 	// return true if ASCII or all non-ASCII byte sequences are valid UTF-8 pattern:
 	// ASCII   0xxxxxxx
@@ -3199,62 +3199,62 @@ bool CMarkup::DetectUTF8( const char* pText, int nTextLen, int* pnNonASCII/*=NUL
 	// or if an invalid UTF-8 sequence is found, to 1 + the valid non-ASCII sequences up to the invalid sequence
 	// *bErrorAtEnd is set (if bErrorAtEnd is not NULL) to true if the UTF-8 was cut off at the end in mid valid sequence
 	int nUChar;
-	if ( pnNonASCII )
+	if (pnNonASCII)
 		*pnNonASCII = 0;
 	const char* pTextEnd = pText + nTextLen;
-	while ( *pText && pText != pTextEnd )
+	while (*pText && pText != pTextEnd)
 	{
-		if ( (unsigned char)(*pText) & 0x80 )
+		if ((unsigned char)(*pText) & 0x80)
 		{
-			if ( pnNonASCII )
+			if (pnNonASCII)
 				++(*pnNonASCII);
-			nUChar = DecodeCharUTF8( pText, pTextEnd );
-			if ( nUChar == -1 )
+			nUChar = DecodeCharUTF8(pText, pTextEnd);
+			if (nUChar == -1)
 			{
-				if ( bErrorAtEnd )
-					*bErrorAtEnd = (pTextEnd == pText)? true:false;
+				if (bErrorAtEnd)
+					*bErrorAtEnd = (pTextEnd == pText) ? true : false;
 				return false;
 			}
 		}
 		else
 			++pText;
 	}
-	if ( bErrorAtEnd )
+	if (bErrorAtEnd)
 		*bErrorAtEnd = false;
 	return true;
 }
 
-int CMarkup::DecodeCharUTF8( const char*& pszUTF8, const char* pszUTF8End/*=NULL*/ )
+int CMarkup::DecodeCharUTF8(const char*& pszUTF8, const char* pszUTF8End/*=NULL*/)
 {
 	// Return Unicode code point and increment pszUTF8 past 1-4 bytes
 	// pszUTF8End can be NULL if pszUTF8 is null terminated
 	int nUChar = (unsigned char)*pszUTF8;
 	++pszUTF8;
-	if ( nUChar & 0x80 )
+	if (nUChar & 0x80)
 	{
 		int nExtraChars;
-		if ( ! (nUChar & 0x20) )
+		if (!(nUChar & 0x20))
 		{
 			nExtraChars = 1;
 			nUChar &= 0x1f;
 		}
-		else if ( ! (nUChar & 0x10) )
+		else if (!(nUChar & 0x10))
 		{
 			nExtraChars = 2;
 			nUChar &= 0x0f;
 		}
-		else if ( ! (nUChar & 0x08) )
+		else if (!(nUChar & 0x08))
 		{
 			nExtraChars = 3;
 			nUChar &= 0x07;
 		}
 		else
 			return -1;
-		while ( nExtraChars-- )
+		while (nExtraChars--)
 		{
-			if ( pszUTF8 == pszUTF8End || ! (*pszUTF8 & 0x80) )
+			if (pszUTF8 == pszUTF8End || !(*pszUTF8 & 0x80))
 				return -1;
-			nUChar = nUChar<<6;
+			nUChar = nUChar << 6;
 			nUChar |= *pszUTF8 & 0x3f;
 			++pszUTF8;
 		}
@@ -3262,17 +3262,17 @@ int CMarkup::DecodeCharUTF8( const char*& pszUTF8, const char* pszUTF8End/*=NULL
 	return nUChar;
 }
 
-void CMarkup::EncodeCharUTF16( int nUChar, unsigned short* pwszUTF16, int& nUTF16Len )
+void CMarkup::EncodeCharUTF16(int nUChar, unsigned short* pwszUTF16, int& nUTF16Len)
 {
 	// Write UTF-16 sequence to pwszUTF16 for Unicode code point nUChar and update nUTF16Len
 	// Be sure pwszUTF16 has room for up to 2 wide chars
-	if ( nUChar & ~0xffff )
+	if (nUChar & ~0xffff)
 	{
-		if ( pwszUTF16 )
+		if (pwszUTF16)
 		{
 			// Surrogate pair
 			nUChar -= 0x10000;
-			pwszUTF16[nUTF16Len++] = (unsigned short)(((nUChar>>10) & 0x3ff) | 0xd800); // W1
+			pwszUTF16[nUTF16Len++] = (unsigned short)(((nUChar >> 10) & 0x3ff) | 0xd800); // W1
 			pwszUTF16[nUTF16Len++] = (unsigned short)((nUChar & 0x3ff) | 0xdc00); // W2
 		}
 		else
@@ -3280,22 +3280,22 @@ void CMarkup::EncodeCharUTF16( int nUChar, unsigned short* pwszUTF16, int& nUTF1
 	}
 	else
 	{
-		if ( pwszUTF16 )
+		if (pwszUTF16)
 			pwszUTF16[nUTF16Len++] = (unsigned short)nUChar;
 		else
 			++nUTF16Len;
 	}
 }
 
-int CMarkup::DecodeCharUTF16( const unsigned short*& pwszUTF16, const unsigned short* pszUTF16End/*=NULL*/ )
+int CMarkup::DecodeCharUTF16(const unsigned short*& pwszUTF16, const unsigned short* pszUTF16End/*=NULL*/)
 {
 	// Return Unicode code point and increment pwszUTF16 past 1 or 2 (if surrogrates) UTF-16 code points
 	// pszUTF16End can be NULL if pszUTF16 is zero terminated
 	int nUChar = *pwszUTF16;
 	++pwszUTF16;
-	if ( (nUChar & ~0x000007ff) == 0xd800 ) // W1
+	if ((nUChar & ~0x000007ff) == 0xd800) // W1
 	{
-		if ( pwszUTF16 == pszUTF16End || ! (*pwszUTF16) ) // W2
+		if (pwszUTF16 == pszUTF16End || !(*pwszUTF16)) // W2
 			return -1; // incorrect UTF-16
 		nUChar = (((nUChar & 0x3ff) << 10) | (*pwszUTF16 & 0x3ff)) + 0x10000;
 		++pwszUTF16;
@@ -3303,53 +3303,53 @@ int CMarkup::DecodeCharUTF16( const unsigned short*& pwszUTF16, const unsigned s
 	return nUChar;
 }
 
-void CMarkup::EncodeCharUTF8( int nUChar, char* pszUTF8, int& nUTF8Len )
+void CMarkup::EncodeCharUTF8(int nUChar, char* pszUTF8, int& nUTF8Len)
 {
 	// Write UTF-8 sequence to pszUTF8 for Unicode code point nUChar and update nUTF8Len
 	// Be sure pszUTF8 has room for up to 4 bytes
-	if ( ! (nUChar & ~0x0000007f) ) // < 0x80
+	if (!(nUChar & ~0x0000007f)) // < 0x80
 	{
-		if ( pszUTF8 )
+		if (pszUTF8)
 			pszUTF8[nUTF8Len++] = (char)nUChar;
 		else
 			++nUTF8Len;
 	}
-	else if ( ! (nUChar & ~0x000007ff) ) // < 0x800
+	else if (!(nUChar & ~0x000007ff)) // < 0x800
 	{
-		if ( pszUTF8 )
+		if (pszUTF8)
 		{
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0x7c0)>>6)|0xc0);
-			pszUTF8[nUTF8Len++] = (char)((nUChar&0x3f)|0x80);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0x7c0) >> 6) | 0xc0);
+			pszUTF8[nUTF8Len++] = (char)((nUChar & 0x3f) | 0x80);
 		}
 		else
 			nUTF8Len += 2;
 	}
-	else if ( ! (nUChar & ~0x0000ffff) ) // < 0x10000
+	else if (!(nUChar & ~0x0000ffff)) // < 0x10000
 	{
-		if ( pszUTF8 )
+		if (pszUTF8)
 		{
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0xf000)>>12)|0xe0);
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0xfc0)>>6)|0x80);
-			pszUTF8[nUTF8Len++] = (char)((nUChar&0x3f)|0x80);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0xf000) >> 12) | 0xe0);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0xfc0) >> 6) | 0x80);
+			pszUTF8[nUTF8Len++] = (char)((nUChar & 0x3f) | 0x80);
 		}
 		else
 			nUTF8Len += 3;
 	}
 	else // < 0x110000
 	{
-		if ( pszUTF8 )
+		if (pszUTF8)
 		{
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0x1c0000)>>18)|0xf0);
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0x3f000)>>12)|0x80);
-			pszUTF8[nUTF8Len++] = (char)(((nUChar&0xfc0)>>6)|0x80);
-			pszUTF8[nUTF8Len++] = (char)((nUChar&0x3f)|0x80);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0x1c0000) >> 18) | 0xf0);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0x3f000) >> 12) | 0x80);
+			pszUTF8[nUTF8Len++] = (char)(((nUChar & 0xfc0) >> 6) | 0x80);
+			pszUTF8[nUTF8Len++] = (char)((nUChar & 0x3f) | 0x80);
 		}
 		else
 			nUTF8Len += 4;
 	}
 }
 
-int CMarkup::UTF16To8( char* pszUTF8, const unsigned short* pwszUTF16, int nUTF8Count )
+int CMarkup::UTF16To8(char* pszUTF8, const unsigned short* pwszUTF16, int nUTF8Count)
 {
 	// Supports the same arguments as wcstombs
 	// the pwszUTF16 source must be a NULL-terminated UTF-16 string
@@ -3359,30 +3359,30 @@ int CMarkup::UTF16To8( char* pszUTF8, const unsigned short* pwszUTF16, int nUTF8
 	// and the number of bytes (excluding NULL) is returned
 	//
 	int nUChar, nUTF8Len = 0;
-	while ( *pwszUTF16 )
+	while (*pwszUTF16)
 	{
 		// Decode UTF-16
-		nUChar = DecodeCharUTF16( pwszUTF16, NULL );
-		if ( nUChar == -1 )
+		nUChar = DecodeCharUTF16(pwszUTF16, NULL);
+		if (nUChar == -1)
 			nUChar = '?';
 
 		// Encode UTF-8
-		if ( pszUTF8 && nUTF8Len + 4 > nUTF8Count )
+		if (pszUTF8 && nUTF8Len + 4 > nUTF8Count)
 		{
 			int nUTF8LenSoFar = nUTF8Len;
-			EncodeCharUTF8( nUChar, NULL, nUTF8Len );
-			if ( nUTF8Len > nUTF8Count )
+			EncodeCharUTF8(nUChar, NULL, nUTF8Len);
+			if (nUTF8Len > nUTF8Count)
 				return nUTF8LenSoFar;
 			nUTF8Len = nUTF8LenSoFar;
 		}
-		EncodeCharUTF8( nUChar, pszUTF8, nUTF8Len );
+		EncodeCharUTF8(nUChar, pszUTF8, nUTF8Len);
 	}
-	if ( pszUTF8 && nUTF8Len < nUTF8Count )
+	if (pszUTF8 && nUTF8Len < nUTF8Count)
 		pszUTF8[nUTF8Len] = 0;
 	return nUTF8Len;
 }
 
-int CMarkup::UTF8To16( unsigned short* pwszUTF16, const char* pszUTF8, int nUTF8Count )
+int CMarkup::UTF8To16(unsigned short* pwszUTF16, const char* pszUTF8, int nUTF8Count)
 {
 	// Supports the same arguments as mbstowcs
 	// the pszUTF8 source must be a UTF-8 string which will be processed up to NULL-terminator or nUTF8Count
@@ -3395,120 +3395,120 @@ int CMarkup::UTF8To16( unsigned short* pwszUTF16, const char* pszUTF8, int nUTF8
 	const char* pszPosUTF8 = pszUTF8;
 	const char* pszUTF8End = pszUTF8 + nUTF8Count;
 	int nUChar, nUTF8Len = 0, nUTF16Len = 0;
-	while ( pszPosUTF8 != pszUTF8End )
+	while (pszPosUTF8 != pszUTF8End)
 	{
-		nUChar = DecodeCharUTF8( pszPosUTF8, pszUTF8End );
-		if ( ! nUChar )
+		nUChar = DecodeCharUTF8(pszPosUTF8, pszUTF8End);
+		if (!nUChar)
 		{
-			if ( pwszUTF16 )
+			if (pwszUTF16)
 				pwszUTF16[nUTF16Len] = 0;
 			break;
 		}
-		else if ( nUChar == -1 )
+		else if (nUChar == -1)
 			nUChar = '?';
 
 		// Encode UTF-16
-		EncodeCharUTF16( nUChar, pwszUTF16, nUTF16Len );
+		EncodeCharUTF16(nUChar, pwszUTF16, nUTF16Len);
 	}
 	nUTF8Len = (int)(pszPosUTF8 - pszUTF8);
-	if ( ! pwszUTF16 )
+	if (!pwszUTF16)
 		return nUTF16Len;
 	return nUTF8Len;
 }
 
 #if ! defined(MARKUP_WCHAR) // not WCHAR
-MCD_STR CMarkup::UTF8ToA( MCD_CSTR pszUTF8, int* pnFailed/*=NULL*/ )
+MCD_STR CMarkup::UTF8ToA(MCD_CSTR pszUTF8, int* pnFailed/*=NULL*/)
 {
 	// Converts from UTF-8 to locale ANSI charset
 	MCD_STR strANSI;
-	int nMBLen = (int)MCD_PSZLEN( pszUTF8 );
-	if ( pnFailed )
+	int nMBLen = (int)MCD_PSZLEN(pszUTF8);
+	if (pnFailed)
 		*pnFailed = 0;
-	if ( nMBLen )
+	if (nMBLen)
 	{
-		TextEncoding textencoding( MCD_T("UTF-8"), (const void*)pszUTF8, nMBLen );
+		TextEncoding textencoding(MCD_T("UTF-8"), (const void*)pszUTF8, nMBLen);
 		textencoding.m_nToCount = nMBLen;
-		MCD_CHAR* pANSIBuffer = MCD_GETBUFFER(strANSI,textencoding.m_nToCount);
-		nMBLen = textencoding.PerformConversion( (void*)pANSIBuffer );
-		MCD_RELEASEBUFFER(strANSI,pANSIBuffer,nMBLen);
-		if ( pnFailed )
+		MCD_CHAR* pANSIBuffer = MCD_GETBUFFER(strANSI, textencoding.m_nToCount);
+		nMBLen = textencoding.PerformConversion((void*)pANSIBuffer);
+		MCD_RELEASEBUFFER(strANSI, pANSIBuffer, nMBLen);
+		if (pnFailed)
 			*pnFailed = textencoding.m_nFailedChars;
 	}
 	return strANSI;
 }
 
-MCD_STR CMarkup::AToUTF8( MCD_CSTR pszANSI )
+MCD_STR CMarkup::AToUTF8(MCD_CSTR pszANSI)
 {
 	// Converts locale ANSI charset to UTF-8
 	MCD_STR strUTF8;
-	int nMBLen = (int)MCD_PSZLEN( pszANSI );
-	if ( nMBLen )
+	int nMBLen = (int)MCD_PSZLEN(pszANSI);
+	if (nMBLen)
 	{
-		TextEncoding textencoding( MCD_T(""), (const void*)pszANSI, nMBLen );
+		TextEncoding textencoding(MCD_T(""), (const void*)pszANSI, nMBLen);
 		textencoding.m_nToCount = nMBLen * 4;
-		MCD_CHAR* pUTF8Buffer = MCD_GETBUFFER(strUTF8,textencoding.m_nToCount);
-		nMBLen = textencoding.PerformConversion( (void*)pUTF8Buffer, MCD_T("UTF-8") );
-		MCD_RELEASEBUFFER(strUTF8,pUTF8Buffer,nMBLen);
+		MCD_CHAR* pUTF8Buffer = MCD_GETBUFFER(strUTF8, textencoding.m_nToCount);
+		nMBLen = textencoding.PerformConversion((void*)pUTF8Buffer, MCD_T("UTF-8"));
+		MCD_RELEASEBUFFER(strUTF8, pUTF8Buffer, nMBLen);
 	}
 	return strUTF8;
 }
 #endif // not WCHAR
 
-MCD_STR CMarkup::GetDeclaredEncoding( MCD_CSTR szDoc )
+MCD_STR CMarkup::GetDeclaredEncoding(MCD_CSTR szDoc)
 {
 	// Extract encoding attribute from XML Declaration, or HTML meta charset
 	MCD_STR strEncoding;
-	TokenPos token( szDoc, MDF_IGNORECASE );
+	TokenPos token(szDoc, MDF_IGNORECASE);
 	NodePos node;
 	bool bHtml = false;
 	int nTypeFound = 0;
-	while ( nTypeFound >= 0 )
+	while (nTypeFound >= 0)
 	{
-		nTypeFound = token.ParseNode( node );
+		nTypeFound = token.ParseNode(node);
 		int nNext = token.m_nNext;
-		if ( nTypeFound == MNT_PROCESSING_INSTRUCTION && node.nStart == 0 )
+		if (nTypeFound == MNT_PROCESSING_INSTRUCTION && node.nStart == 0)
 		{
 			token.m_nNext = node.nStart + 2; // after <?
-			if ( token.FindName() && token.Match(MCD_T("xml")) )
+			if (token.FindName() && token.Match(MCD_T("xml")))
 			{
 				// e.g. <?xml version="1.0" encoding="UTF-8"?>
-				if ( token.FindAttrib(MCD_T("encoding")) )
+				if (token.FindAttrib(MCD_T("encoding")))
 					strEncoding = token.GetTokenText();
 				break;
 			}
 		}
-		else if ( nTypeFound == 0 ) // end tag
+		else if (nTypeFound == 0) // end tag
 		{
 			// Check for end of HTML head
 			token.m_nNext = node.nStart + 2; // after </
-			if ( token.FindName() && token.Match(MCD_T("head")) )
+			if (token.FindName() && token.Match(MCD_T("head")))
 				break;
 		}
-		else if ( nTypeFound == MNT_ELEMENT )
+		else if (nTypeFound == MNT_ELEMENT)
 		{
 			token.m_nNext = node.nStart + 1; // after <
 			token.FindName();
-			if ( ! bHtml )
+			if (!bHtml)
 			{
-				if ( ! token.Match(MCD_T("html")) )
+				if (!token.Match(MCD_T("html")))
 					break;
 				bHtml = true;
 			}
-			else if ( token.Match(MCD_T("meta")) )
+			else if (token.Match(MCD_T("meta")))
 			{
 				// e.g. <META http-equiv=Content-Type content="text/html; charset=UTF-8">
 				int nAttribOffset = node.nStart + 1;
 				token.m_nNext = nAttribOffset;
-				if ( token.FindAttrib(MCD_T("http-equiv")) && token.Match(MCD_T("Content-Type")) )
+				if (token.FindAttrib(MCD_T("http-equiv")) && token.Match(MCD_T("Content-Type")))
 				{
 					token.m_nNext = nAttribOffset;
-					if ( token.FindAttrib(MCD_T("content")) )
+					if (token.FindAttrib(MCD_T("content")))
 					{
 						int nContentEndOffset = token.m_nNext;
 						token.m_nNext = token.m_nL;
-						while ( token.m_nNext < nContentEndOffset && token.FindName() )
+						while (token.m_nNext < nContentEndOffset && token.FindName())
 						{
-							if ( token.Match(MCD_T("charset")) && token.FindName() && token.Match(MCD_T("=")) )
+							if (token.Match(MCD_T("charset")) && token.FindName() && token.Match(MCD_T("=")))
 							{
 								token.FindName();
 								strEncoding = token.GetTokenText();
@@ -3525,12 +3525,12 @@ MCD_STR CMarkup::GetDeclaredEncoding( MCD_CSTR szDoc )
 	return strEncoding;
 }
 
-int CMarkup::GetEncodingCodePage( MCD_CSTR pszEncoding )
+int CMarkup::GetEncodingCodePage(MCD_CSTR pszEncoding)
 {
-	return x_GetEncodingCodePage( pszEncoding );
+	return x_GetEncodingCodePage(pszEncoding);
 }
 
-int CMarkup::FindNode( int nType )
+int CMarkup::FindNode(int nType)
 {
 	// Change current node position only if a node is found
 	// If nType is 0 find any node, otherwise find node of type nType
@@ -3538,7 +3538,7 @@ int CMarkup::FindNode( int nType )
 
 	// Determine where in document to start scanning for node
 	int nNodeOffset = m_nNodeOffset;
-	if ( m_nNodeType > MNT_ELEMENT )
+	if (m_nNodeType > MNT_ELEMENT)
 	{
 		// By-pass current node
 		nNodeOffset += m_nNodeLength;
@@ -3546,15 +3546,15 @@ int CMarkup::FindNode( int nType )
 	else // element or no current main position
 	{
 		// Set position to begin looking for node
-		if ( m_iPos )
+		if (m_iPos)
 		{
 			// After element
 			nNodeOffset = ELEM(m_iPos).StartAfter();
 		}
-		else if ( m_iPosParent )
+		else if (m_iPosParent)
 		{
 			// Immediately after start tag of parent
-			if ( ELEM(m_iPosParent).IsEmptyElement() )
+			if (ELEM(m_iPosParent).IsEmptyElement())
 				return 0;
 			else
 				nNodeOffset = ELEM(m_iPosParent).StartContent();
@@ -3564,46 +3564,45 @@ int CMarkup::FindNode( int nType )
 	// Get nodes until we find what we're looking for
 	int nTypeFound = 0;
 	int iPosNew = m_iPos;
-	TokenPos token( m_strDoc, m_nDocFlags );
+	TokenPos token(m_strDoc, m_nDocFlags);
 	NodePos node;
 	token.m_nNext = nNodeOffset;
 	do
 	{
 		nNodeOffset = token.m_nNext;
-		nTypeFound = token.ParseNode( node );
-		if ( nTypeFound == 0 )
+		nTypeFound = token.ParseNode(node);
+		if (nTypeFound == 0)
 		{
 			// Check if we have reached the end of the parent element
-			if ( m_iPosParent && nNodeOffset == ELEM(m_iPosParent).StartContent()
-					+ ELEM(m_iPosParent).ContentLen() )
+			if (m_iPosParent && nNodeOffset == ELEM(m_iPosParent).StartContent()
+				+ ELEM(m_iPosParent).ContentLen())
 				return 0;
 			nTypeFound = MNT_LONE_END_TAG; // otherwise it is a lone end tag
 		}
-		else if ( nTypeFound < 0 )
+		else if (nTypeFound < 0)
 		{
-			if ( nTypeFound == -2 ) // end of document
+			if (nTypeFound == -2) // end of document
 				return 0;
 			// -1 is node error
 			nTypeFound = MNT_NODE_ERROR;
 		}
-		else if ( nTypeFound == MNT_ELEMENT )
+		else if (nTypeFound == MNT_ELEMENT)
 		{
-			if ( iPosNew )
+			if (iPosNew)
 				iPosNew = ELEM(iPosNew).iElemNext;
 			else
 				iPosNew = ELEM(m_iPosParent).iElemChild;
-			if ( ! iPosNew )
+			if (!iPosNew)
 				return 0;
-			if ( ! nType || (nType & nTypeFound) )
+			if (!nType || (nType & nTypeFound))
 			{
 				// Found element node, move position to this element
-				x_SetPos( m_iPosParent, iPosNew, 0 );
+				x_SetPos(m_iPosParent, iPosNew, 0);
 				return m_nNodeType;
 			}
 			token.m_nNext = ELEM(iPosNew).StartAfter();
 		}
-	}
-	while ( nType && ! (nType & nTypeFound) );
+	} while (nType && !(nType & nTypeFound));
 
 	m_iPos = iPosNew;
 	m_iPosChild = 0;
@@ -3616,11 +3615,11 @@ int CMarkup::FindNode( int nType )
 
 bool CMarkup::RemoveNode()
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
-	if ( m_iPos || m_nNodeLength )
+	if (m_iPos || m_nNodeLength)
 	{
-		x_RemoveNode( m_iPosParent, m_iPos, m_nNodeType, m_nNodeOffset, m_nNodeLength );
+		x_RemoveNode(m_iPosParent, m_iPos, m_nNodeType, m_nNodeOffset, m_nNodeLength);
 		m_iPosChild = 0;
 		MARKUP_SETDEBUGSTATE;
 		return true;
@@ -3635,20 +3634,20 @@ MCD_STR CMarkup::GetTagName() const
 
 	// This method is primarily for elements, however
 	// it does return something for certain other nodes
-	if ( m_nNodeLength )
+	if (m_nNodeLength)
 	{
-		switch ( m_nNodeType )
+		switch (m_nNodeType)
 		{
 		case MNT_PROCESSING_INSTRUCTION:
 		case MNT_LONE_END_TAG:
-			{
-				// <?target or </tagname
-				TokenPos token( m_strDoc, m_nDocFlags );
-				token.m_nNext = m_nNodeOffset + 2;
-				if ( token.FindName() )
-					strTagName = token.GetTokenText();
-			}
-			break;
+		{
+			// <?target or </tagname
+			TokenPos token(m_strDoc, m_nDocFlags);
+			token.m_nNext = m_nNodeOffset + 2;
+			if (token.FindName())
+				strTagName = token.GetTokenText();
+		}
+		break;
 		case MNT_COMMENT:
 			strTagName = MCD_T("#comment");
 			break;
@@ -3656,14 +3655,14 @@ MCD_STR CMarkup::GetTagName() const
 			strTagName = MCD_T("#cdata-section");
 			break;
 		case MNT_DOCUMENT_TYPE:
-			{
-				// <!DOCTYPE name
-				TokenPos token( m_strDoc, m_nDocFlags );
-				token.m_nNext = m_nNodeOffset + 2;
-				if ( token.FindName() && token.FindName() )
-					strTagName = token.GetTokenText();
-			}
-			break;
+		{
+			// <!DOCTYPE name
+			TokenPos token(m_strDoc, m_nDocFlags);
+			token.m_nNext = m_nNodeOffset + 2;
+			if (token.FindName() && token.FindName())
+				strTagName = token.GetTokenText();
+		}
+		break;
 		case MNT_TEXT:
 		case MNT_WHITESPACE:
 			strTagName = MCD_T("#text");
@@ -3672,17 +3671,17 @@ MCD_STR CMarkup::GetTagName() const
 		return strTagName;
 	}
 
-	if ( m_iPos )
-		strTagName = x_GetTagName( m_iPos );
+	if (m_iPos)
+		strTagName = x_GetTagName(m_iPos);
 	return strTagName;
 }
 
 bool CMarkup::IntoElem()
 {
 	// Make current element the parent
-	if ( m_iPos && m_nNodeType == MNT_ELEMENT )
+	if (m_iPos && m_nNodeType == MNT_ELEMENT)
 	{
-		x_SetPos( m_iPos, m_iPosChild, 0 );
+		x_SetPos(m_iPos, m_iPosChild, 0);
 		return true;
 	}
 	return false;
@@ -3691,65 +3690,65 @@ bool CMarkup::IntoElem()
 bool CMarkup::OutOfElem()
 {
 	// Go to parent element
-	if ( m_iPosParent )
+	if (m_iPosParent)
 	{
-		x_SetPos( ELEM(m_iPosParent).iElemParent, m_iPosParent, m_iPos );
+		x_SetPos(ELEM(m_iPosParent).iElemParent, m_iPosParent, m_iPos);
 		return true;
 	}
 	return false;
 }
 
-bool CMarkup::GetNthAttrib( int n, MCD_STR& strAttrib, MCD_STR& strValue ) const
+bool CMarkup::GetNthAttrib(int n, MCD_STR& strAttrib, MCD_STR& strValue) const
 {
 	// Return nth attribute name and value from main position
-	TokenPos token( m_strDoc, m_nDocFlags );
-	if ( m_iPos && m_nNodeType == MNT_ELEMENT )
+	TokenPos token(m_strDoc, m_nDocFlags);
+	if (m_iPos && m_nNodeType == MNT_ELEMENT)
 		token.m_nNext = ELEM(m_iPos).nStart + 1;
-	else if ( m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION )
+	else if (m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION)
 		token.m_nNext = m_nNodeOffset + 2;
 	else
 		return false;
-	if ( token.FindAttrib(NULL,n,&strAttrib) )
+	if (token.FindAttrib(NULL, n, &strAttrib))
 	{
-		strValue = UnescapeText( token.GetTokenPtr(), token.Length(), m_nDocFlags );
+		strValue = UnescapeText(token.GetTokenPtr(), token.Length(), m_nDocFlags);
 		return true;
 	}
 	return false;
 }
 
-MCD_STR CMarkup::GetAttribName( int n ) const
+MCD_STR CMarkup::GetAttribName(int n) const
 {
 	// Return nth attribute name of main position
-	TokenPos token( m_strDoc, m_nDocFlags );
-	if ( m_iPos && m_nNodeType == MNT_ELEMENT )
+	TokenPos token(m_strDoc, m_nDocFlags);
+	if (m_iPos && m_nNodeType == MNT_ELEMENT)
 		token.m_nNext = ELEM(m_iPos).nStart + 1;
-	else if ( m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION )
+	else if (m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION)
 		token.m_nNext = m_nNodeOffset + 2;
 	else
 		return MCD_T("");
-	if ( token.FindAttrib(NULL,n) )
+	if (token.FindAttrib(NULL, n))
 		return token.GetTokenText();
 	return MCD_T("");
 }
 
-bool CMarkup::SavePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
+bool CMarkup::SavePos(MCD_CSTR szPosName /*=""*/, int nMap /*=0*/)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Save current element position in saved position map
-	if ( szPosName )
+	if (szPosName)
 	{
 		SavedPosMap* pMap;
-		m_pSavedPosMaps->GetMap( pMap, nMap );
+		m_pSavedPosMaps->GetMap(pMap, nMap);
 		SavedPos savedpos;
-		if ( szPosName )
+		if (szPosName)
 			savedpos.strName = szPosName;
-		if ( m_iPosChild )
+		if (m_iPosChild)
 		{
 			savedpos.iPos = m_iPosChild;
 			savedpos.nSavedPosFlags |= SavedPos::SPM_CHILD;
 		}
-		else if ( m_iPos )
+		else if (m_iPos)
 		{
 			savedpos.iPos = m_iPos;
 			savedpos.nSavedPosFlags |= SavedPos::SPM_MAIN;
@@ -3760,10 +3759,10 @@ bool CMarkup::SavePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
 		}
 		savedpos.nSavedPosFlags |= SavedPos::SPM_USED;
 
-		int nSlot = x_Hash( szPosName, pMap->nMapSize);
+		int nSlot = x_Hash(szPosName, pMap->nMapSize);
 		SavedPos* pSavedPos = pMap->pTable[nSlot];
 		int nOffset = 0;
-		if ( ! pSavedPos )
+		if (!pSavedPos)
 		{
 			pSavedPos = new SavedPos[2];
 			pSavedPos[1].nSavedPosFlags = SavedPos::SPM_LAST;
@@ -3771,19 +3770,19 @@ bool CMarkup::SavePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
 		}
 		else
 		{
-			while ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED )
+			while (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED)
 			{
-				if ( pSavedPos[nOffset].strName == (MCD_PCSZ)szPosName )
+				if (pSavedPos[nOffset].strName == (MCD_PCSZ)szPosName)
 					break;
-				if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST )
+				if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST)
 				{
 					int nNewSize = (nOffset + 6) * 2;
 					SavedPos* pNewSavedPos = new SavedPos[nNewSize];
-					for ( int nCopy=0; nCopy<=nOffset; ++nCopy )
+					for (int nCopy = 0; nCopy <= nOffset; ++nCopy)
 						pNewSavedPos[nCopy] = pSavedPos[nCopy];
 					pNewSavedPos[nOffset].nSavedPosFlags ^= SavedPos::SPM_LAST;
-					pNewSavedPos[nNewSize-1].nSavedPosFlags = SavedPos::SPM_LAST;
-					delete [] pSavedPos;
+					pNewSavedPos[nNewSize - 1].nSavedPosFlags = SavedPos::SPM_LAST;
+					delete[] pSavedPos;
 					pSavedPos = pNewSavedPos;
 					pMap->pTable[nSlot] = pSavedPos;
 					++nOffset;
@@ -3792,7 +3791,7 @@ bool CMarkup::SavePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
 				++nOffset;
 			}
 		}
-		if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST )
+		if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST)
 			savedpos.nSavedPosFlags |= SavedPos::SPM_LAST;
 		pSavedPos[nOffset] = savedpos;
 
@@ -3819,34 +3818,34 @@ bool CMarkup::SavePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
 	return false;
 }
 
-bool CMarkup::RestorePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
+bool CMarkup::RestorePos(MCD_CSTR szPosName /*=""*/, int nMap /*=0*/)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Restore element position if found in saved position map
-	if ( szPosName )
+	if (szPosName)
 	{
 		SavedPosMap* pMap;
-		m_pSavedPosMaps->GetMap( pMap, nMap );
-		int nSlot = x_Hash( szPosName, pMap->nMapSize );
+		m_pSavedPosMaps->GetMap(pMap, nMap);
+		int nSlot = x_Hash(szPosName, pMap->nMapSize);
 		SavedPos* pSavedPos = pMap->pTable[nSlot];
-		if ( pSavedPos )
+		if (pSavedPos)
 		{
 			int nOffset = 0;
-			while ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED )
+			while (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED)
 			{
-				if ( pSavedPos[nOffset].strName == (MCD_PCSZ)szPosName )
+				if (pSavedPos[nOffset].strName == (MCD_PCSZ)szPosName)
 				{
 					int i = pSavedPos[nOffset].iPos;
-					if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_CHILD )
-						x_SetPos( ELEM(ELEM(i).iElemParent).iElemParent, ELEM(i).iElemParent, i );
-					else if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_MAIN )
-						x_SetPos( ELEM(i).iElemParent, i, 0 );
+					if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_CHILD)
+						x_SetPos(ELEM(ELEM(i).iElemParent).iElemParent, ELEM(i).iElemParent, i);
+					else if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_MAIN)
+						x_SetPos(ELEM(i).iElemParent, i, 0);
 					else
-						x_SetPos( i, 0, 0 );
+						x_SetPos(i, 0, 0);
 					return true;
 				}
-				if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST )
+				if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST)
 					break;
 				++nOffset;
 			}
@@ -3855,26 +3854,26 @@ bool CMarkup::RestorePos( MCD_CSTR szPosName /*=""*/, int nMap /*=0*/ )
 	return false;
 }
 
-bool CMarkup::SetMapSize( int nSize, int nMap /*=0*/ )
+bool CMarkup::SetMapSize(int nSize, int nMap /*=0*/)
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Set saved position map hash table size before using it
 	// Returns false if map already exists
 	// Some prime numbers: 53, 101, 211, 503, 1009, 2003, 10007, 20011, 50021, 100003, 200003, 500009
 	SavedPosMap* pNewMap;
-	return m_pSavedPosMaps->GetMap( pNewMap, nMap, nSize );
+	return m_pSavedPosMaps->GetMap(pNewMap, nMap, nSize);
 }
 
 bool CMarkup::RemoveElem()
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Remove current main position element
-	if ( m_iPos && m_nNodeType == MNT_ELEMENT )
+	if (m_iPos && m_nNodeType == MNT_ELEMENT)
 	{
-		int iPos = x_RemoveElem( m_iPos );
-		x_SetPos( m_iPosParent, iPos, 0 );
+		int iPos = x_RemoveElem(m_iPos);
+		x_SetPos(m_iPosParent, iPos, 0);
 		return true;
 	}
 	return false;
@@ -3882,13 +3881,13 @@ bool CMarkup::RemoveElem()
 
 bool CMarkup::RemoveChildElem()
 {
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 	// Remove current child position element
-	if ( m_iPosChild )
+	if (m_iPosChild)
 	{
-		int iPosChild = x_RemoveElem( m_iPosChild );
-		x_SetPos( m_iPosParent, m_iPos, iPosChild );
+		int iPosChild = x_RemoveElem(m_iPosChild);
+		x_SetPos(m_iPosParent, m_iPos, iPosChild);
 		return true;
 	}
 	return false;
@@ -3913,19 +3912,19 @@ void CMarkup::x_InitMarkup()
 #endif // not ignore case
 }
 
-int CMarkup::x_GetParent( int i )
+int CMarkup::x_GetParent(int i)
 {
 	return ELEM(i).iElemParent;
 }
 
-void CMarkup::x_SetPos( int iPosParent, int iPos, int iPosChild )
+void CMarkup::x_SetPos(int iPosParent, int iPos, int iPosChild)
 {
 	m_iPosParent = iPosParent;
 	m_iPos = iPos;
 	m_iPosChild = iPosChild;
 	m_nNodeOffset = 0;
 	m_nNodeLength = 0;
-	m_nNodeType = iPos?MNT_ELEMENT:0;
+	m_nNodeType = iPos ? MNT_ELEMENT : 0;
 	MARKUP_SETDEBUGSTATE;
 }
 
@@ -3936,10 +3935,10 @@ void CMarkup::x_SetDebugState()
 	MCD_PCSZ pD = MCD_2PCSZ(m_strDoc);
 
 	// Node (non-element) position is determined differently in file mode
-	if ( m_nNodeLength || (m_nNodeOffset && !m_pFilePos)
-			|| (m_pFilePos && (!m_iPos) && (!m_iPosParent) && ! m_pFilePos->FileAtTop()) )
+	if (m_nNodeLength || (m_nNodeOffset && !m_pFilePos)
+		|| (m_pFilePos && (!m_iPos) && (!m_iPosParent) && !m_pFilePos->FileAtTop()))
 	{
-		if ( ! m_nNodeLength )
+		if (!m_nNodeLength)
 			m_pDebugCur = MCD_T("main position offset"); // file mode only
 		else
 			m_pDebugCur = MCD_T("main position node");
@@ -3947,17 +3946,17 @@ void CMarkup::x_SetDebugState()
 	}
 	else
 	{
-		if ( m_iPosChild )
+		if (m_iPosChild)
 		{
 			m_pDebugCur = MCD_T("child position element");
 			m_pDebugPos = &pD[ELEM(m_iPosChild).nStart];
 		}
-		else if ( m_iPos )
+		else if (m_iPos)
 		{
 			m_pDebugCur = MCD_T("main position element");
 			m_pDebugPos = &pD[ELEM(m_iPos).nStart];
 		}
-		else if ( m_iPosParent )
+		else if (m_iPosParent)
 		{
 			m_pDebugCur = MCD_T("parent position element");
 			m_pDebugPos = &pD[ELEM(m_iPosParent).nStart];
@@ -3973,18 +3972,18 @@ void CMarkup::x_SetDebugState()
 
 int CMarkup::x_GetFreePos()
 {
-	if ( m_iPosFree == m_pElemPosTree->GetSize() )
+	if (m_iPosFree == m_pElemPosTree->GetSize())
 		x_AllocElemPos();
 	return m_iPosFree++;
 }
 
-bool CMarkup::x_AllocElemPos( int nNewSize /*=0*/ )
+bool CMarkup::x_AllocElemPos(int nNewSize /*=0*/)
 {
 	// Resize m_aPos when the document is created or the array is filled
-	if ( ! nNewSize )
-		nNewSize = m_iPosFree + (m_iPosFree>>1); // Grow By: multiply size by 1.5
-	if ( m_pElemPosTree->GetSize() < nNewSize )
-		m_pElemPosTree->GrowElemPosTree( nNewSize );
+	if (!nNewSize)
+		nNewSize = m_iPosFree + (m_iPosFree >> 1); // Grow By: multiply size by 1.5
+	if (m_pElemPosTree->GetSize() < nNewSize)
+		m_pElemPosTree->GrowElemPosTree(nNewSize);
 	return true;
 }
 
@@ -3999,31 +3998,31 @@ bool CMarkup::x_ParseDoc()
 	// Start at 8 when creating new document
 	int nDocLen = MCD_STRLENGTH(m_strDoc);
 	m_iPosFree = 1;
-	x_AllocElemPos( nDocLen / 64 + 8 );
+	x_AllocElemPos(nDocLen / 64 + 8);
 	m_iPosDeleted = 0;
 
 	// Parse document
 	ELEM(0).ClearVirtualParent();
-	if ( nDocLen )
+	if (nDocLen)
 	{
-		TokenPos token( m_strDoc, m_nDocFlags );
-		int iPos = x_ParseElem( 0, token );
+		TokenPos token(m_strDoc, m_nDocFlags);
+		int iPos = x_ParseElem(0, token);
 		ELEM(0).nLength = nDocLen;
-		if ( iPos > 0 )
+		if (iPos > 0)
 		{
 			ELEM(0).iElemChild = iPos;
-			if ( ELEM(iPos).iElemNext )
-				x_AddResult( m_strResult, MCD_T("root_has_sibling") );
+			if (ELEM(iPos).iElemNext)
+				x_AddResult(m_strResult, MCD_T("root_has_sibling"));
 		}
 		else
-			x_AddResult( m_strResult, MCD_T("no_root_element") );
+			x_AddResult(m_strResult, MCD_T("no_root_element"));
 	}
 
 	ResetPos();
 	return IsWellFormed();
 }
 
-int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
+int CMarkup::x_ParseElem(int iPosParent, TokenPos& token)
 {
 	// This is either called by x_ParseDoc or x_AddSubDoc or x_SetElemContent
 	// Returns index of the first element encountered or zero if no elements
@@ -4046,20 +4045,20 @@ int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
 	ElemStack elemstack;
 	NodePos node;
 	token.m_nNext = 0;
-	while ( 1 )
+	while (1)
 	{
-		nTypeFound = token.ParseNode( node );
+		nTypeFound = token.ParseNode(node);
 		nMatchLevel = 0;
-		if ( nTypeFound == MNT_ELEMENT ) // start tag
+		if (nTypeFound == MNT_ELEMENT) // start tag
 		{
 			iPos = x_GetFreePos();
-			if ( ! iPosRoot )
+			if (!iPosRoot)
 				iPosRoot = iPos;
 			pElem = &ELEM(iPos);
 			pElem->iElemParent = iPosParent;
 			pElem->iElemNext = 0;
 			pElemParent = &ELEM(iPosParent);
-			if ( pElemParent->iElemChild )
+			if (pElemParent->iElemChild)
 			{
 				iPosFirst = pElemParent->iElemChild;
 				pElemChild = &ELEM(iPosFirst);
@@ -4075,47 +4074,47 @@ int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
 				pElem->iElemPrev = iPos;
 				pElem->nFlags = MNF_FIRST;
 			}
-			pElem->SetLevel( nRootDepth + elemstack.iTop );
+			pElem->SetLevel(nRootDepth + elemstack.iTop);
 			pElem->iElemChild = 0;
 			pElem->nStart = node.nStart;
-			pElem->SetStartTagLen( node.nLength );
-			if ( node.nNodeFlags & MNF_EMPTY )
+			pElem->SetStartTagLen(node.nLength);
+			if (node.nNodeFlags & MNF_EMPTY)
 			{
 				iPos = iPosParent;
-				pElem->SetEndTagLen( 0 );
+				pElem->SetEndTagLen(0);
 				pElem->nLength = node.nLength;
 			}
 			else
 			{
 				iPosParent = iPos;
-				elemstack.PushIntoLevel( token.GetTokenPtr(), token.Length() );
+				elemstack.PushIntoLevel(token.GetTokenPtr(), token.Length());
 			}
 		}
-		else if ( nTypeFound == 0 ) // end tag
+		else if (nTypeFound == 0) // end tag
 		{
 			iPosMatch = iPos;
 			iTag = elemstack.iTop;
 			nMatchLevel = iTag;
-			while ( nMatchLevel && ! token.Match(elemstack.GetRefTagPosAt(iTag--).strTagName) )
+			while (nMatchLevel && !token.Match(elemstack.GetRefTagPosAt(iTag--).strTagName))
 			{
 				--nMatchLevel;
 				iPosMatch = ELEM(iPosMatch).iElemParent;
 			}
-			if ( nMatchLevel == 0 )
+			if (nMatchLevel == 0)
 			{
 				// Not matched at all, it is a lone end tag, a non-element node
 				ELEM(iVirtualParent).nFlags |= MNF_ILLFORMED;
 				ELEM(iPos).nFlags |= MNF_ILLDATA;
-				x_AddResult( m_strResult, MCD_T("lone_end_tag"), token.GetTokenText(), 0, node.nStart );
+				x_AddResult(m_strResult, MCD_T("lone_end_tag"), token.GetTokenText(), 0, node.nStart);
 			}
 			else
 			{
 				pElem = &ELEM(iPosMatch);
 				pElem->nLength = node.nStart - pElem->nStart + node.nLength;
-				pElem->SetEndTagLen( node.nLength );
+				pElem->SetEndTagLen(node.nLength);
 			}
 		}
-		else if ( nTypeFound == -1 )
+		else if (nTypeFound == -1)
 		{
 			ELEM(iVirtualParent).nFlags |= MNF_ILLFORMED;
 			ELEM(iPos).nFlags |= MNF_ILLDATA;
@@ -4123,28 +4122,28 @@ int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
 		}
 
 		// Matched end tag, or end of document
-		if ( nMatchLevel || nTypeFound == -2 )
+		if (nMatchLevel || nTypeFound == -2)
 		{
-			if ( elemstack.iTop > nMatchLevel )
+			if (elemstack.iTop > nMatchLevel)
 				ELEM(iVirtualParent).nFlags |= MNF_ILLFORMED;
 
 			// Process any non-ended elements
-			while ( elemstack.iTop > nMatchLevel )
+			while (elemstack.iTop > nMatchLevel)
 			{
 				// Element with no end tag
 				pElem = &ELEM(iPos);
 				int iPosChild = pElem->iElemChild;
 				iPosParent = pElem->iElemParent;
-				pElem->SetEndTagLen( 0 );
+				pElem->SetEndTagLen(0);
 				pElem->nFlags |= MNF_NONENDED;
 				pElem->iElemChild = 0;
 				pElem->nLength = pElem->StartTagLen();
-				if ( pElem->nFlags & MNF_ILLDATA )
+				if (pElem->nFlags & MNF_ILLDATA)
 				{
 					pElem->nFlags ^= MNF_ILLDATA;
 					ELEM(iPosParent).nFlags |= MNF_ILLDATA;
 				}
-				while ( iPosChild )
+				while (iPosChild)
 				{
 					ELEM(iPosChild).iElemParent = iPosParent;
 					ELEM(iPosChild).iElemPrev = iPos;
@@ -4157,13 +4156,13 @@ int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
 				// if end of document, any nodes below top have no end tag
 				// second offset represents location where end tag was expected but end of document or other end tag was found 
 				// end tag that was found is token.GetTokenText() but not reported in error
-				int nOffset2 = (nTypeFound==0)? token.m_nL-1: MCD_STRLENGTH(m_strDoc);
-				x_AddResult( m_strResult, MCD_T("unended_start_tag"), elemstack.Current().strTagName, 0, pElem->nStart, nOffset2 );
+				int nOffset2 = (nTypeFound == 0) ? token.m_nL - 1 : MCD_STRLENGTH(m_strDoc);
+				x_AddResult(m_strResult, MCD_T("unended_start_tag"), elemstack.Current().strTagName, 0, pElem->nStart, nOffset2);
 
 				iPos = iPosParent;
 				elemstack.PopOutOfLevel();
 			}
-			if ( nTypeFound == -2 )
+			if (nTypeFound == -2)
 				break;
 			iPosParent = ELEM(iPos).iElemParent;
 			iPos = iPosParent;
@@ -4173,35 +4172,35 @@ int CMarkup::x_ParseElem( int iPosParent, TokenPos& token )
 	return iPosRoot;
 }
 
-int CMarkup::x_FindElem( int iPosParent, int iPos, PathPos& path ) const
+int CMarkup::x_FindElem(int iPosParent, int iPos, PathPos& path) const
 {
 	// If pPath is NULL or empty, go to next sibling element
 	// Otherwise go to next sibling element with matching path
 	//
-	if ( ! path.ValidPath() )
+	if (!path.ValidPath())
 		return 0;
 
 	// Paths other than simple tag name are only supported in the developer version
-	if ( path.IsAnywherePath() || path.IsAbsolutePath() )
+	if (path.IsAnywherePath() || path.IsAbsolutePath())
 		return 0;
 
-	if ( iPos )
+	if (iPos)
 		iPos = ELEM(iPos).iElemNext;
 	else
 		iPos = ELEM(iPosParent).iElemChild;
 
 	// Finished here if pPath not specified
-	if ( ! path.IsPath() )
+	if (!path.IsPath())
 		return iPos;
 
 	// Search
-	TokenPos token( m_strDoc, m_nDocFlags );
-	while ( iPos )
+	TokenPos token(m_strDoc, m_nDocFlags);
+	while (iPos)
 	{
 		// Compare tag name
 		token.m_nNext = ELEM(iPos).nStart + 1;
 		token.FindName(); // Locate tag name
-		if ( token.Match(path.GetPtr()) )
+		if (token.Match(path.GetPtr()))
 			return iPos;
 		iPos = ELEM(iPos).iElemNext;
 	}
@@ -4209,16 +4208,16 @@ int CMarkup::x_FindElem( int iPosParent, int iPos, PathPos& path ) const
 
 }
 
-MCD_STR CMarkup::x_GetPath( int iPos ) const
+MCD_STR CMarkup::x_GetPath(int iPos) const
 {
 	// In file mode, iPos is an index into m_pFilePos->m_elemstack or zero
 	MCD_STR strPath;
-	while ( iPos )
+	while (iPos)
 	{
 		MCD_STR strTagName;
 		int iPosParent;
 		int nCount = 0;
-		if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+		if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		{
 			TagPos& tag = m_pFilePos->m_elemstack.GetRefTagPosAt(iPos);
 			strTagName = tag.strTagName;
@@ -4227,23 +4226,23 @@ MCD_STR CMarkup::x_GetPath( int iPos ) const
 		}
 		else
 		{
-			strTagName = x_GetTagName( iPos );
-			PathPos path( MCD_2PCSZ(strTagName), false );
+			strTagName = x_GetTagName(iPos);
+			PathPos path(MCD_2PCSZ(strTagName), false);
 			iPosParent = ELEM(iPos).iElemParent;
 			int iPosSib = 0;
-			while ( iPosSib != iPos )
+			while (iPosSib != iPos)
 			{
 				path.RevertOffset();
-				iPosSib = x_FindElem( iPosParent, iPosSib, path );
+				iPosSib = x_FindElem(iPosParent, iPosSib, path);
 				++nCount;
 			}
 		}
-		if ( nCount == 1 )
+		if (nCount == 1)
 			strPath = MCD_T("/") + strTagName + strPath;
 		else
 		{
 			MCD_CHAR szPred[25];
-			MCD_SPRINTF( MCD_SSZ(szPred), MCD_T("[%d]"), nCount );
+			MCD_SPRINTF(MCD_SSZ(szPred), MCD_T("[%d]"), nCount);
 			strPath = MCD_T("/") + strTagName + szPred + strPath;
 		}
 		iPos = iPosParent;
@@ -4251,131 +4250,131 @@ MCD_STR CMarkup::x_GetPath( int iPos ) const
 	return strPath;
 }
 
-MCD_STR CMarkup::x_GetTagName( int iPos ) const
+MCD_STR CMarkup::x_GetTagName(int iPos) const
 {
 	// Return the tag name at specified element
-	TokenPos token( m_strDoc, m_nDocFlags );
+	TokenPos token(m_strDoc, m_nDocFlags);
 	token.m_nNext = ELEM(iPos).nStart + 1;
-	if ( ! iPos || ! token.FindName() )
+	if (!iPos || !token.FindName())
 		return MCD_T("");
 
 	// Return substring of document
 	return token.GetTokenText();
 }
 
-MCD_STR CMarkup::x_GetAttrib( int iPos, MCD_PCSZ pAttrib ) const
+MCD_STR CMarkup::x_GetAttrib(int iPos, MCD_PCSZ pAttrib) const
 {
 	// Return the value of the attrib
-	TokenPos token( m_strDoc, m_nDocFlags );
-	if ( iPos && m_nNodeType == MNT_ELEMENT )
+	TokenPos token(m_strDoc, m_nDocFlags);
+	if (iPos && m_nNodeType == MNT_ELEMENT)
 		token.m_nNext = ELEM(iPos).nStart + 1;
-	else if ( iPos == m_iPos && m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION )
+	else if (iPos == m_iPos && m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION)
 		token.m_nNext = m_nNodeOffset + 2;
 	else
 		return MCD_T("");
 
-	if ( pAttrib && token.FindAttrib(pAttrib) )
-		return UnescapeText( token.GetTokenPtr(), token.Length(), m_nDocFlags );
+	if (pAttrib && token.FindAttrib(pAttrib))
+		return UnescapeText(token.GetTokenPtr(), token.Length(), m_nDocFlags);
 	return MCD_T("");
 }
 
-bool CMarkup::x_SetAttrib( int iPos, MCD_PCSZ pAttrib, int nValue, int nFlags /*=0*/ )
+bool CMarkup::x_SetAttrib(int iPos, MCD_PCSZ pAttrib, int nValue, int nFlags /*=0*/)
 {
 	// Convert integer to string
 	MCD_CHAR szVal[25];
-	MCD_SPRINTF( MCD_SSZ(szVal), MCD_T("%d"), nValue );
-	return x_SetAttrib( iPos, pAttrib, szVal, nFlags );
+	MCD_SPRINTF(MCD_SSZ(szVal), MCD_T("%d"), nValue);
+	return x_SetAttrib(iPos, pAttrib, szVal, nFlags);
 }
 
-bool CMarkup::x_SetAttrib( int iPos, MCD_PCSZ pAttrib, MCD_PCSZ pValue, int nFlags /*=0*/ )
+bool CMarkup::x_SetAttrib(int iPos, MCD_PCSZ pAttrib, MCD_PCSZ pValue, int nFlags /*=0*/)
 {
-	if ( m_nDocFlags & MDF_READFILE )
+	if (m_nDocFlags & MDF_READFILE)
 		return false;
 	int nNodeStart = 0;
-	if ( iPos && m_nNodeType == MNT_ELEMENT )
+	if (iPos && m_nNodeType == MNT_ELEMENT)
 		nNodeStart = ELEM(iPos).nStart;
-	else if ( iPos == m_iPos && m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION )
+	else if (iPos == m_iPos && m_nNodeLength && m_nNodeType == MNT_PROCESSING_INSTRUCTION)
 		nNodeStart = m_nNodeOffset;
 	else
 		return false;
 
 	// Create insertion text depending on whether attribute already exists
 	// Decision: for empty value leaving attrib="" instead of removing attrib
-	TokenPos token( m_strDoc, m_nDocFlags );
-	token.m_nNext = nNodeStart + ((m_nNodeType == MNT_ELEMENT)?1:2); 
+	TokenPos token(m_strDoc, m_nDocFlags);
+	token.m_nNext = nNodeStart + ((m_nNodeType == MNT_ELEMENT) ? 1 : 2);
 	int nReplace = 0;
 	int nInsertAt;
-	MCD_STR strEscapedValue = EscapeText( pValue, MNF_ESCAPEQUOTES|nFlags );
-	int nEscapedValueLen = MCD_STRLENGTH( strEscapedValue );
+	MCD_STR strEscapedValue = EscapeText(pValue, MNF_ESCAPEQUOTES | nFlags);
+	int nEscapedValueLen = MCD_STRLENGTH(strEscapedValue);
 	MCD_STR strInsert;
-	if ( token.FindAttrib(pAttrib) )
+	if (token.FindAttrib(pAttrib))
 	{
 		// Replace value
-		MCD_BLDRESERVE( strInsert, nEscapedValueLen + 2 );
-		MCD_BLDAPPEND1( strInsert, x_ATTRIBQUOTE );
-		MCD_BLDAPPENDN( strInsert, MCD_2PCSZ(strEscapedValue), nEscapedValueLen );
-		MCD_BLDAPPEND1( strInsert, x_ATTRIBQUOTE );
-		MCD_BLDRELEASE( strInsert );
-		nInsertAt = token.m_nL - ((token.m_nTokenFlags&MNF_QUOTED)?1:0);
-		nReplace = token.Length() + ((token.m_nTokenFlags&MNF_QUOTED)?2:0);
+		MCD_BLDRESERVE(strInsert, nEscapedValueLen + 2);
+		MCD_BLDAPPEND1(strInsert, x_ATTRIBQUOTE);
+		MCD_BLDAPPENDN(strInsert, MCD_2PCSZ(strEscapedValue), nEscapedValueLen);
+		MCD_BLDAPPEND1(strInsert, x_ATTRIBQUOTE);
+		MCD_BLDRELEASE(strInsert);
+		nInsertAt = token.m_nL - ((token.m_nTokenFlags & MNF_QUOTED) ? 1 : 0);
+		nReplace = token.Length() + ((token.m_nTokenFlags & MNF_QUOTED) ? 2 : 0);
 	}
 	else
 	{
 		// Insert string name value pair
-		int nAttribNameLen = MCD_PSZLEN( pAttrib );
-		MCD_BLDRESERVE( strInsert, nAttribNameLen + nEscapedValueLen + 4 );
-		MCD_BLDAPPEND1( strInsert, ' ' );
-		MCD_BLDAPPENDN( strInsert, pAttrib, nAttribNameLen );
-		MCD_BLDAPPEND1( strInsert, '=' );
-		MCD_BLDAPPEND1( strInsert, x_ATTRIBQUOTE );
-		MCD_BLDAPPENDN( strInsert, MCD_2PCSZ(strEscapedValue), nEscapedValueLen );
-		MCD_BLDAPPEND1( strInsert, x_ATTRIBQUOTE );
-		MCD_BLDRELEASE( strInsert );
+		int nAttribNameLen = MCD_PSZLEN(pAttrib);
+		MCD_BLDRESERVE(strInsert, nAttribNameLen + nEscapedValueLen + 4);
+		MCD_BLDAPPEND1(strInsert, ' ');
+		MCD_BLDAPPENDN(strInsert, pAttrib, nAttribNameLen);
+		MCD_BLDAPPEND1(strInsert, '=');
+		MCD_BLDAPPEND1(strInsert, x_ATTRIBQUOTE);
+		MCD_BLDAPPENDN(strInsert, MCD_2PCSZ(strEscapedValue), nEscapedValueLen);
+		MCD_BLDAPPEND1(strInsert, x_ATTRIBQUOTE);
+		MCD_BLDRELEASE(strInsert);
 		nInsertAt = token.m_nNext;
 	}
 
 	int nAdjust = MCD_STRLENGTH(strInsert) - nReplace;
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
 		int nNewDocLength = MCD_STRLENGTH(m_strDoc) + nAdjust;
-		MCD_STRCLEAR( m_strResult );
-		if ( nNodeStart && nNewDocLength > m_pFilePos->m_nBlockSizeBasis )
+		MCD_STRCLEAR(m_strResult);
+		if (nNodeStart && nNewDocLength > m_pFilePos->m_nBlockSizeBasis)
 		{
 			int nDocCapacity = MCD_STRCAPACITY(m_strDoc);
-			if ( nNewDocLength > nDocCapacity )
+			if (nNewDocLength > nDocCapacity)
 			{
-				m_pFilePos->FileFlush( *m_pFilePos->m_pstrBuffer, nNodeStart );
+				m_pFilePos->FileFlush(*m_pFilePos->m_pstrBuffer, nNodeStart);
 				m_strResult = m_pFilePos->m_strIOResult;
 				nInsertAt -= nNodeStart;
 				m_nNodeOffset = 0;
-				if ( m_nNodeType == MNT_ELEMENT )
+				if (m_nNodeType == MNT_ELEMENT)
 					ELEM(iPos).nStart = 0;
 			}
 		}
 	}
-	x_DocChange( nInsertAt, nReplace, strInsert );
-	if ( m_nNodeType == MNT_PROCESSING_INSTRUCTION )
+	x_DocChange(nInsertAt, nReplace, strInsert);
+	if (m_nNodeType == MNT_PROCESSING_INSTRUCTION)
 	{
-		x_AdjustForNode( m_iPosParent, m_iPos, nAdjust );
+		x_AdjustForNode(m_iPosParent, m_iPos, nAdjust);
 		m_nNodeLength += nAdjust;
 	}
 	else
 	{
-		ELEM(iPos).AdjustStartTagLen( nAdjust );
+		ELEM(iPos).AdjustStartTagLen(nAdjust);
 		ELEM(iPos).nLength += nAdjust;
-		x_Adjust( iPos, nAdjust );
+		x_Adjust(iPos, nAdjust);
 	}
 	MARKUP_SETDEBUGSTATE;
 	return true;
 }
 
 
-bool CMarkup::x_CreateNode( MCD_STR& strNode, int nNodeType, MCD_PCSZ pText )
+bool CMarkup::x_CreateNode(MCD_STR& strNode, int nNodeType, MCD_PCSZ pText)
 {
 	// Set strNode based on nNodeType and szData
 	// Return false if szData would jeopardize well-formed document
 	//
-	switch ( nNodeType )
+	switch (nNodeType)
 	{
 	case MNT_PROCESSING_INSTRUCTION:
 		strNode = MCD_T("<?");
@@ -4394,7 +4393,7 @@ bool CMarkup::x_CreateNode( MCD_STR& strNode, int nNodeType, MCD_PCSZ pText )
 		break;
 	case MNT_TEXT:
 	case MNT_WHITESPACE:
-		strNode = EscapeText( pText );
+		strNode = EscapeText(pText);
 		break;
 	case MNT_DOCUMENT_TYPE:
 		strNode = pText;
@@ -4405,7 +4404,7 @@ bool CMarkup::x_CreateNode( MCD_STR& strNode, int nNodeType, MCD_PCSZ pText )
 		strNode += MCD_T(">");
 		break;
 	case MNT_CDATA_SECTION:
-		if ( MCD_PSZSTR(pText,MCD_T("]]>")) != NULL )
+		if (MCD_PSZSTR(pText, MCD_T("]]>")) != NULL)
 			return false;
 		strNode = MCD_T("<![CDATA[");
 		strNode += pText;
@@ -4415,131 +4414,131 @@ bool CMarkup::x_CreateNode( MCD_STR& strNode, int nNodeType, MCD_PCSZ pText )
 	return true;
 }
 
-MCD_STR CMarkup::x_EncodeCDATASection( MCD_PCSZ szData )
+MCD_STR CMarkup::x_EncodeCDATASection(MCD_PCSZ szData)
 {
 	// Split CDATA Sections if there are any end delimiters
 	MCD_STR strData = MCD_T("<![CDATA[");
 	MCD_PCSZ pszNextStart = szData;
-	MCD_PCSZ pszEnd = MCD_PSZSTR( szData, MCD_T("]]>") );
-	while ( pszEnd )
+	MCD_PCSZ pszEnd = MCD_PSZSTR(szData, MCD_T("]]>"));
+	while (pszEnd)
 	{
-		strData += MCD_STR( pszNextStart, (int)(pszEnd - pszNextStart) );
+		strData += MCD_STR(pszNextStart, (int)(pszEnd - pszNextStart));
 		strData += MCD_T("]]]]><![CDATA[>");
 		pszNextStart = pszEnd + 3;
-		pszEnd = MCD_PSZSTR( pszNextStart, MCD_T("]]>") );
+		pszEnd = MCD_PSZSTR(pszNextStart, MCD_T("]]>"));
 	}
 	strData += pszNextStart;
 	strData += MCD_T("]]>");
 	return strData;
 }
 
-bool CMarkup::x_SetData( int iPos, int nValue )
+bool CMarkup::x_SetData(int iPos, int nValue)
 {
 	// Convert integer to string
 	MCD_CHAR szVal[25];
-	MCD_SPRINTF( MCD_SSZ(szVal), MCD_T("%d"), nValue );
-	return x_SetData( iPos, szVal, 0 );
+	MCD_SPRINTF(MCD_SSZ(szVal), MCD_T("%d"), nValue);
+	return x_SetData(iPos, szVal, 0);
 }
 
-bool CMarkup::x_SetData( int iPos, MCD_PCSZ szData, int nFlags )
+bool CMarkup::x_SetData(int iPos, MCD_PCSZ szData, int nFlags)
 {
-	if ( m_nDocFlags & MDF_READFILE )
+	if (m_nDocFlags & MDF_READFILE)
 		return false;
 	MCD_STR strInsert;
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
-		if ( ! iPos || m_nNodeType != 1 || ! ELEM(iPos).IsEmptyElement() )
+		if (!iPos || m_nNodeType != 1 || !ELEM(iPos).IsEmptyElement())
 			return false; // only set data on current empty element (no other kinds of nodes)
 	}
-	if ( iPos == m_iPos && m_nNodeLength )
+	if (iPos == m_iPos && m_nNodeLength)
 	{
 		// Not an element
-		if ( ! x_CreateNode(strInsert, m_nNodeType, szData) )
+		if (!x_CreateNode(strInsert, m_nNodeType, szData))
 			return false;
-		x_DocChange( m_nNodeOffset, m_nNodeLength, strInsert );
-		x_AdjustForNode( m_iPosParent, iPos, MCD_STRLENGTH(strInsert) - m_nNodeLength );
+		x_DocChange(m_nNodeOffset, m_nNodeLength, strInsert);
+		x_AdjustForNode(m_iPosParent, iPos, MCD_STRLENGTH(strInsert) - m_nNodeLength);
 		m_nNodeLength = MCD_STRLENGTH(strInsert);
 		MARKUP_SETDEBUGSTATE;
 		return true;
 	}
 
 	// Set data in iPos element
-	if ( ! iPos || ELEM(iPos).iElemChild )
+	if (!iPos || ELEM(iPos).iElemChild)
 		return false;
 
 	// Build strInsert from szData based on nFlags
-	if ( nFlags & MNF_WITHCDATA )
-		strInsert = x_EncodeCDATASection( szData );
+	if (nFlags & MNF_WITHCDATA)
+		strInsert = x_EncodeCDATASection(szData);
 	else
-		strInsert = EscapeText( szData, nFlags );
+		strInsert = EscapeText(szData, nFlags);
 
 	// Insert
-	NodePos node( MNF_WITHNOLINES|MNF_REPLACE );
+	NodePos node(MNF_WITHNOLINES | MNF_REPLACE);
 	node.strMeta = strInsert;
 	int iPosBefore = 0;
-	int nReplace = x_InsertNew( iPos, iPosBefore, node );
+	int nReplace = x_InsertNew(iPos, iPosBefore, node);
 	int nAdjust = MCD_STRLENGTH(node.strMeta) - nReplace;
-	x_Adjust( iPos, nAdjust );
+	x_Adjust(iPos, nAdjust);
 	ELEM(iPos).nLength += nAdjust;
-	if ( ELEM(iPos).nFlags & MNF_ILLDATA )
+	if (ELEM(iPos).nFlags & MNF_ILLDATA)
 		ELEM(iPos).nFlags &= ~MNF_ILLDATA;
 	MARKUP_SETDEBUGSTATE;
 	return true;
 }
 
-MCD_STR CMarkup::x_GetData( int iPos )
+MCD_STR CMarkup::x_GetData(int iPos)
 {
-	if ( iPos == m_iPos && m_nNodeLength )
+	if (iPos == m_iPos && m_nNodeLength)
 	{
-		if ( m_nNodeType == MNT_COMMENT )
-			return MCD_STRMID( m_strDoc, m_nNodeOffset+4, m_nNodeLength-7 );
-		else if ( m_nNodeType == MNT_PROCESSING_INSTRUCTION )
-			return MCD_STRMID( m_strDoc, m_nNodeOffset+2, m_nNodeLength-4 );
-		else if ( m_nNodeType == MNT_CDATA_SECTION )
-			return MCD_STRMID( m_strDoc, m_nNodeOffset+9, m_nNodeLength-12 );
-		else if ( m_nNodeType == MNT_TEXT )
-			return UnescapeText( &(MCD_2PCSZ(m_strDoc))[m_nNodeOffset], m_nNodeLength, m_nDocFlags );
-		else if ( m_nNodeType == MNT_LONE_END_TAG )
-			return MCD_STRMID( m_strDoc, m_nNodeOffset+2, m_nNodeLength-3 );
-		return MCD_STRMID( m_strDoc, m_nNodeOffset, m_nNodeLength );
+		if (m_nNodeType == MNT_COMMENT)
+			return MCD_STRMID(m_strDoc, m_nNodeOffset + 4, m_nNodeLength - 7);
+		else if (m_nNodeType == MNT_PROCESSING_INSTRUCTION)
+			return MCD_STRMID(m_strDoc, m_nNodeOffset + 2, m_nNodeLength - 4);
+		else if (m_nNodeType == MNT_CDATA_SECTION)
+			return MCD_STRMID(m_strDoc, m_nNodeOffset + 9, m_nNodeLength - 12);
+		else if (m_nNodeType == MNT_TEXT)
+			return UnescapeText(&(MCD_2PCSZ(m_strDoc))[m_nNodeOffset], m_nNodeLength, m_nDocFlags);
+		else if (m_nNodeType == MNT_LONE_END_TAG)
+			return MCD_STRMID(m_strDoc, m_nNodeOffset + 2, m_nNodeLength - 3);
+		return MCD_STRMID(m_strDoc, m_nNodeOffset, m_nNodeLength);
 	}
 
 	// Return a string representing data between start and end tag
 	// Return empty string if there are any children elements
 	MCD_STR strData;
-	if ( iPos && ! ELEM(iPos).IsEmptyElement() )
+	if (iPos && !ELEM(iPos).IsEmptyElement())
 	{
 		ElemPos* pElem = &ELEM(iPos);
 		int nStartContent = pElem->StartContent();
-		if ( pElem->IsUnparsed() )
+		if (pElem->IsUnparsed())
 		{
-			TokenPos token( m_strDoc, m_nDocFlags, m_pFilePos );
+			TokenPos token(m_strDoc, m_nDocFlags, m_pFilePos);
 			token.m_nNext = nStartContent;
 			NodePos node;
 			m_pFilePos->m_nReadBufferStart = pElem->nStart;
-			while ( 1 )
+			while (1)
 			{
 				m_pFilePos->m_nReadBufferRemoved = 0; // will be non-zero after ParseNode if read buffer shifted
-				token.ParseNode( node );
-				if ( m_pFilePos->m_nReadBufferRemoved )
+				token.ParseNode(node);
+				if (m_pFilePos->m_nReadBufferRemoved)
 				{
 					pElem->nStart = 0;
 					MARKUP_SETDEBUGSTATE;
 				}
-				if ( node.nNodeType == MNT_TEXT )
-					strData += UnescapeText( &token.m_pDocText[node.nStart], node.nLength, m_nDocFlags );
-				else if ( node.nNodeType == MNT_CDATA_SECTION )
-					strData += MCD_STRMID( m_strDoc, node.nStart+9, node.nLength-12 );
-				else if ( node.nNodeType == MNT_ELEMENT )
+				if (node.nNodeType == MNT_TEXT)
+					strData += UnescapeText(&token.m_pDocText[node.nStart], node.nLength, m_nDocFlags);
+				else if (node.nNodeType == MNT_CDATA_SECTION)
+					strData += MCD_STRMID(m_strDoc, node.nStart + 9, node.nLength - 12);
+				else if (node.nNodeType == MNT_ELEMENT)
 				{
 					MCD_STRCLEAR(strData);
 					break;
 				}
-				else if ( node.nNodeType == 0 )
+				else if (node.nNodeType == 0)
 				{
-					if ( token.Match(m_pFilePos->m_elemstack.Current().strTagName) )
+					if (token.Match(m_pFilePos->m_elemstack.Current().strTagName))
 					{
-						pElem->SetEndTagLen( node.nLength );
+						pElem->SetEndTagLen(node.nLength);
 						pElem->nLength = node.nStart + node.nLength - pElem->nStart;
 						m_pFilePos->m_elemstack.OutOfLevel();
 					}
@@ -4551,109 +4550,109 @@ MCD_STR CMarkup::x_GetData( int iPos )
 				}
 			}
 		}
-		else if ( ! pElem->iElemChild )
+		else if (!pElem->iElemChild)
 		{
 			// Quick scan for any tags inside content
 			int nContentLen = pElem->ContentLen();
 			MCD_PCSZ pszContent = &(MCD_2PCSZ(m_strDoc))[nStartContent];
-			MCD_PCSZ pszTag = MCD_PSZCHR( pszContent, '<' );
-			if ( pszTag && ((int)(pszTag-pszContent) < nContentLen) )
+			MCD_PCSZ pszTag = MCD_PSZCHR(pszContent, '<');
+			if (pszTag && ((int)(pszTag - pszContent) < nContentLen))
 			{
 				// Concatenate all CDATA Sections and text nodes, ignore other nodes
-				TokenPos token( m_strDoc, m_nDocFlags );
+				TokenPos token(m_strDoc, m_nDocFlags);
 				token.m_nNext = nStartContent;
 				NodePos node;
-				while ( token.m_nNext < nStartContent + nContentLen )
+				while (token.m_nNext < nStartContent + nContentLen)
 				{
-					token.ParseNode( node );
-					if ( node.nNodeType == MNT_TEXT )
-						strData += UnescapeText( &token.m_pDocText[node.nStart], node.nLength, m_nDocFlags );
-					else if ( node.nNodeType == MNT_CDATA_SECTION )
-						strData += MCD_STRMID( m_strDoc, node.nStart+9, node.nLength-12 );
+					token.ParseNode(node);
+					if (node.nNodeType == MNT_TEXT)
+						strData += UnescapeText(&token.m_pDocText[node.nStart], node.nLength, m_nDocFlags);
+					else if (node.nNodeType == MNT_CDATA_SECTION)
+						strData += MCD_STRMID(m_strDoc, node.nStart + 9, node.nLength - 12);
 				}
 			}
 			else // no tags
-				strData = UnescapeText( &(MCD_2PCSZ(m_strDoc))[nStartContent], nContentLen, m_nDocFlags );
+				strData = UnescapeText(&(MCD_2PCSZ(m_strDoc))[nStartContent], nContentLen, m_nDocFlags);
 		}
 	}
 	return strData;
 }
 
-MCD_STR CMarkup::x_GetElemContent( int iPos ) const
+MCD_STR CMarkup::x_GetElemContent(int iPos) const
 {
-	if ( ! (m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE)) )
+	if (!(m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE)))
 	{
 		ElemPos* pElem = &ELEM(iPos);
-		if ( iPos && pElem->ContentLen() )
-			return MCD_STRMID( m_strDoc, pElem->StartContent(), pElem->ContentLen() );
+		if (iPos && pElem->ContentLen())
+			return MCD_STRMID(m_strDoc, pElem->StartContent(), pElem->ContentLen());
 	}
 	return MCD_T("");
 }
 
-bool CMarkup::x_SetElemContent( MCD_PCSZ szContent )
+bool CMarkup::x_SetElemContent(MCD_PCSZ szContent)
 {
 	MCD_STRCLEAR(m_strResult);
-	if ( m_nDocFlags & (MDF_READFILE|MDF_WRITEFILE) )
+	if (m_nDocFlags & (MDF_READFILE | MDF_WRITEFILE))
 		return false;
 
 	// Set data in iPos element only
-	if ( ! m_iPos )
+	if (!m_iPos)
 		return false;
 
-	if ( m_nNodeLength )
+	if (m_nNodeLength)
 		return false; // not an element
 
 	// Unlink all children
 	int iPos = m_iPos;
 	int iPosChild = ELEM(iPos).iElemChild;
 	bool bHadChild = (iPosChild != 0);
-	while ( iPosChild )
-		iPosChild = x_ReleaseSubDoc( iPosChild );
-	if ( bHadChild )
+	while (iPosChild)
+		iPosChild = x_ReleaseSubDoc(iPosChild);
+	if (bHadChild)
 		x_CheckSavedPos();
 
 	// Parse content
 	bool bWellFormed = true;
-	TokenPos token( szContent, m_nDocFlags );
+	TokenPos token(szContent, m_nDocFlags);
 	int iPosVirtual = x_GetFreePos();
 	ELEM(iPosVirtual).ClearVirtualParent();
-	ELEM(iPosVirtual).SetLevel( ELEM(iPos).Level() + 1 );
-	iPosChild = x_ParseElem( iPosVirtual, token );
-	if ( ELEM(iPosVirtual).nFlags & MNF_ILLFORMED )
+	ELEM(iPosVirtual).SetLevel(ELEM(iPos).Level() + 1);
+	iPosChild = x_ParseElem(iPosVirtual, token);
+	if (ELEM(iPosVirtual).nFlags & MNF_ILLFORMED)
 		bWellFormed = false;
 	ELEM(iPos).nFlags = (ELEM(iPos).nFlags & ~MNF_ILLDATA) | (ELEM(iPosVirtual).nFlags & MNF_ILLDATA);
 
 	// Prepare insert and adjust offsets
-	NodePos node( MNF_WITHNOLINES|MNF_REPLACE );
+	NodePos node(MNF_WITHNOLINES | MNF_REPLACE);
 	node.strMeta = szContent;
 	int iPosBefore = 0;
-	int nReplace = x_InsertNew( iPos, iPosBefore, node );
-	
+	int nReplace = x_InsertNew(iPos, iPosBefore, node);
+
 	// Adjust and link in the inserted elements
-	x_Adjust( iPosChild, node.nStart );
+	x_Adjust(iPosChild, node.nStart);
 	ELEM(iPosChild).nStart += node.nStart;
 	ELEM(iPos).iElemChild = iPosChild;
-	while ( iPosChild )
+	while (iPosChild)
 	{
 		ELEM(iPosChild).iElemParent = iPos;
 		iPosChild = ELEM(iPosChild).iElemNext;
 	}
-	x_ReleasePos( iPosVirtual );
+	x_ReleasePos(iPosVirtual);
 
 	int nAdjust = MCD_STRLENGTH(node.strMeta) - nReplace;
-	x_Adjust( iPos, nAdjust, true );
+	x_Adjust(iPos, nAdjust, true);
 	ELEM(iPos).nLength += nAdjust;
 
-	x_SetPos( m_iPosParent, m_iPos, 0 );
+	x_SetPos(m_iPosParent, m_iPos, 0);
 	return bWellFormed;
 }
 
-void CMarkup::x_DocChange( int nLeft, int nReplace, const MCD_STR& strInsert )
+void CMarkup::x_DocChange(int nLeft, int nReplace, const MCD_STR& strInsert)
 {
-	x_StrInsertReplace( m_strDoc, nLeft, nReplace, strInsert );
+	x_StrInsertReplace(m_strDoc, nLeft, nReplace, strInsert);
 }
 
-void CMarkup::x_Adjust( int iPos, int nShift, bool bAfterPos /*=false*/ )
+void CMarkup::x_Adjust(int iPos, int nShift, bool bAfterPos /*=false*/)
 {
 	// Loop through affected elements and adjust indexes
 	// Algorithm:
@@ -4666,11 +4665,11 @@ void CMarkup::x_Adjust( int iPos, int nShift, bool bAfterPos /*=false*/ )
 	bool bPosFirst = bAfterPos; // mark as first to skip its children
 
 	// Stop when we've reached the virtual parent (which has no tags)
-	while ( ELEM(iPos).StartTagLen() )
+	while (ELEM(iPos).StartTagLen())
 	{
 		// Were we at containing parent of affected position?
 		bool bPosTop = false;
-		if ( iPos == iPosTop )
+		if (iPos == iPosTop)
 		{
 			// Move iPosTop up one towards root
 			iPosTop = ELEM(iPos).iElemParent;
@@ -4678,12 +4677,12 @@ void CMarkup::x_Adjust( int iPos, int nShift, bool bAfterPos /*=false*/ )
 		}
 
 		// Traverse to the next update position
-		if ( ! bPosTop && ! bPosFirst && ELEM(iPos).iElemChild )
+		if (!bPosTop && !bPosFirst && ELEM(iPos).iElemChild)
 		{
 			// Depth first
 			iPos = ELEM(iPos).iElemChild;
 		}
-		else if ( ELEM(iPos).iElemNext )
+		else if (ELEM(iPos).iElemNext)
 		{
 			iPos = ELEM(iPos).iElemNext;
 		}
@@ -4691,12 +4690,12 @@ void CMarkup::x_Adjust( int iPos, int nShift, bool bAfterPos /*=false*/ )
 		{
 			// Look for next sibling of a parent of iPos
 			// When going back up, parents have already been done except iPosTop
-			while ( 1 )
+			while (1)
 			{
 				iPos = ELEM(iPos).iElemParent;
-				if ( iPos == iPosTop )
+				if (iPos == iPosTop)
 					break;
-				if ( ELEM(iPos).iElemNext )
+				if (ELEM(iPos).iElemNext)
 				{
 					iPos = ELEM(iPos).iElemNext;
 					break;
@@ -4706,71 +4705,71 @@ void CMarkup::x_Adjust( int iPos, int nShift, bool bAfterPos /*=false*/ )
 		bPosFirst = false;
 
 		// Shift indexes at iPos
-		if ( iPos != iPosTop )
+		if (iPos != iPosTop)
 			ELEM(iPos).nStart += nShift;
 		else
 			ELEM(iPos).nLength += nShift;
 	}
 }
 
-int CMarkup::x_InsertNew( int iPosParent, int& iPosRel, NodePos& node )
+int CMarkup::x_InsertNew(int iPosParent, int& iPosRel, NodePos& node)
 {
 	// Parent empty tag or tags with no content?
 	bool bEmptyParentTag = iPosParent && ELEM(iPosParent).IsEmptyElement();
-	bool bNoContentParentTags = iPosParent && ! ELEM(iPosParent).ContentLen();
-	if ( iPosRel && ! node.nLength ) // current position element?
+	bool bNoContentParentTags = iPosParent && !ELEM(iPosParent).ContentLen();
+	if (iPosRel && !node.nLength) // current position element?
 	{
 		node.nStart = ELEM(iPosRel).nStart;
-		if ( ! (node.nNodeFlags & MNF_INSERT) ) // follow iPosRel
+		if (!(node.nNodeFlags & MNF_INSERT)) // follow iPosRel
 			node.nStart += ELEM(iPosRel).nLength;
 	}
-	else if ( bEmptyParentTag ) // parent has no separate end tag?
+	else if (bEmptyParentTag) // parent has no separate end tag?
 	{
 		// Split empty parent element
-		if ( ELEM(iPosParent).nFlags & MNF_NONENDED )
+		if (ELEM(iPosParent).nFlags & MNF_NONENDED)
 			node.nStart = ELEM(iPosParent).StartContent();
 		else
 			node.nStart = ELEM(iPosParent).StartContent() - 1;
 	}
-	else if ( node.nLength || (m_nDocFlags&MDF_WRITEFILE) ) // non-element node or a file mode zero length position?
+	else if (node.nLength || (m_nDocFlags & MDF_WRITEFILE)) // non-element node or a file mode zero length position?
 	{
-		if ( ! (node.nNodeFlags & MNF_INSERT) )
+		if (!(node.nNodeFlags & MNF_INSERT))
 			node.nStart += node.nLength; // after node or file mode position
 	}
 	else // no current node
 	{
 		// Insert relative to parent's content
-		if ( node.nNodeFlags & (MNF_INSERT|MNF_REPLACE) )
+		if (node.nNodeFlags & (MNF_INSERT | MNF_REPLACE))
 			node.nStart = ELEM(iPosParent).StartContent(); // beginning of parent's content
 		else // in front of parent's end tag
 			node.nStart = ELEM(iPosParent).StartAfter() - ELEM(iPosParent).EndTagLen();
 	}
 
 	// Go up to start of next node, unless its splitting an empty element
-	if ( ! (node.nNodeFlags&(MNF_WITHNOLINES|MNF_REPLACE)) && ! bEmptyParentTag )
+	if (!(node.nNodeFlags & (MNF_WITHNOLINES | MNF_REPLACE)) && !bEmptyParentTag)
 	{
-		TokenPos token( m_strDoc, m_nDocFlags );
-		node.nStart = token.WhitespaceToTag( node.nStart );
+		TokenPos token(m_strDoc, m_nDocFlags);
+		node.nStart = token.WhitespaceToTag(node.nStart);
 	}
 
 	// Is insert relative to element position? (i.e. not other kind of node)
-	if ( ! node.nLength )
+	if (!node.nLength)
 	{
 		// Modify iPosRel to reflect position before
-		if ( iPosRel )
+		if (iPosRel)
 		{
-			if ( node.nNodeFlags & MNF_INSERT )
+			if (node.nNodeFlags & MNF_INSERT)
 			{
-				if ( ! (ELEM(iPosRel).nFlags & MNF_FIRST) )
+				if (!(ELEM(iPosRel).nFlags & MNF_FIRST))
 					iPosRel = ELEM(iPosRel).iElemPrev;
 				else
 					iPosRel = 0;
 			}
 		}
-		else if ( ! (node.nNodeFlags & MNF_INSERT) )
+		else if (!(node.nNodeFlags & MNF_INSERT))
 		{
 			// If parent has a child, add after last child
-			if ( ELEM(iPosParent).iElemChild )
+			if (ELEM(iPosParent).iElemChild)
 				iPosRel = ELEM(ELEM(iPosParent).iElemChild).iElemPrev;
 		}
 	}
@@ -4779,19 +4778,19 @@ int CMarkup::x_InsertNew( int iPosParent, int& iPosRel, NodePos& node )
 	node.nLength = MCD_STRLENGTH(node.strMeta);
 
 	// Prepare end of lines
-	if ( (! (node.nNodeFlags & MNF_WITHNOLINES)) && (bEmptyParentTag || bNoContentParentTags) )
+	if ((!(node.nNodeFlags & MNF_WITHNOLINES)) && (bEmptyParentTag || bNoContentParentTags))
 		node.nStart += MCD_EOLLEN;
-	if ( ! (node.nNodeFlags & MNF_WITHNOLINES) )
+	if (!(node.nNodeFlags & MNF_WITHNOLINES))
 		node.strMeta += MCD_EOL;
 
 	// Calculate insert offset and replace length
 	int nReplace = 0;
 	int nInsertAt = node.nStart;
-	if ( bEmptyParentTag )
+	if (bEmptyParentTag)
 	{
-		MCD_STR strTagName = x_GetTagName( iPosParent );
+		MCD_STR strTagName = x_GetTagName(iPosParent);
 		MCD_STR strFormat;
-		if ( node.nNodeFlags & MNF_WITHNOLINES )
+		if (node.nNodeFlags & MNF_WITHNOLINES)
 			strFormat = MCD_T(">");
 		else
 			strFormat = MCD_T(">") MCD_EOL;
@@ -4799,7 +4798,7 @@ int CMarkup::x_InsertNew( int iPosParent, int& iPosRel, NodePos& node )
 		strFormat += MCD_T("</");
 		strFormat += strTagName;
 		node.strMeta = strFormat;
-		if ( ELEM(iPosParent).nFlags & MNF_NONENDED )
+		if (ELEM(iPosParent).nFlags & MNF_NONENDED)
 		{
 			nInsertAt = ELEM(iPosParent).StartAfter() - 1;
 			nReplace = 0;
@@ -4809,80 +4808,80 @@ int CMarkup::x_InsertNew( int iPosParent, int& iPosRel, NodePos& node )
 		{
 			nInsertAt = ELEM(iPosParent).StartAfter() - 2;
 			nReplace = 1;
-			ELEM(iPosParent).AdjustStartTagLen( -1 );
+			ELEM(iPosParent).AdjustStartTagLen(-1);
 		}
-		ELEM(iPosParent).SetEndTagLen( 3 + MCD_STRLENGTH(strTagName) );
+		ELEM(iPosParent).SetEndTagLen(3 + MCD_STRLENGTH(strTagName));
 	}
 	else
 	{
-		if ( node.nNodeFlags & MNF_REPLACE )
+		if (node.nNodeFlags & MNF_REPLACE)
 		{
 			nInsertAt = ELEM(iPosParent).StartContent();
 			nReplace = ELEM(iPosParent).ContentLen();
 		}
-		else if ( bNoContentParentTags )
+		else if (bNoContentParentTags)
 		{
 			node.strMeta = MCD_EOL + node.strMeta;
 			nInsertAt = ELEM(iPosParent).StartContent();
 		}
 	}
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
 		// Check if buffer is full
 		int nNewDocLength = MCD_STRLENGTH(m_strDoc) + MCD_STRLENGTH(node.strMeta) - nReplace;
 		int nFlushTo = node.nStart;
-		MCD_STRCLEAR( m_strResult );
-		if ( bEmptyParentTag )
+		MCD_STRCLEAR(m_strResult);
+		if (bEmptyParentTag)
 			nFlushTo = ELEM(iPosParent).nStart;
-		if ( nFlushTo && nNewDocLength > m_pFilePos->m_nBlockSizeBasis )
+		if (nFlushTo && nNewDocLength > m_pFilePos->m_nBlockSizeBasis)
 		{
 			int nDocCapacity = MCD_STRCAPACITY(m_strDoc);
-			if ( nNewDocLength > nDocCapacity )
+			if (nNewDocLength > nDocCapacity)
 			{
-				if ( bEmptyParentTag )
+				if (bEmptyParentTag)
 					ELEM(iPosParent).nStart = 0;
 				node.nStart -= nFlushTo;
 				nInsertAt -= nFlushTo;
-				m_pFilePos->FileFlush( m_strDoc, nFlushTo );
+				m_pFilePos->FileFlush(m_strDoc, nFlushTo);
 				m_strResult = m_pFilePos->m_strIOResult;
 			}
 		}
 	}
-	x_DocChange( nInsertAt, nReplace, node.strMeta );
+	x_DocChange(nInsertAt, nReplace, node.strMeta);
 	return nReplace;
 }
 
-bool CMarkup::x_AddElem( MCD_PCSZ pName, int nValue, int nFlags )
+bool CMarkup::x_AddElem(MCD_PCSZ pName, int nValue, int nFlags)
 {
 	// Convert integer to string
 	MCD_CHAR szVal[25];
-	MCD_SPRINTF( MCD_SSZ(szVal), MCD_T("%d"), nValue );
-	return x_AddElem( pName, szVal, nFlags );
+	MCD_SPRINTF(MCD_SSZ(szVal), MCD_T("%d"), nValue);
+	return x_AddElem(pName, szVal, nFlags);
 }
 
-bool CMarkup::x_AddElem( MCD_PCSZ pName, MCD_PCSZ pValue, int nFlags )
+bool CMarkup::x_AddElem(MCD_PCSZ pName, MCD_PCSZ pValue, int nFlags)
 {
-	if ( m_nDocFlags & MDF_READFILE )
+	if (m_nDocFlags & MDF_READFILE)
 		return false;
-	if ( nFlags & MNF_CHILD )
+	if (nFlags & MNF_CHILD)
 	{
 		// Adding a child element under main position
-		if ( ! m_iPos || (m_nDocFlags & MDF_WRITEFILE) )
+		if (!m_iPos || (m_nDocFlags & MDF_WRITEFILE))
 			return false;
 	}
 
 	// Cannot have data in non-ended element
-	if ( (nFlags&MNF_WITHNOEND) && pValue && pValue[0] )
+	if ((nFlags & MNF_WITHNOEND) && pValue && pValue[0])
 		return false;
 
 	// Node and element structures
-	NodePos node( nFlags );
+	NodePos node(nFlags);
 	int iPosParent = 0, iPosBefore = 0;
 	int iPos = x_GetFreePos();
 	ElemPos* pElem = &ELEM(iPos);
 
 	// Locate where to add element relative to current node
-	if ( nFlags & MNF_CHILD )
+	if (nFlags & MNF_CHILD)
 	{
 		iPosParent = m_iPos;
 		iPosBefore = m_iPosChild;
@@ -4900,91 +4899,91 @@ bool CMarkup::x_AddElem( MCD_PCSZ pName, MCD_PCSZ pValue, int nFlags )
 	// i.e. either <NAME>value</NAME> or <NAME/>
 	//
 	int nLenName = MCD_PSZLEN(pName);
-	if ( ! pValue || ! pValue[0] )
+	if (!pValue || !pValue[0])
 	{
 		// <NAME/> empty element
-		MCD_BLDRESERVE( node.strMeta, nLenName + 4 );
-		MCD_BLDAPPEND1( node.strMeta, '<' );
-		MCD_BLDAPPENDN( node.strMeta, pName, nLenName );
-		if ( nFlags & MNF_WITHNOEND )
+		MCD_BLDRESERVE(node.strMeta, nLenName + 4);
+		MCD_BLDAPPEND1(node.strMeta, '<');
+		MCD_BLDAPPENDN(node.strMeta, pName, nLenName);
+		if (nFlags & MNF_WITHNOEND)
 		{
-			MCD_BLDAPPEND1( node.strMeta, '>' );
+			MCD_BLDAPPEND1(node.strMeta, '>');
 		}
 		else
 		{
-			if ( nFlags & MNF_WITHXHTMLSPACE )
+			if (nFlags & MNF_WITHXHTMLSPACE)
 			{
-				MCD_BLDAPPENDN( node.strMeta, MCD_T(" />"), 3 );
+				MCD_BLDAPPENDN(node.strMeta, MCD_T(" />"), 3);
 			}
 			else
 			{
-				MCD_BLDAPPENDN( node.strMeta, MCD_T("/>"), 2 );
+				MCD_BLDAPPENDN(node.strMeta, MCD_T("/>"), 2);
 			}
 		}
-		MCD_BLDRELEASE( node.strMeta );
-		pElem->nLength = MCD_STRLENGTH( node.strMeta );
-		pElem->SetStartTagLen( pElem->nLength );
-		pElem->SetEndTagLen( 0 );
+		MCD_BLDRELEASE(node.strMeta);
+		pElem->nLength = MCD_STRLENGTH(node.strMeta);
+		pElem->SetStartTagLen(pElem->nLength);
+		pElem->SetEndTagLen(0);
 	}
 	else
 	{
 		// <NAME>value</NAME>
 		MCD_STR strValue;
-		if ( nFlags & MNF_WITHCDATA )
-			strValue = x_EncodeCDATASection( pValue );
+		if (nFlags & MNF_WITHCDATA)
+			strValue = x_EncodeCDATASection(pValue);
 		else
-			strValue = EscapeText( pValue, nFlags );
+			strValue = EscapeText(pValue, nFlags);
 		int nLenValue = MCD_STRLENGTH(strValue);
 		pElem->nLength = nLenName * 2 + nLenValue + 5;
-		MCD_BLDRESERVE( node.strMeta, pElem->nLength );
-		MCD_BLDAPPEND1( node.strMeta, '<' );
-		MCD_BLDAPPENDN( node.strMeta, pName, nLenName );
-		MCD_BLDAPPEND1( node.strMeta, '>' );
-		MCD_BLDAPPENDN( node.strMeta, MCD_2PCSZ(strValue), nLenValue );
-		MCD_BLDAPPENDN( node.strMeta, MCD_T("</"), 2 );
-		MCD_BLDAPPENDN( node.strMeta, pName, nLenName );
-		MCD_BLDAPPEND1( node.strMeta, '>' );
-		MCD_BLDRELEASE( node.strMeta );
-		pElem->SetEndTagLen( nLenName + 3 );
-		pElem->SetStartTagLen( nLenName + 2 );
+		MCD_BLDRESERVE(node.strMeta, pElem->nLength);
+		MCD_BLDAPPEND1(node.strMeta, '<');
+		MCD_BLDAPPENDN(node.strMeta, pName, nLenName);
+		MCD_BLDAPPEND1(node.strMeta, '>');
+		MCD_BLDAPPENDN(node.strMeta, MCD_2PCSZ(strValue), nLenValue);
+		MCD_BLDAPPENDN(node.strMeta, MCD_T("</"), 2);
+		MCD_BLDAPPENDN(node.strMeta, pName, nLenName);
+		MCD_BLDAPPEND1(node.strMeta, '>');
+		MCD_BLDRELEASE(node.strMeta);
+		pElem->SetEndTagLen(nLenName + 3);
+		pElem->SetStartTagLen(nLenName + 2);
 	}
 
 	// Insert
-	int nReplace = x_InsertNew( iPosParent, iPosBefore, node );
+	int nReplace = x_InsertNew(iPosParent, iPosBefore, node);
 	pElem->nStart = node.nStart;
 	pElem->iElemChild = 0;
-	if ( nFlags & MNF_WITHNOEND )
+	if (nFlags & MNF_WITHNOEND)
 		pElem->nFlags = MNF_NONENDED;
 	else
 		pElem->nFlags = 0;
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
-		iPosParent = x_UnlinkPrevElem( iPosParent, iPosBefore, iPos );
-		TokenPos token( m_strDoc, m_nDocFlags );
+		iPosParent = x_UnlinkPrevElem(iPosParent, iPosBefore, iPos);
+		TokenPos token(m_strDoc, m_nDocFlags);
 		token.m_nL = pElem->nStart + 1;
 		token.m_nR = pElem->nStart + nLenName;
-		m_pFilePos->m_elemstack.PushTagAndCount( token );
+		m_pFilePos->m_elemstack.PushTagAndCount(token);
 	}
 	else
 	{
-		x_LinkElem( iPosParent, iPosBefore, iPos );
-		x_Adjust( iPos, MCD_STRLENGTH(node.strMeta) - nReplace );
+		x_LinkElem(iPosParent, iPosBefore, iPos);
+		x_Adjust(iPos, MCD_STRLENGTH(node.strMeta) - nReplace);
 	}
-	if ( nFlags & MNF_CHILD )
-		x_SetPos( m_iPosParent, iPosParent, iPos );
+	if (nFlags & MNF_CHILD)
+		x_SetPos(m_iPosParent, iPosParent, iPos);
 	else
-		x_SetPos( iPosParent, iPos, 0 );
+		x_SetPos(iPosParent, iPos, 0);
 	return true;
 }
 
-MCD_STR CMarkup::x_GetSubDoc( int iPos )
+MCD_STR CMarkup::x_GetSubDoc(int iPos)
 {
-	if ( iPos && ! (m_nDocFlags&MDF_WRITEFILE) )
+	if (iPos && !(m_nDocFlags & MDF_WRITEFILE))
 	{
-		if ( ! (m_nDocFlags&MDF_READFILE) )
+		if (!(m_nDocFlags & MDF_READFILE))
 		{
-			TokenPos token( m_strDoc, m_nDocFlags );
-			token.WhitespaceToTag( ELEM(iPos).StartAfter() );
+			TokenPos token(m_strDoc, m_nDocFlags);
+			token.WhitespaceToTag(ELEM(iPos).StartAfter());
 			token.m_nL = ELEM(iPos).nStart;
 			return token.GetTokenText();
 		}
@@ -4992,18 +4991,18 @@ MCD_STR CMarkup::x_GetSubDoc( int iPos )
 	return MCD_T("");
 }
 
-bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
+bool CMarkup::x_AddSubDoc(MCD_PCSZ pSubDoc, int nFlags)
 {
-	if ( m_nDocFlags & MDF_READFILE || ((nFlags & MNF_CHILD) && (m_nDocFlags & MDF_WRITEFILE)) )
+	if (m_nDocFlags & MDF_READFILE || ((nFlags & MNF_CHILD) && (m_nDocFlags & MDF_WRITEFILE)))
 		return false;
 
 	MCD_STRCLEAR(m_strResult);
-	NodePos node( nFlags );
+	NodePos node(nFlags);
 	int iPosParent, iPosBefore;
-	if ( nFlags & MNF_CHILD )
+	if (nFlags & MNF_CHILD)
 	{
 		// Add a subdocument under main position, before or after child
-		if ( ! m_iPos )
+		if (!m_iPos)
 			return false;
 		iPosParent = m_iPos;
 		iPosBefore = m_iPosChild;
@@ -5019,31 +5018,31 @@ bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
 
 	// Parse subdocument, generating indexes based on the subdocument string to be offset later
 	bool bWellFormed = true;
-	TokenPos token( pSubDoc, m_nDocFlags );
+	TokenPos token(pSubDoc, m_nDocFlags);
 	int iPosVirtual = x_GetFreePos();
 	ELEM(iPosVirtual).ClearVirtualParent();
-	ELEM(iPosVirtual).SetLevel( ELEM(iPosParent).Level() + 1 );
-	int iPos = x_ParseElem( iPosVirtual, token );
-	if ( (!iPos) || ELEM(iPosVirtual).nFlags & MNF_ILLFORMED )
+	ELEM(iPosVirtual).SetLevel(ELEM(iPosParent).Level() + 1);
+	int iPos = x_ParseElem(iPosVirtual, token);
+	if ((!iPos) || ELEM(iPosVirtual).nFlags & MNF_ILLFORMED)
 		bWellFormed = false;
-	if ( ELEM(iPosVirtual).nFlags & MNF_ILLDATA )
+	if (ELEM(iPosVirtual).nFlags & MNF_ILLDATA)
 		ELEM(iPosParent).nFlags |= MNF_ILLDATA;
 
 	// File write mode handling
 	bool bBypassSubDoc = false;
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
 		// Current position will bypass subdoc unless well-formed single element
-		if ( (! bWellFormed) || ELEM(iPos).iElemChild || ELEM(iPos).iElemNext )
+		if ((!bWellFormed) || ELEM(iPos).iElemChild || ELEM(iPos).iElemNext)
 			bBypassSubDoc = true;
 
 		// Count tag names of top level elements (usually one) in given markup
 		int iPosTop = iPos;
-		while ( iPosTop )
+		while (iPosTop)
 		{
 			token.m_nNext = ELEM(iPosTop).nStart + 1;
 			token.FindName();
-			m_pFilePos->m_elemstack.PushTagAndCount( token );
+			m_pFilePos->m_elemstack.PushTagAndCount(token);
 			iPosTop = ELEM(iPosTop).iElemNext;
 		}
 	}
@@ -5051,16 +5050,16 @@ bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
 	// Extract subdocument without leading/trailing nodes
 	int nExtractStart = 0;
 	int iPosLast = ELEM(iPos).iElemPrev;
-	if ( bWellFormed )
+	if (bWellFormed)
 	{
 		nExtractStart = ELEM(iPos).nStart;
 		int nExtractLength = ELEM(iPos).nLength;
-		if ( iPos != iPosLast )
+		if (iPos != iPosLast)
 		{
 			nExtractLength = ELEM(iPosLast).nStart - nExtractStart + ELEM(iPosLast).nLength;
 			bWellFormed = false; // treat as subdoc here, but return not well-formed
 		}
-		MCD_STRASSIGN(node.strMeta,&pSubDoc[nExtractStart],nExtractLength);
+		MCD_STRASSIGN(node.strMeta, &pSubDoc[nExtractStart], nExtractLength);
 	}
 	else
 	{
@@ -5069,15 +5068,15 @@ bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
 	}
 
 	// Insert
-	int nReplace = x_InsertNew( iPosParent, iPosBefore, node );
+	int nReplace = x_InsertNew(iPosParent, iPosBefore, node);
 
 	// Clean up indexes
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
-		if ( bBypassSubDoc )
+		if (bBypassSubDoc)
 		{
 			// Release indexes used in parsing the subdocument
-			m_iPosParent = x_UnlinkPrevElem( iPosParent, iPosBefore, 0 );
+			m_iPosParent = x_UnlinkPrevElem(iPosParent, iPosBefore, 0);
 			m_iPosFree = 1;
 			m_iPosDeleted = 0;
 			m_iPos = 0;
@@ -5092,8 +5091,8 @@ bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
 			m_iPos = iPos;
 			ElemPos* pElem = &ELEM(iPos);
 			pElem->nStart = node.nStart;
-			m_iPosParent = x_UnlinkPrevElem( iPosParent, iPosBefore, iPos );
-			x_ReleasePos( iPosVirtual );
+			m_iPosParent = x_UnlinkPrevElem(iPosParent, iPosBefore, iPos);
+			x_ReleasePos(iPosVirtual);
 		}
 	}
 	else
@@ -5101,59 +5100,59 @@ bool CMarkup::x_AddSubDoc( MCD_PCSZ pSubDoc, int nFlags )
 		// Adjust and link in the inserted elements
 		// iPosVirtual will stop it from affecting rest of document
 		int nAdjust = node.nStart - nExtractStart;
-		if ( iPos && nAdjust )
+		if (iPos && nAdjust)
 		{
-			x_Adjust( iPos, nAdjust );
+			x_Adjust(iPos, nAdjust);
 			ELEM(iPos).nStart += nAdjust;
 		}
 		int iPosChild = iPos;
-		while ( iPosChild )
+		while (iPosChild)
 		{
 			int iPosNext = ELEM(iPosChild).iElemNext;
-			x_LinkElem( iPosParent, iPosBefore, iPosChild );
+			x_LinkElem(iPosParent, iPosBefore, iPosChild);
 			iPosBefore = iPosChild;
 			iPosChild = iPosNext;
 		}
-		x_ReleasePos( iPosVirtual );
+		x_ReleasePos(iPosVirtual);
 
 		// Now adjust remainder of document
-		x_Adjust( iPosLast, MCD_STRLENGTH(node.strMeta) - nReplace, true );
+		x_Adjust(iPosLast, MCD_STRLENGTH(node.strMeta) - nReplace, true);
 	}
 
 	// Set position to top element of subdocument
-	if ( nFlags & MNF_CHILD )
-		x_SetPos( m_iPosParent, iPosParent, iPos );
+	if (nFlags & MNF_CHILD)
+		x_SetPos(m_iPosParent, iPosParent, iPos);
 	else // Main
-		x_SetPos( m_iPosParent, iPos, 0 );
+		x_SetPos(m_iPosParent, iPos, 0);
 	return bWellFormed;
 }
 
-int CMarkup::x_RemoveElem( int iPos )
+int CMarkup::x_RemoveElem(int iPos)
 {
 	// Determine whether any whitespace up to next tag
-	TokenPos token( m_strDoc, m_nDocFlags );
-	int nAfterEnd = token.WhitespaceToTag( ELEM(iPos).StartAfter() );
+	TokenPos token(m_strDoc, m_nDocFlags);
+	int nAfterEnd = token.WhitespaceToTag(ELEM(iPos).StartAfter());
 
 	// Remove from document, adjust affected indexes, and unlink
 	int nLen = nAfterEnd - ELEM(iPos).nStart;
-	x_DocChange( ELEM(iPos).nStart, nLen, MCD_STR() );
-	x_Adjust( iPos, - nLen, true );
-	int iPosPrev = x_UnlinkElem( iPos );
+	x_DocChange(ELEM(iPos).nStart, nLen, MCD_STR());
+	x_Adjust(iPos, -nLen, true);
+	int iPosPrev = x_UnlinkElem(iPos);
 	x_CheckSavedPos();
 	return iPosPrev; // new position
 }
 
-void CMarkup::x_LinkElem( int iPosParent, int iPosBefore, int iPos )
+void CMarkup::x_LinkElem(int iPosParent, int iPosBefore, int iPos)
 {
 	// Update links between elements and initialize nFlags
 	ElemPos* pElem = &ELEM(iPos);
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
 		// In file write mode, only keep virtual parent 0 plus one element 
-		if ( iPosParent )
-			x_ReleasePos( iPosParent );
-		else if ( iPosBefore )
-			x_ReleasePos( iPosBefore );
+		if (iPosParent)
+			x_ReleasePos(iPosParent);
+		else if (iPosBefore)
+			x_ReleasePos(iPosBefore);
 		iPosParent = 0;
 		ELEM(iPosParent).iElemChild = iPos;
 		pElem->iElemParent = iPosParent;
@@ -5164,12 +5163,12 @@ void CMarkup::x_LinkElem( int iPosParent, int iPosBefore, int iPos )
 	else
 	{
 		pElem->iElemParent = iPosParent;
-		if ( iPosBefore )
+		if (iPosBefore)
 		{
 			// Link in after iPosBefore
 			pElem->nFlags &= ~MNF_FIRST;
 			pElem->iElemNext = ELEM(iPosBefore).iElemNext;
-			if ( pElem->iElemNext )
+			if (pElem->iElemNext)
 				ELEM(pElem->iElemNext).iElemPrev = iPos;
 			else
 				ELEM(ELEM(iPosParent).iElemChild).iElemPrev = iPos;
@@ -5180,7 +5179,7 @@ void CMarkup::x_LinkElem( int iPosParent, int iPosBefore, int iPos )
 		{
 			// Link in as first child
 			pElem->nFlags |= MNF_FIRST;
-			if ( ELEM(iPosParent).iElemChild )
+			if (ELEM(iPosParent).iElemChild)
 			{
 				pElem->iElemNext = ELEM(iPosParent).iElemChild;
 				pElem->iElemPrev = ELEM(pElem->iElemNext).iElemPrev;
@@ -5194,12 +5193,12 @@ void CMarkup::x_LinkElem( int iPosParent, int iPosBefore, int iPos )
 			}
 			ELEM(iPosParent).iElemChild = iPos;
 		}
-		if ( iPosParent )
-			pElem->SetLevel( ELEM(iPosParent).Level() + 1 );
+		if (iPosParent)
+			pElem->SetLevel(ELEM(iPosParent).Level() + 1);
 	}
 }
 
-int CMarkup::x_UnlinkElem( int iPos )
+int CMarkup::x_UnlinkElem(int iPos)
 {
 	// Fix links to remove element and mark as deleted
 	// return previous position or zero if none
@@ -5207,9 +5206,9 @@ int CMarkup::x_UnlinkElem( int iPos )
 
 	// Find previous sibling and bypass removed element
 	int iPosPrev = 0;
-	if ( pElem->nFlags & MNF_FIRST )
+	if (pElem->nFlags & MNF_FIRST)
 	{
-		if ( pElem->iElemNext ) // set next as first child
+		if (pElem->iElemNext) // set next as first child
 		{
 			ELEM(pElem->iElemParent).iElemChild = pElem->iElemNext;
 			ELEM(pElem->iElemNext).iElemPrev = pElem->iElemPrev;
@@ -5222,28 +5221,28 @@ int CMarkup::x_UnlinkElem( int iPos )
 	{
 		iPosPrev = pElem->iElemPrev;
 		ELEM(iPosPrev).iElemNext = pElem->iElemNext;
-		if ( pElem->iElemNext )
+		if (pElem->iElemNext)
 			ELEM(pElem->iElemNext).iElemPrev = iPosPrev;
 		else
 			ELEM(ELEM(pElem->iElemParent).iElemChild).iElemPrev = iPosPrev;
 	}
-	x_ReleaseSubDoc( iPos );
+	x_ReleaseSubDoc(iPos);
 	return iPosPrev;
 }
 
-int CMarkup::x_UnlinkPrevElem( int iPosParent, int iPosBefore, int iPos )
+int CMarkup::x_UnlinkPrevElem(int iPosParent, int iPosBefore, int iPos)
 {
 	// In file write mode, only keep virtual parent 0 plus one element if currently at element
-	if ( iPosParent )
+	if (iPosParent)
 	{
-		x_ReleasePos( iPosParent );
+		x_ReleasePos(iPosParent);
 		iPosParent = 0;
 	}
-	else if ( iPosBefore )
-		x_ReleasePos( iPosBefore );
+	else if (iPosBefore)
+		x_ReleasePos(iPosBefore);
 	ELEM(iPosParent).iElemChild = iPos;
 	ELEM(iPosParent).nLength = MCD_STRLENGTH(m_strDoc);
-	if ( iPos )
+	if (iPos)
 	{
 		ElemPos* pElem = &ELEM(iPos);
 		pElem->iElemParent = iPosParent;
@@ -5254,7 +5253,7 @@ int CMarkup::x_UnlinkPrevElem( int iPosParent, int iPosBefore, int iPos )
 	return iPosParent;
 }
 
-int CMarkup::x_ReleasePos( int iPos )
+int CMarkup::x_ReleasePos(int iPos)
 {
 	int iPosNext = ELEM(iPos).iElemNext;
 	ELEM(iPos).iElemNext = m_iPosDeleted;
@@ -5263,27 +5262,27 @@ int CMarkup::x_ReleasePos( int iPos )
 	return iPosNext;
 }
 
-int CMarkup::x_ReleaseSubDoc( int iPos )
+int CMarkup::x_ReleaseSubDoc(int iPos)
 {
 	// Mark position structures as deleted by depth first traversal
 	// Tricky because iElemNext used in traversal is overwritten for linked list of deleted
 	// Return value is what iElemNext was before being overwritten
 	//
 	int iPosNext = 0, iPosTop = iPos;
-	while ( 1 )
+	while (1)
 	{
-		if ( ELEM(iPos).iElemChild )
+		if (ELEM(iPos).iElemChild)
 			iPos = ELEM(iPos).iElemChild;
 		else
 		{
-			while ( 1 )
+			while (1)
 			{
-				iPosNext = x_ReleasePos( iPos );
-				if ( iPosNext || iPos == iPosTop )
+				iPosNext = x_ReleasePos(iPos);
+				if (iPosNext || iPos == iPosTop)
 					break;
 				iPos = ELEM(iPos).iElemParent;
 			}
-			if ( iPos == iPosTop )
+			if (iPos == iPosTop)
 				break;
 			iPos = iPosNext;
 		}
@@ -5295,27 +5294,27 @@ void CMarkup::x_CheckSavedPos()
 {
 	// Remove any saved positions now pointing to deleted elements
 	// Must be done as part of element removal before position reassigned
-	if ( m_pSavedPosMaps->m_pMaps )
+	if (m_pSavedPosMaps->m_pMaps)
 	{
 		int nMap = 0;
-		while ( m_pSavedPosMaps->m_pMaps[nMap] )
+		while (m_pSavedPosMaps->m_pMaps[nMap])
 		{
 			SavedPosMap* pMap = m_pSavedPosMaps->m_pMaps[nMap];
-			for ( int nSlot = 0; nSlot < pMap->nMapSize; ++nSlot )
+			for (int nSlot = 0; nSlot < pMap->nMapSize; ++nSlot)
 			{
 				SavedPos* pSavedPos = pMap->pTable[nSlot];
-				if ( pSavedPos )
+				if (pSavedPos)
 				{
 					int nOffset = 0;
 					int nSavedPosCount = 0;
-					while ( 1 )
+					while (1)
 					{
-						if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED )
+						if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_USED)
 						{
 							int iPos = pSavedPos[nOffset].iPos;
-							if ( ! (ELEM(iPos).nFlags & MNF_DELETED) )
+							if (!(ELEM(iPos).nFlags & MNF_DELETED))
 							{
-								if ( nSavedPosCount < nOffset )
+								if (nSavedPosCount < nOffset)
 								{
 									pSavedPos[nSavedPosCount] = pSavedPos[nOffset];
 									pSavedPos[nSavedPosCount].nSavedPosFlags &= ~SavedPos::SPM_LAST;
@@ -5323,9 +5322,9 @@ void CMarkup::x_CheckSavedPos()
 								++nSavedPosCount;
 							}
 						}
-						if ( pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST )
+						if (pSavedPos[nOffset].nSavedPosFlags & SavedPos::SPM_LAST)
 						{
-							while ( nSavedPosCount <= nOffset )
+							while (nSavedPosCount <= nOffset)
 								pSavedPos[nSavedPosCount++].nSavedPosFlags &= ~SavedPos::SPM_USED;
 							break;
 						}
@@ -5338,17 +5337,17 @@ void CMarkup::x_CheckSavedPos()
 	}
 }
 
-void CMarkup::x_AdjustForNode( int iPosParent, int iPos, int nShift )
+void CMarkup::x_AdjustForNode(int iPosParent, int iPos, int nShift)
 {
 	// Adjust affected indexes
 	bool bAfterPos = true;
-	if ( ! iPos )
+	if (!iPos)
 	{
 		// Change happened before or at first element under iPosParent
 		// If there are any children of iPosParent, adjust from there
 		// otherwise start at parent and adjust from there
 		iPos = ELEM(iPosParent).iElemChild;
-		if ( iPos )
+		if (iPos)
 		{
 			ELEM(iPos).nStart += nShift;
 			bAfterPos = false;
@@ -5359,22 +5358,22 @@ void CMarkup::x_AdjustForNode( int iPosParent, int iPos, int nShift )
 			ELEM(iPos).nLength += nShift;
 		}
 	}
-	x_Adjust( iPos, nShift, bAfterPos );
+	x_Adjust(iPos, nShift, bAfterPos);
 }
 
-bool CMarkup::x_AddNode( int nNodeType, MCD_PCSZ pText, int nNodeFlags )
+bool CMarkup::x_AddNode(int nNodeType, MCD_PCSZ pText, int nNodeFlags)
 {
-	if ( m_nDocFlags & MDF_READFILE )
+	if (m_nDocFlags & MDF_READFILE)
 		return false;
 
 	// Comments, DTDs, and processing instructions are followed by CRLF
 	// Other nodes are usually concerned with mixed content, so no CRLF
-	if ( ! (nNodeType & (MNT_PROCESSING_INSTRUCTION|MNT_COMMENT|MNT_DOCUMENT_TYPE)) )
+	if (!(nNodeType & (MNT_PROCESSING_INSTRUCTION | MNT_COMMENT | MNT_DOCUMENT_TYPE)))
 		nNodeFlags |= MNF_WITHNOLINES;
 
 	// Add node of nNodeType after current node position
-	NodePos node( nNodeFlags );
-	if ( ! x_CreateNode(node.strMeta, nNodeType, pText) )
+	NodePos node(nNodeFlags);
+	if (!x_CreateNode(node.strMeta, nNodeType, pText))
 		return false;
 
 	// Insert the new node relative to current node
@@ -5382,39 +5381,39 @@ bool CMarkup::x_AddNode( int nNodeType, MCD_PCSZ pText, int nNodeFlags )
 	node.nLength = m_nNodeLength;
 	node.nNodeType = nNodeType;
 	int iPosBefore = m_iPos;
-	int nReplace = x_InsertNew( m_iPosParent, iPosBefore, node );
+	int nReplace = x_InsertNew(m_iPosParent, iPosBefore, node);
 
 	// If its a new element, create an ElemPos
 	int iPos = iPosBefore;
 	ElemPos* pElem = NULL;
-	if ( nNodeType == MNT_ELEMENT )
+	if (nNodeType == MNT_ELEMENT)
 	{
 		// Set indexes
 		iPos = x_GetFreePos();
 		pElem = &ELEM(iPos);
 		pElem->nStart = node.nStart;
-		pElem->SetStartTagLen( node.nLength );
-		pElem->SetEndTagLen( 0 );
+		pElem->SetStartTagLen(node.nLength);
+		pElem->SetEndTagLen(0);
 		pElem->nLength = node.nLength;
 		node.nStart = 0;
 		node.nLength = 0;
 		pElem->iElemChild = 0;
 		pElem->nFlags = 0;
-		x_LinkElem( m_iPosParent, iPosBefore, iPos );
+		x_LinkElem(m_iPosParent, iPosBefore, iPos);
 	}
-	if ( m_nDocFlags & MDF_WRITEFILE )
+	if (m_nDocFlags & MDF_WRITEFILE)
 	{
-		m_iPosParent = x_UnlinkPrevElem( m_iPosParent, iPosBefore, iPos );
-		if ( nNodeType == MNT_ELEMENT )
+		m_iPosParent = x_UnlinkPrevElem(m_iPosParent, iPosBefore, iPos);
+		if (nNodeType == MNT_ELEMENT)
 		{
-			TokenPos token( m_strDoc, m_nDocFlags );
+			TokenPos token(m_strDoc, m_nDocFlags);
 			token.m_nL = pElem->nStart + 1;
 			token.m_nR = pElem->nStart + pElem->nLength - 3;
-			m_pFilePos->m_elemstack.PushTagAndCount( token );
+			m_pFilePos->m_elemstack.PushTagAndCount(token);
 		}
 	}
 	else // need to adjust element positions after iPos
-		x_AdjustForNode( m_iPosParent, iPos, MCD_STRLENGTH(node.strMeta) - nReplace );
+		x_AdjustForNode(m_iPosParent, iPos, MCD_STRLENGTH(node.strMeta) - nReplace);
 
 	// Store current position
 	m_iPos = iPos;
@@ -5426,65 +5425,65 @@ bool CMarkup::x_AddNode( int nNodeType, MCD_PCSZ pText, int nNodeFlags )
 	return true;
 }
 
-void CMarkup::x_RemoveNode( int iPosParent, int& iPos, int& nNodeType, int& nNodeOffset, int& nNodeLength )
+void CMarkup::x_RemoveNode(int iPosParent, int& iPos, int& nNodeType, int& nNodeOffset, int& nNodeLength)
 {
 	int iPosPrev = iPos;
 
 	// Removing an element?
-	if ( nNodeType == MNT_ELEMENT )
+	if (nNodeType == MNT_ELEMENT)
 	{
 		nNodeOffset = ELEM(iPos).nStart;
 		nNodeLength = ELEM(iPos).nLength;
-		iPosPrev = x_UnlinkElem( iPos );
+		iPosPrev = x_UnlinkElem(iPos);
 		x_CheckSavedPos();
 	}
 
 	// Find previous node type, offset and length
 	int nPrevOffset = 0;
-	if ( iPosPrev )
+	if (iPosPrev)
 		nPrevOffset = ELEM(iPosPrev).StartAfter();
-	else if ( iPosParent )
+	else if (iPosParent)
 		nPrevOffset = ELEM(iPosParent).StartContent();
-	TokenPos token( m_strDoc, m_nDocFlags );
+	TokenPos token(m_strDoc, m_nDocFlags);
 	NodePos node;
 	token.m_nNext = nPrevOffset;
 	int nPrevType = 0;
-	while ( token.m_nNext < nNodeOffset )
+	while (token.m_nNext < nNodeOffset)
 	{
 		nPrevOffset = token.m_nNext;
-		nPrevType = token.ParseNode( node );
+		nPrevType = token.ParseNode(node);
 	}
 	int nPrevLength = nNodeOffset - nPrevOffset;
-	if ( ! nPrevLength )
+	if (!nPrevLength)
 	{
 		// Previous node is iPosPrev element
 		nPrevOffset = 0;
-		if ( iPosPrev )
+		if (iPosPrev)
 			nPrevType = MNT_ELEMENT;
 	}
 
 	// Remove node from document
- 	x_DocChange( nNodeOffset, nNodeLength, MCD_STR() );
-	x_AdjustForNode( iPosParent, iPosPrev, - nNodeLength );
+	x_DocChange(nNodeOffset, nNodeLength, MCD_STR());
+	x_AdjustForNode(iPosParent, iPosPrev, -nNodeLength);
 
 	// Was removed node a lone end tag?
-	if ( nNodeType == MNT_LONE_END_TAG )
+	if (nNodeType == MNT_LONE_END_TAG)
 	{
 		// See if we can unset parent MNF_ILLDATA flag
 		token.m_nNext = ELEM(iPosParent).StartContent();
 		int nEndOfContent = token.m_nNext + ELEM(iPosParent).ContentLen();
 		int iPosChild = ELEM(iPosParent).iElemChild;
-		while ( token.m_nNext < nEndOfContent )
+		while (token.m_nNext < nEndOfContent)
 		{
-			if ( token.ParseNode(node) <= 0 )
+			if (token.ParseNode(node) <= 0)
 				break;
-			if ( node.nNodeType == MNT_ELEMENT )
+			if (node.nNodeType == MNT_ELEMENT)
 			{
 				token.m_nNext = ELEM(iPosChild).StartAfter();
 				iPosChild = ELEM(iPosChild).iElemNext;
 			}
 		}
-		if ( token.m_nNext == nEndOfContent )
+		if (token.m_nNext == nEndOfContent)
 			ELEM(iPosParent).nFlags &= ~MNF_ILLDATA;
 	}
 

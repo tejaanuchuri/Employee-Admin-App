@@ -1,6 +1,13 @@
 
 // AdminAppDlg.h : header file
 //
+struct E_DATE {
+	int d, m, y;
+};
+
+const int mdays[12]
+= { 31, 28, 31, 30, 31, 30,
+   31, 31, 30, 31, 30, 31 };
 
 #pragma once
 #include "external/GraphCtrl.h"
@@ -9,6 +16,19 @@
 #include "ChartCtrl\ChartLineSerie.h"
 #include "ChartCtrl\ChartLabel.h"
 
+#include <fstream>
+#include <vector>
+#include <stdlib.h>
+#include <tchar.h>
+#include <vector>
+#include <string>
+#include <stack>
+using namespace std;
+
+#define sls _T("<")
+#define srs _T(">")
+#define srsn _T(">\n")
+#define els _T("</")
 // CAdminAppDlg dialog
 class CAdminAppDlg : public CDialogEx
 {
@@ -27,6 +47,7 @@ protected:
 public:
 	void m_ResetListControl();
 	void ResetListControl();
+	void s_ResetListControl();
 	void emp_data_load();
 	void bargraph_loaded();
 	void bargraph_update();
@@ -34,6 +55,21 @@ public:
 	void linegraph_loaded();
 	void linegraph_update();
 	void linegraph_empty();
+	CString Add_elem(CString s, CString v);
+	CString Start_Tag(CString s);
+	CString End_Tag(CString s);
+	CString root_start_tag(CString s);
+	CString root_end_tag(CString s);
+	int getDiff(E_DATE dt1, E_DATE dt2);
+	int cntLeapYears(E_DATE dt1);
+	CString remove_spaces(CString s);
+	bool isvalidxml(vector<CString>& v);
+	bool isstarttag(CString s);
+	bool isendtag(CString s);
+	CString stagname(CString s);
+	CString etagname(CString s);
+	bool ismatchingtagname(CString s, CString d);
+
 
 	// Implementation
 protected:
@@ -61,6 +97,7 @@ public:
 	CChartStandardAxis* pLeftAxis;
 	CChartLineSerie* pSeries;
 
+
 	afx_msg void OnBnClickedRadioBargraph();
 	afx_msg void OnBnClickedRadioLineGraphRepresentation();
 	CButton m_bar_graph_control;
@@ -69,6 +106,9 @@ public:
 	CString S_choose_filed_value;
 	CComboBox CChooseType;
 	CEdit CChoosetypevalue;
+	vector< vector<pair<CString, CString>>> employee_records;
+
 	afx_msg void OnOperationsExport();
 	afx_msg void OnOperationsImport();
+	afx_msg void OnBnClickedButtonImportFile();
 };

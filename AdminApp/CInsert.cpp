@@ -25,6 +25,7 @@ CInsert::CInsert(CWnd* pParent /*=nullptr*/)
 	, emp_datebirth(COleDateTime::GetCurrentTime())
 	, employee_hiredate(COleDateTime::GetCurrentTime())
 	, e_yrsofexp(_T(""))
+	, i_empid(_T(""))
 {
 
 }
@@ -60,6 +61,7 @@ void CInsert::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_SALARY, CSalary);
 	DDX_Text(pDX, IDC_EDIT_YEARSOFEXP, e_yrsofexp);
 	DDX_Control(pDX, IDC_EDIT_YEARSOFEXP, CYrsOfExp);
+	DDX_Text(pDX, IDC_EDIT_EMP_ID, i_empid);
 }
 
 
@@ -75,7 +77,7 @@ void CInsert::OnBnClickedButtonInsert()
 {
 	UpdateData(TRUE); // flow direction database <- ui
 
-
+	CString id;
 	CDatabase database;
 	CString sDsn;
 	CString SqlString;
@@ -173,7 +175,12 @@ void CInsert::OnBnClickedButtonInsert()
 
 		CString out = L" ,";
 		CString quo = L"'";
-		SqlString.Append(_T("INSERT INTO EmployeeTable(Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary,Hiredate,YearsOfExp) VALUES ("));
+		SqlString.Append(_T("INSERT INTO EmployeeTable(EmpID,Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary,Hiredate,YearsOfExp) VALUES ("));
+		SqlString.Append(quo);
+		SqlString.Append(i_empid);
+		SqlString.Append(quo);
+		SqlString.Append(out);
+
 		SqlString.Append(quo);
 		SqlString.Append(emp_title);
 		SqlString.Append(quo);

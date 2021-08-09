@@ -220,6 +220,7 @@
     <ClInclude Include="ChartCtrl\PointsOrdering.h" />
     <ClInclude Include="CInsert.h" />
     <ClInclude Include="CSearch.h" />
+    <ClInclude Include="CSelectedFiles.h" />
     <ClInclude Include="CUpdateDlg.h" />
     <ClInclude Include="external\GraphCtrl.h" />
     <ClInclude Include="external\MyStatic.h" />
@@ -259,6 +260,7 @@
     <ClCompile Include="ChartCtrl\ChartXYSerie.cpp" />
     <ClCompile Include="CInsert.cpp" />
     <ClCompile Include="CSearch.cpp" />
+    <ClCompile Include="CSelectedFiles.cpp" />
     <ClCompile Include="CUpdateDlg.cpp" />
     <ClCompile Include="external\GraphCtrl.cpp" />
     <ClCompile Include="external\MyStatic.cpp" />

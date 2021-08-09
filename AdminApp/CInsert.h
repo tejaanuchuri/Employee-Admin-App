@@ -56,4 +56,5 @@ public:
 	int countLeapYears(DT d);
 	int getDifference(DT dt1, DT dt2);
 
+	CString i_empid;
 };

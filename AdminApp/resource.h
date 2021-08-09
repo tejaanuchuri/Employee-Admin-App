@@ -17,6 +17,10 @@
 #define IDC_COMBO_CHHOSEFIELDOPTIONS    120
 #define IDC_STATIC_ENTERVALUE           121
 #define IDC_EDIT_CHOOSEVALUE            122
+#define IDC_EDIT_EMP_ID                 123
+#define IDC_LIST_SELECT_FILES           124
+#define IDC_BUTTON1                     125
+#define IDC_BUTTON_IMPORT_FILE          125
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_INSERTDLG            130
 #define IDD_DIALOG_SEARCH               134
@@ -25,6 +29,7 @@
 #define IDR_MENU1                       141
 #define IDD_DIALOG1                     142
 #define IDD_DIALOG_ABOUT_ADMINAPP       143
+#define IDD_DIALOG_SELECT_FILES         146
 #define IDC_LIST_EMP                    1000
 #define IDC_BUTTON_UPDATE               1019
 #define IDC_STATIC_SEARCH_CHOOSE_FIELD  1021
@@ -99,9 +104,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         123
+#define _APS_NEXT_CONTROL_VALUE         126
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

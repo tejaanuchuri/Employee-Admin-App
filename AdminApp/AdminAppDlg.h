@@ -25,10 +25,10 @@ const int mdays[12]
 #include <stack>
 using namespace std;
 
-#define sls _T("<")
-#define srs _T(">")
-#define srsn _T(">\n")
-#define els _T("</")
+#define open_tag_symbol _T("<")
+#define close_tag_symbol _T(">")
+#define close_tag_symbol_with_nextline _T(">\n")
+#define open_end_tag_symbol _T("</")
 // CAdminAppDlg dialog
 class CAdminAppDlg : public CDialogEx
 {
@@ -45,16 +45,15 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 public:
+
 	void m_ResetListControl();
 	void ResetListControl();
 	void s_ResetListControl();
-	void emp_data_load();
-	void bargraph_loaded();
-	void bargraph_update();
-	void bargraph_empty();
-	void linegraph_loaded();
-	void linegraph_update();
-	void linegraph_empty();
+	void display_all_employee_records_in_the_listview_representation();
+	void display_all_employee_records_in_the_bargraph_representation();
+	void delete_all_employee_records_in_the_bargraph();
+	void display_all_employee_records_in_the_linegraph();
+	void delete_all_employee_records_in_the_linegraph();
 	CString Add_elem(CString s, CString v);
 	CString Start_Tag(CString s);
 	CString End_Tag(CString s);
@@ -69,7 +68,7 @@ public:
 	CString stagname(CString s);
 	CString etagname(CString s);
 	bool ismatchingtagname(CString s, CString d);
-
+	vector<CString> split_entire_file_string_to_vector_of_small_elements(CString s);
 
 	// Implementation
 protected:

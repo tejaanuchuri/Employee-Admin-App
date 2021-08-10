@@ -175,9 +175,20 @@ void CInsert::OnBnClickedButtonInsert()
 
 		CString out = L" ,";
 		CString quo = L"'";
-		SqlString.Append(_T("INSERT INTO EmployeeTable(EmpID,Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary,Hiredate,YearsOfExp) VALUES ("));
+		SqlString.Append(_T("INSERT INTO EmployeeTable(EmpID,Hiredate,YearsOfExp,Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary) VALUES ("));
 		SqlString.Append(quo);
 		SqlString.Append(i_empid);
+		SqlString.Append(quo);
+		SqlString.Append(out);
+
+		COleDateTime DT(employee_hiredate);
+		SqlString.Append(quo);
+		SqlString.Append(DT.Format(_T("%d-%m-%Y")));
+		SqlString.Append(quo);
+		SqlString.Append(out);
+
+		SqlString.Append(quo);
+		SqlString.Append(yrsofexps);
 		SqlString.Append(quo);
 		SqlString.Append(out);
 
@@ -216,11 +227,6 @@ void CInsert::OnBnClickedButtonInsert()
 		SqlString.Append(quo);
 		SqlString.Append(out);
 
-		COleDateTime dt(emp_datebirth);
-		SqlString.Append(quo);
-		SqlString.Append(dt.Format(_T("%Y-%m-%d")));
-		SqlString.Append(quo);
-		SqlString.Append(out);
 
 		SqlString.Append(quo);
 		SqlString.Append(emp_address);
@@ -237,15 +243,11 @@ void CInsert::OnBnClickedButtonInsert()
 		SqlString.Append(quo);
 		SqlString.Append(out);
 
-		COleDateTime DT(employee_hiredate);
+		COleDateTime dt(emp_datebirth);
 		SqlString.Append(quo);
-		SqlString.Append(DT.Format(_T("%Y-%m-%d")));
+		SqlString.Append(dt.Format(_T("%d-%m-%Y")));
 		SqlString.Append(quo);
-		SqlString.Append(out);
 
-		SqlString.Append(quo);
-		SqlString.Append(yrsofexps);
-		SqlString.Append(quo);
 
 		SqlString.Append(_T(" )"));
 

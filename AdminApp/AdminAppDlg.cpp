@@ -1220,10 +1220,11 @@ void CAdminAppDlg::OnOperationsExport()
 				file.WriteString(Add_elem(_T("Gender"), emp_gender));
 				file.WriteString(Add_elem(_T("PhoneNumber"), emp_phonenumber));
 				file.WriteString(Add_elem(_T("Email"), emp_email));
+				file.WriteString(Add_elem(_T("DateofBirth"), emp_date_birth));
 				file.WriteString(Add_elem(_T("Address"), emp_address));
 				file.WriteString(Add_elem(_T("JobTitle"), emp_jobtitle));
 				file.WriteString(Add_elem(_T("Salary"), emp_salary));
-				file.WriteString(Add_elem(_T("DateofBirth"), emp_date_birth));
+
 				file.WriteString(root_end_tag(L"Employee"));
 
 			}

@@ -171,7 +171,7 @@ void CInsert::OnBnClickedButtonInsert()
 		TRY{
 			// Open the database
 			database.Open(NULL,false,false,sDsn);
-		//MessageBoxW(L"Are You Sure ?", L"Insert a Record",MB_YESNO);
+
 
 		CString out = L" ,";
 		CString quo = L"'";
@@ -257,7 +257,6 @@ void CInsert::OnBnClickedButtonInsert()
 		// Close the database
 		database.Close();
 		}CATCH(CDBException, e) {
-			// If a database exception occured, show error msg
 			AfxMessageBox(L"Database error: " + e->m_strError);
 		}
 		END_CATCH;
@@ -294,24 +293,17 @@ BOOL CInsert::OnInitDialog()
 	CSalary.SetWindowText(_T(""));
 	CGender.SetWindowText(_T(""));
 	CYrsOfExp.SetWindowText(_T(""));
-	return TRUE;  // return TRUE unless you set the focus to a control
-				  // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE;
 }
 
 int CInsert::countLeapYears(DT d)
 {
 	int years = d.y;
 
-	// Check if the current year needs to be
-	//  considered for the count of leap years
-	// or not
+
 	if (d.m <= 2)
 		years--;
 
-	// An year is a leap year if it
-	// is a multiple of 4,
-	// multiple of 400 and not a
-	 // multiple of 100.
 	return years / 4
 		- years / 100
 		+ years / 400;
@@ -322,23 +314,18 @@ int CInsert::getDifference(DT dt1, DT dt2)
 {
 	long int n1 = dt1.y * 365 + dt1.d;
 
-	// Add days for months in given date
+
 	for (int i = 0; i < dt1.m - 1; i++)
 		n1 += monthdays[i];
 
-	// Since every leap year is of 366 days,
-	// Add a day for every leap year
 	n1 += countLeapYears(dt1);
 
-	// SIMILARLY, COUNT TOTAL NUMBER OF
-	// DAYS BEFORE 'dt2'
 
 	long int n2 = dt2.y * 365 + dt2.d;
 	for (int i = 0; i < dt2.m - 1; i++)
 		n2 += monthdays[i];
 	n2 += countLeapYears(dt2);
 
-	// return difference between two counts
 	return (n2 - n1);
 	return 0;
 }

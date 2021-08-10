@@ -1,34 +1,18 @@
 <AdminApp>
 <Employee>
-<id>13</id>
-<HireDate>09-05-2005</HireDate>
-<YearsofExperience>16</YearsofExperience>
-<Title>MRS</Title>
-<Age>55</Age>
-<FirstName>venkata ramana</FirstName>
-<LastName>anuchuri</LastName>
-<Gender>Male</Gender>
-<PhoneNumber>2345617890</PhoneNumber>
-<Email>ramana@gmail.com</Email>
-<DateofBirth>09-05-1966</DateofBirth>
-<Address>mulikipalli</Address>
-<JobTitle>Finace</JobTitle>
-<Salary>1300000</Salary>
-</Employee>
-<Employee>
-<id>14</id>
-<HireDate>12-06-2019</HireDate>
-<YearsofExperience>2</YearsofExperience>
+<id>6</id>
+<HireDate>24-02-2010</HireDate>
+<YearsofExperience>11</YearsofExperience>
 <Title>MISS</Title>
-<Age>22</Age>
-<FirstName>renuka</FirstName>
-<LastName>gubbala</LastName>
+<Age>17</Age>
+<FirstName>gayathri</FirstName>
+<LastName>anuchuri</LastName>
 <Gender>Female</Gender>
-<PhoneNumber>1234567890</PhoneNumber>
-<Email>renuka@gmail.com</Email>
-<DateofBirth>25-12-1998</DateofBirth>
-<Address>medicherlapalam</Address>
-<JobTitle>Hr</JobTitle>
-<Salary>360000</Salary>
+<PhoneNumber>9493969236</PhoneNumber>
+<Email>gayathri</Email>
+<DateofBirth>23-01-2004</DateofBirth>
+<Address>Andhra Pradesh</Address>
+<JobTitle>Software Engineer</JobTitle>
+<Salary>340000</Salary>
 </Employee>
 </AdminApp>

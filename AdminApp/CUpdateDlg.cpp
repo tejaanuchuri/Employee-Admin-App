@@ -215,7 +215,7 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 	SqlString.Append(L"BirthDate = ");
 	COleDateTime dt(u_dateofbirthdate);
 	SqlString.Append(quo);
-	SqlString.Append(dt.Format(_T("%Y-%m-%d")));
+	SqlString.Append(dt.Format(_T("%d-%m-%Y")));
 	SqlString.Append(quo);
 	SqlString.Append(out);
 
@@ -241,7 +241,7 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 	SqlString.Append(L"Hiredate = ");
 	COleDateTime DT(u_hiredate);
 	SqlString.Append(quo);
-	SqlString.Append(DT.Format(_T("%Y-%m-%d")));
+	SqlString.Append(DT.Format(_T("%d-%m-%Y")));
 	SqlString.Append(quo);
 	SqlString.Append(out);
 
@@ -252,12 +252,10 @@ void CUpdateDlg::OnBnClickedButtonUpdateButton()
 
 	SqlString.Append(_T(" WHERE EmpID = " + u_id));
 
-	//MessageBox(SqlString);
 	database.ExecuteSQL(SqlString);
-	// Close the database
+
 	database.Close();
 		}CATCH(CDBException, e) {
-			// If a database exception occured, show error msg
 			AfxMessageBox(L"Database error: " + e->m_strError);
 		}
 		END_CATCH;
@@ -269,16 +267,8 @@ int CUpdateDlg::countLeapYears(Date d)
 {
 	int years = d.y;
 
-	// Check if the current year needs to be
-	//  considered for the count of leap years
-	// or not
 	if (d.m <= 2)
 		years--;
-
-	// An year is a leap year if it
-	// is a multiple of 4,
-	// multiple of 400 and not a
-	 // multiple of 100.
 	return years / 4
 		- years / 100
 		+ years / 400;
@@ -289,23 +279,16 @@ int CUpdateDlg::getDifference(Date dt1, Date dt2)
 {
 	long int n1 = dt1.y * 365 + dt1.d;
 
-	// Add days for months in given date
 	for (int i = 0; i < dt1.m - 1; i++)
 		n1 += monthDays[i];
 
-	// Since every leap year is of 366 days,
-	// Add a day for every leap year
 	n1 += countLeapYears(dt1);
 
-	// SIMILARLY, COUNT TOTAL NUMBER OF
-	// DAYS BEFORE 'dt2'
 
 	long int n2 = dt2.y * 365 + dt2.d;
 	for (int i = 0; i < dt2.m - 1; i++)
 		n2 += monthDays[i];
 	n2 += countLeapYears(dt2);
-
-	// return difference between two counts
 	return (n2 - n1);
 	return 0;
 }

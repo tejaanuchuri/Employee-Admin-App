@@ -54,6 +54,7 @@ public:
 	void delete_all_employee_records_in_the_bargraph();
 	void display_all_employee_records_in_the_linegraph();
 	void delete_all_employee_records_in_the_linegraph();
+	void displayallrecords();
 	CString Add_elem(CString s, CString v);
 	CString Start_Tag(CString s);
 	CString End_Tag(CString s);
@@ -106,6 +107,7 @@ public:
 	CComboBox CChooseType;
 	CEdit CChoosetypevalue;
 	vector< vector<pair<CString, CString>>> employee_records;
+	vector<vector<CString>> employeerecords;
 
 	afx_msg void OnOperationsExport();
 	afx_msg void OnOperationsImport();

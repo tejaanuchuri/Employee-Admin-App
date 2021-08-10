@@ -35,6 +35,7 @@
 #include "ChartCtrl\ChartDragLineCursor.h"
 #include "xml_library/Markup.h"
 #include "CSelectedFiles.h"
+#include <set>
 
 // CAdminAppDlg dialog;
 
@@ -200,8 +201,22 @@ void CAdminAppDlg::display_all_employee_records_in_the_listview_representation()
 		emp_list.SetItemText(row, 11, e_address);
 		emp_list.SetItemText(row, 12, e_jobtitle);
 		emp_list.SetItemText(row, 13, e_salary);
-
-
+		vector<CString> temp;
+		temp.push_back(e_id);
+		temp.push_back(e_hiredate);
+		temp.push_back(e_yrsofexp);
+		temp.push_back(e_title);
+		temp.push_back(e_age);
+		temp.push_back(e_firstname);
+		temp.push_back(e_lastname);
+		temp.push_back(e_gender);
+		temp.push_back(e_phonenumber);
+		temp.push_back(e_email);
+		temp.push_back(e_birthdate);
+		temp.push_back(e_address);
+		temp.push_back(e_salary);
+		employeerecords.push_back(temp);
+		temp.clear();
 		// goto next record
 		recset.MoveNext();
 	}
@@ -420,6 +435,29 @@ void CAdminAppDlg::delete_all_employee_records_in_the_linegraph()
 {
 	m_ChartCtrl.RemoveAllSeries();
 	m_ChartCtrl.EnableRefresh(true);
+}
+
+void CAdminAppDlg::displayallrecords()
+{
+	m_ResetListControl();
+	UpdateData(TRUE);
+	ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
+	int iRec = 0;
+	for (unsigned int i = 0; i < employeerecords.size(); i++) {
+		vector<CString> record = employeerecords[i];
+		int z = 0;
+		for (unsigned int j = 0; j < record.size(); j++) {
+			if (j == 0) {
+				iRec = emp_list.InsertItem(z, record[j], 0);
+			}
+			else {
+				emp_list.SetItemText(z, j, record[j]);
+			}
+		}
+	}
+	emp_list.UpdateWindow();
+	UpdateWindow();
+	UpdateData(FALSE);
 }
 
 CString CAdminAppDlg::Add_elem(CString s, CString v)
@@ -742,7 +780,57 @@ void CAdminAppDlg::OnBnClickedButtonSearch()
 	//if (dlg.DoModal() == IDD_DIALOG_INSERT) {
 	CString ChooseField = S_choose_filed;
 	CString EnterValue = S_choose_filed_value;
+	map<CString, int> m;
+	m[L"EmpID"] = 0;
+	m[L"Title"] = 3;
+	m[L"Age"] = 4;
+	m[L"FirstName"] = 5;
+	m[L"LastName"] = 6;
+	m[L"Gender"] = 7;
+	m[L"MobilePhone"] = 8;
+	m[L"EMail"] = 9;
+	m[L"BirthDate"] = 10;
+	m[L"Address"] = 11;
+	m[L"JobTitle"] = 12;
+	m[L"Salary"] = 13;
+	if (EnterValue.IsEmpty()) {
+		UpdateData(FALSE);
+		displayallrecords();
+		CChooseType.SetWindowText(_T(""));
+		CChoosetypevalue.SetWindowText(_T(""));
+	}
+	else {
+		UpdateData(FALSE);
+		vector<int> record_index;
+		for (int i = 0; i < emp_list.GetItemCount(); i++) {
+			CString temp = emp_list.GetItemText(i, m[ChooseField]);
+			if (temp.Find(S_choose_filed_value)) {
+				record_index.push_back(i);
+			}
+		}
+		if (record_index.size() > 0) {
+			m_ResetListControl();
+			UpdateData(FALSE);
+			ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
+			int iRec = 0;
+			for (unsigned int i = 0; i < employeerecords.size(); i++) {
+				vector<CString> record = employeerecords[i];
+				int z = 0;
+				for (unsigned int j = 0; j < record.size(); j++) {
+					if (j == 0) {
+						iRec = emp_list.InsertItem(z, record[j], 0);
+					}
+					else {
+						emp_list.SetItemText(z, j, record[j]);
+					}
+				}
+			}
+			emp_list.UpdateWindow();
 
+		}
+	}
+
+	/*
 	CString e_id;
 	CString e_age;
 	CString e_title;
@@ -845,7 +933,8 @@ void CAdminAppDlg::OnBnClickedButtonSearch()
 		AfxMessageBox(L"Database error: " + e->m_strError);
 	}
 	END_CATCH;
-	UpdateWindow();
+	*/UpdateWindow();
+
 }
 
 void CAdminAppDlg::ResetListControl() {
@@ -887,7 +976,7 @@ void CAdminAppDlg::OnBnClickedButtonDelete()
 		CString id = emp_list.GetItemText(row, 0);
 		emp_list.DeleteItem(row);
 		UpdateWindow();
-		m_Graph.DeleteBar(m_Graph.GetNumberOfBars() - row - 1);
+		m_Graph.DeleteBar(row);
 		m_Graph.DrawGraph();
 
 		CDatabase database;
@@ -1139,10 +1228,10 @@ void CAdminAppDlg::OnOperationsExport()
 				file.WriteString(Add_elem(_T("Gender"), emp_gender));
 				file.WriteString(Add_elem(_T("PhoneNumber"), emp_phonenumber));
 				file.WriteString(Add_elem(_T("Email"), emp_email));
+				file.WriteString(Add_elem(_T("DateofBirth"), emp_date_birth));
 				file.WriteString(Add_elem(_T("Address"), emp_address));
 				file.WriteString(Add_elem(_T("JobTitle"), emp_jobtitle));
 				file.WriteString(Add_elem(_T("Salary"), emp_salary));
-				file.WriteString(Add_elem(_T("DateofBirth"), emp_date_birth));
 				file.WriteString(root_end_tag(L"Employee"));
 
 			}

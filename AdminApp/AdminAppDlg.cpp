@@ -214,6 +214,7 @@ void CAdminAppDlg::display_all_employee_records_in_the_listview_representation()
 		temp.push_back(e_email);
 		temp.push_back(e_birthdate);
 		temp.push_back(e_address);
+		temp.push_back(e_jobtitle);
 		temp.push_back(e_salary);
 		employeerecords.push_back(temp);
 		temp.clear();
@@ -439,14 +440,15 @@ void CAdminAppDlg::delete_all_employee_records_in_the_linegraph()
 
 void CAdminAppDlg::displayallrecords()
 {
-	m_ResetListControl();
-	UpdateData(TRUE);
+	UpdateData(FALSE);
 	ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
+	removeallrecords();
 	int iRec = 0;
 	for (unsigned int i = 0; i < employeerecords.size(); i++) {
 		vector<CString> record = employeerecords[i];
-		int z = 0;
+		int z = emp_list.GetItemCount();
 		for (unsigned int j = 0; j < record.size(); j++) {
+			//MessageBox(record[j]);
 			if (j == 0) {
 				iRec = emp_list.InsertItem(z, record[j], 0);
 			}
@@ -458,6 +460,13 @@ void CAdminAppDlg::displayallrecords()
 	emp_list.UpdateWindow();
 	UpdateWindow();
 	UpdateData(FALSE);
+}
+
+void CAdminAppDlg::removeallrecords()
+{
+	while (emp_list.GetItemCount() != 0) {
+		emp_list.DeleteItem(0);
+	}
 }
 
 CString CAdminAppDlg::Add_elem(CString s, CString v)
@@ -564,33 +573,6 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 		yrsofexps.Format(_T("%d"), ((getDiff(dt1, dt2) - remove_leap_year) / 365));
 
 
-		/*CDatabase database;
-		CString sDsn;
-		CString SqlString;
-		int iRec = 0;
-		// Build ODBC connection string
-
-		sDsn.Format(_T("Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\\Users\\admin.teja\\Documents\\EmployeeDatabase.accdb;Uid=Admin;Pwd=;"));
-		TRY{
-			// Open the database
-			CRecordset recset(&database);
-			database.Open(NULL,false,false,sDsn);
-			SqlString = L"SELECT TOP 1 EmpID FROM EmployeeTable ORDER BY EmpID DESC";
-			//AfxMessageBox(SqlString);
-
-			recset.Open(CRecordset::forwardOnly, SqlString, CRecordset::readOnly);
-
-			while (!recset.IsEOF()) {
-				// Copy each column into a variable
-				recset.GetFieldValue(L"EmpID", e_id);
-				recset.MoveNext();
-			}
-			database.Close();
-		}CATCH(CDBException, e) {
-			// If a database exception occured, show error msg
-			AfxMessageBox(L"Database error: " + e->m_strError);
-		}
-		END_CATCH;*/
 		ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
 		int row = emp_list.GetItemCount();
 
@@ -637,10 +619,6 @@ void CAdminAppDlg::OnBnClickedButtonInsert()
 		unsigned int l = j;
 		pSeries->SetPoints(XVal, YVal, l);
 		m_ChartCtrl.EnableRefresh(true);
-
-
-		/*delete_all_employee_records_in_the_linegraph();
-		display_all_employee_records_in_the_linegraph();*/
 		UpdateWindow();
 	}
 }
@@ -651,15 +629,10 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 	UpdateData(TRUE); // flow direction database <- ui
 
 	row = emp_list.GetSelectionMark();
-	//MessageBox((LPCTSTR)row);
-	//AfxMessageBox(row);
 	if (row < 0) {
 		AfxMessageBox(L"No row Selected");
 	}
 	else {
-
-
-
 		CString id = emp_list.GetItemText(row, 0);
 		CString emp_title = emp_list.GetItemText(row, 3);
 		CString emp_age = emp_list.GetItemText(row, 4);
@@ -776,58 +749,89 @@ void CAdminAppDlg::OnBnClickedButtonUpdate()
 
 void CAdminAppDlg::OnBnClickedButtonSearch()
 {
-	UpdateData(TRUE); // flow direction database <- ui
-	//if (dlg.DoModal() == IDD_DIALOG_INSERT) {
+	UpdateData(TRUE);
+
 	CString ChooseField = S_choose_filed;
 	CString EnterValue = S_choose_filed_value;
 	map<CString, int> m;
-	m[L"EmpID"] = 0;
-	m[L"Title"] = 3;
-	m[L"Age"] = 4;
-	m[L"FirstName"] = 5;
-	m[L"LastName"] = 6;
-	m[L"Gender"] = 7;
-	m[L"MobilePhone"] = 8;
-	m[L"EMail"] = 9;
-	m[L"BirthDate"] = 10;
-	m[L"Address"] = 11;
-	m[L"JobTitle"] = 12;
-	m[L"Salary"] = 13;
+	m.insert(make_pair(L"EmpID", 0));
+	m.insert(make_pair(L"Hiredate", 1));
+	m.insert(make_pair(L"YearsOfExp", 2));
+	m.insert(make_pair(L"Title", 3));
+	m.insert(make_pair(L"Age", 4));
+	m.insert(make_pair(L"FirstName", 5));
+	m.insert(make_pair(L"LastName", 6));
+	m.insert(make_pair(L"Gender", 7));
+	m.insert(make_pair(L"MobilePhone", 8));
+	m.insert(make_pair(L"EMail", 9));
+	m.insert(make_pair(L"BirthDate", 10));
+	m.insert(make_pair(L"Address", 11));
+	m.insert(make_pair(L"JobTitle", 12));
+	m.insert(make_pair(L"Salary", 13));
+	//m[L"EmpID"] = 0;
+	//m[L"Hiredate"] = 1;
+	//m[L"YearsOfExp"] = 2;
+	//m[L"Title"] = 3;
+	//m[L"Age"] = 4;
+	//m[L"FirstName"] = 5;
+	//m[L"LastName"] = 6;
+	//m[L"Gender"] = 7;
+	//m[L"MobilePhone"] = 8;
+	//m[L"EMail"] = 9;
+	//m[L"BirthDate"] = 10;
+	//m[L"Address"] = 11;
+	//m[L"JobTitle"] = 12;
+	//m[L"Salary"] = 13;
+	displayallrecords();
 	if (EnterValue.IsEmpty()) {
-		UpdateData(FALSE);
-		displayallrecords();
 		CChooseType.SetWindowText(_T(""));
 		CChoosetypevalue.SetWindowText(_T(""));
 	}
 	else {
 		UpdateData(FALSE);
 		vector<int> record_index;
-		for (int i = 0; i < emp_list.GetItemCount(); i++) {
+		record_index.clear();
+		int cnt = employeerecords.size();
+		CString q;
+		q.Format(_T("%d"), cnt);
+		//MessageBox(q);
+		for (int i = 0; i < cnt; i++) {
 			CString temp = emp_list.GetItemText(i, m[ChooseField]);
-			if (temp.Find(S_choose_filed_value)) {
-				record_index.push_back(i);
-			}
-		}
-		if (record_index.size() > 0) {
-			m_ResetListControl();
-			UpdateData(FALSE);
-			ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
-			int iRec = 0;
-			for (unsigned int i = 0; i < employeerecords.size(); i++) {
-				vector<CString> record = employeerecords[i];
-				int z = 0;
-				for (unsigned int j = 0; j < record.size(); j++) {
-					if (j == 0) {
-						iRec = emp_list.InsertItem(z, record[j], 0);
-					}
-					else {
-						emp_list.SetItemText(z, j, record[j]);
-					}
+			if (m[ChooseField] == 0 || m[ChooseField] == 1 || m[ChooseField] == 2 || m[ChooseField] == 4 || m[ChooseField] == 10 || m[ChooseField] == 13 || m[ChooseField] == 8) {
+				//MessageBox(temp);
+				//MessageBox(S_choose_filed_value);
+				if (compare_twostrings(temp, S_choose_filed_value)) {
+					record_index.push_back(i);
+					//MessageBox(L"In");
 				}
 			}
-			emp_list.UpdateWindow();
-
+			else {
+				if (temp.Find(S_choose_filed_value) != -1) {
+					//MessageBox(temp);
+					record_index.push_back(i);
+				}
+			}
 		}
+		removeallrecords();
+		//m_ResetListControl();
+		UpdateData(FALSE);
+		ListView_SetExtendedListViewStyle(emp_list, LVS_EX_FULLROWSELECT);
+		int iRec = 0;
+		for (unsigned int i = 0; i < record_index.size(); i++) {
+			vector<CString> record = employeerecords[record_index[i]];
+			int z = emp_list.GetItemCount();
+			for (unsigned int j = 0; j < record.size(); j++) {
+				//MessageBox(record[j]);
+				if (j == 0) {
+					iRec = emp_list.InsertItem(z, record[j], 0);
+				}
+				else {
+					emp_list.SetItemText(z, j, record[j]);
+				}
+			}
+		}
+		emp_list.UpdateWindow();
+		UpdateWindow();
 	}
 
 	/*
@@ -1185,7 +1189,7 @@ void CAdminAppDlg::OnOperationsExport()
 		AfxMessageBox(L"No row Selected");
 	}
 	else {
-
+		vector<int> selected_rows;
 		POSITION pos = emp_list.GetFirstSelectedItemPosition();
 
 		CStdioFile file;
@@ -1196,6 +1200,7 @@ void CAdminAppDlg::OnOperationsExport()
 			while (pos)
 			{
 				int row = emp_list.GetNextSelectedItem(pos);
+				selected_rows.push_back(row);
 				CString id = emp_list.GetItemText(row, 0);
 				int e_id = _wtoi(id);
 				CString emp_title = emp_list.GetItemText(row, 3);
@@ -1386,8 +1391,7 @@ void CAdminAppDlg::OnOperationsImport()
 					}
 
 					emp_list.UpdateWindow();
-					//delete_all_employee_records_in_the_linegraph();
-					//display_all_employee_records_in_the_linegraph();
+
 					UpdateWindow();
 
 					CDatabase database;
@@ -1402,19 +1406,22 @@ void CAdminAppDlg::OnOperationsImport()
 
 					for (unsigned int i = 0; i < dlg.emp_index.size(); i++) {
 						vector<pair<CString, CString>> record = employee_records[dlg.emp_index[i]];
-
+						vector<CString> emp_record;
+						emp_record.clear();
 						SqlString.Empty();
 						//SqlString.Append(_T("/) VALUES ("));
 						SqlString.Append(_T("INSERT INTO EmployeeTable(EmpID,Hiredate,YearsOfExp,Title,Age,FirstName,LastName,Gender,MobilePhone,EMail,BirthDate,Address,JobTitle,Salary) VALUES ("));
 						for (unsigned int j = 0; j < record.size(); j++) {
 							SqlString.Append(quo);
+							emp_record.push_back(record[j].second);
 							SqlString.Append(record[j].second);
 							SqlString.Append(quo);
 							if (j != record.size() - 1)
 							SqlString.Append(out);
 
 						}SqlString.Append(_T(" )"));
-
+						employeerecords.push_back(emp_record);
+						emp_record.clear();
 						database.ExecuteSQL(SqlString);
 					}
 					database.Close();
@@ -1566,6 +1573,17 @@ vector<CString> CAdminAppDlg::split_entire_file_string_to_vector_of_small_elemen
 	hold.Empty();
 
 	return v;
+}
+bool CAdminAppDlg::compare_twostrings(CString p, CString q)
+{
+	if (p.GetLength() != q.GetLength())
+		return false;
+	for (int i = 0; i < p.GetLength(); i++) {
+		if (p[i] != q[i]) {
+			return false;
+		}
+	}
+	return true;
 }
 int CAdminAppDlg::getDiff(E_DATE dt1, E_DATE dt2) {
 	long int n1 = dt1.y * 365 + dt1.d;

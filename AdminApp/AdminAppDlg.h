@@ -55,6 +55,7 @@ public:
 	void display_all_employee_records_in_the_linegraph();
 	void delete_all_employee_records_in_the_linegraph();
 	void displayallrecords();
+	void removeallrecords();
 	CString Add_elem(CString s, CString v);
 	CString Start_Tag(CString s);
 	CString End_Tag(CString s);
@@ -70,7 +71,7 @@ public:
 	CString etagname(CString s);
 	bool ismatchingtagname(CString s, CString d);
 	vector<CString> split_entire_file_string_to_vector_of_small_elements(CString s);
-
+	bool compare_twostrings(CString p, CString q);
 	// Implementation
 protected:
 	HICON m_hIcon;

@@ -24,7 +24,7 @@ const int mdays[12]
 #include <string>
 #include <stack>
 using namespace std;
-
+#include "Employee.h"
 #define open_tag_symbol _T("<")
 #define close_tag_symbol _T(">")
 #define close_tag_symbol_with_nextline _T(">\n")
@@ -56,6 +56,7 @@ public:
 	void delete_all_employee_records_in_the_linegraph();
 	void displayallrecords();
 	void removeallrecords();
+
 	CString Add_elem(CString s, CString v);
 	CString Start_Tag(CString s);
 	CString End_Tag(CString s);
@@ -63,15 +64,16 @@ public:
 	CString root_end_tag(CString s);
 	int getDiff(E_DATE dt1, E_DATE dt2);
 	int cntLeapYears(E_DATE dt1);
-	CString remove_spaces(CString s);
+	/*CString remove_spaces(CString s);
 	bool isvalidxml(vector<CString>& v);
 	bool isstarttag(CString s);
 	bool isendtag(CString s);
 	CString stagname(CString s);
 	CString etagname(CString s);
 	bool ismatchingtagname(CString s, CString d);
-	vector<CString> split_entire_file_string_to_vector_of_small_elements(CString s);
+	vector<CString> split_entire_file_string_to_vector_of_small_elements(CString s);*/
 	bool compare_twostrings(CString p, CString q);
+	Employee GetRecord(int Row);
 	// Implementation
 protected:
 	HICON m_hIcon;
@@ -107,8 +109,8 @@ public:
 	CString S_choose_filed_value;
 	CComboBox CChooseType;
 	CEdit CChoosetypevalue;
-	vector< vector<pair<CString, CString>>> employee_records;
-	vector<vector<CString>> employeerecords;
+	//vector< vector<pair<CString, CString>>> employee_records;
+	vector<Employee> EmployeeRecords;
 
 	afx_msg void OnOperationsExport();
 	afx_msg void OnOperationsImport();

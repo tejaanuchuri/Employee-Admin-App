@@ -11,6 +11,7 @@
 #include <string>
 #include <stack>
 using namespace std;
+#include "Employee.h"
 class CSelectedFiles : public CDialogEx
 {
 	DECLARE_DYNAMIC(CSelectedFiles)
@@ -32,9 +33,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CListCtrl m_select_list;
-	vector<vector<pair<CString, CString>>> emps;
+	vector<Employee> EmployeeRecords;
 	vector<CString> v;
 	vector<vector<CString>> u;
-	vector<int> emp_index;
+	vector<int> SelectedEmployeesIndex;
 	afx_msg void OnBnClickedButtonImportFile();
 };

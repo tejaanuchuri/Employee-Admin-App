@@ -39,26 +39,18 @@ BOOL CSelectedFiles::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	UpdateData(FALSE); // flow direction database -> ui
 
-	int iRec = 0;
+	int iRec = 0, j = 0;
 	//m_ResetListControl();
 	ListView_SetExtendedListViewStyle(m_select_list, LVS_EX_FULLROWSELECT);
-	for (int i = 0, j = 0; i < emps[0].size(); i++) {
-		if (i == 5 || i == 6) {
-			m_select_list.InsertColumn(j++, emps[0][i].first, LVCFMT_CENTER, 260);
-		}
-	}
-	for (unsigned int i = 0; i < emps.size(); i++) {
-		vector<pair<CString, CString>> record = emps[i];
 
-		for (unsigned int j = 0; j < record.size(); j++) {
-			if (j == 5) {
-				iRec = m_select_list.InsertItem(0, record[j].second, 0);
-			}
-			else if (j == 6) {
-				m_select_list.SetItemText(0, 1, record[j].second);
-			}
-		}
-		record.clear();
+	m_select_list.InsertColumn(j++, L"FirstName", LVCFMT_CENTER, 260);
+	m_select_list.InsertColumn(j++, L"LastName", LVCFMT_CENTER, 260);
+
+	for (unsigned int i = 0; i < EmployeeRecords.size(); i++) {
+		Employee Record = EmployeeRecords[i];
+
+		iRec = m_select_list.InsertItem(0, Record.FirstName, 0);
+		m_select_list.SetItemText(0, 1, Record.LastName);
 	}
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -77,7 +69,7 @@ void CSelectedFiles::OnBnClickedButtonImportFile()
 			while (pos)
 			{
 				int Row = m_select_list.GetNextSelectedItem(pos);
-				emp_index.push_back(m_select_list.GetItemCount() - Row - 1);
+				SelectedEmployeesIndex.push_back(m_select_list.GetItemCount() - Row - 1);
 			}
 		}
 		UpdateData(FALSE);

@@ -19,7 +19,6 @@
 #define IDC_EDIT_CHOOSEVALUE            122
 #define IDC_EDIT_EMP_ID                 123
 #define IDC_LIST_SELECT_FILES           124
-#define IDC_BUTTON1                     125
 #define IDC_BUTTON_IMPORT_FILE          125
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_INSERTDLG            130

@@ -222,13 +222,14 @@
     <ClInclude Include="CSearch.h" />
     <ClInclude Include="CSelectedFiles.h" />
     <ClInclude Include="CUpdateDlg.h" />
+    <ClInclude Include="CXml.h" />
+    <ClInclude Include="Employee.h" />
     <ClInclude Include="external\GraphCtrl.h" />
     <ClInclude Include="external\MyStatic.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="xml_library\Markup.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdminApp.cpp" />
@@ -262,6 +263,8 @@
     <ClCompile Include="CSearch.cpp" />
     <ClCompile Include="CSelectedFiles.cpp" />
     <ClCompile Include="CUpdateDlg.cpp" />
+    <ClCompile Include="CXml.cpp" />
+    <ClCompile Include="Employee.cpp" />
     <ClCompile Include="external\GraphCtrl.cpp" />
     <ClCompile Include="external\MyStatic.cpp" />
     <ClCompile Include="pch.cpp">
@@ -270,7 +273,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="xml_library\Markup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AdminApp.rc" />

@@ -147,10 +147,13 @@
     <ClInclude Include="ChartCtrl\PointsOrdering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="xml_library\Markup.h">
+    <ClInclude Include="CSelectedFiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CSelectedFiles.h">
+    <ClInclude Include="CXml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Employee.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -254,10 +257,13 @@
     <ClCompile Include="ChartCtrl\ChartXYSerie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xml_library\Markup.cpp">
+    <ClCompile Include="CSelectedFiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CSelectedFiles.cpp">
+    <ClCompile Include="CXml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Employee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

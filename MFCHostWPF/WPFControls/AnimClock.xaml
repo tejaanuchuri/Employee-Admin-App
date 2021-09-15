@@ -1,0 +1,10 @@
+<Page x:Class="WPFControls.AnimClock"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Height="460"
+      Width="844"
+    >
+    <Grid Background="SkyBlue" Margin="0,0,62,54">
+        <DataGrid x:Name="datagrid" HorizontalAlignment="Left" Height="378" Margin="13,13,0,0" VerticalAlignment="Top" Width="758"/>
+    </Grid>
+</Page>
